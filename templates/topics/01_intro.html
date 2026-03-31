@@ -1,0 +1,49 @@
+{% set show_sidebar = true %}
+{% extends "base.html" %}
+
+{% block content %}
+<div class="lesson-header" style="margin-bottom: 30px;">
+    <p style="color: #6366f1; font-weight: bold; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 1px;">Module 1</p>
+    <h1 style="font-size: 36px; margin-top: 0; margin-bottom: 15px;">Introduction to Encryption & Decryption</h1>
+    <p style="font-size: 18px; color: #555; line-height: 1.6; max-width: 800px;">
+        Welcome to the foundation of cryptography. In this module, we explore the core mechanics of how data is scrambled to hide its meaning from unauthorized eyes, and how it is unscrambled back into readable format.
+    </p>
+</div>
+
+<hr style="border: 0; height: 1px; background: #e5e7eb; margin: 40px 0;">
+
+<div class="learning-objectives">
+    <h2 style="font-size: 24px; margin-bottom: 20px;">What You Will Learn</h2>
+    
+    <div style="display: grid; gap: 20px; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));">
+        
+        <div style="background: #f8f9fa; border: 1px solid #e5e7eb; border-radius: 8px; padding: 20px;">
+            <h3 style="margin-top: 0; color: #333;">1. Plaintext vs Ciphertext</h3>
+            <p style="color: #666; font-size: 15px; margin-bottom: 0;">
+                Learn the vocabulary of cryptography. Understand the difference between the original readable message and the scrambled, unreadable output.
+            </p>
+        </div>
+
+        <div style="background: #f8f9fa; border: 1px solid #e5e7eb; border-radius: 8px; padding: 20px;">
+            <h3 style="margin-top: 0; color: #333;">2. The Encryption Process</h3>
+            <p style="color: #666; font-size: 15px; margin-bottom: 0;">
+                Visualize how an algorithm and a secret key transform $m$ (message) into $c$ (ciphertext). We will look at the mathematical formula $E(k, m) = c$.
+            </p>
+        </div>
+
+        <div style="background: #f8f9fa; border: 1px solid #e5e7eb; border-radius: 8px; padding: 20px;">
+            <h3 style="margin-top: 0; color: #333;">3. The Decryption Process</h3>
+            <p style="color: #666; font-size: 15px; margin-bottom: 0;">
+                See how the receiver reverses the process. We will explore the formula $D(k, c) = m$ and why the key is the most critical piece of the puzzle.
+            </p>
+        </div>
+
+    </div>
+</div>
+
+<div style="margin-top: 50px; text-align: right;">
+    <a href="#" style="background: #10b981; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold; font-size: 16px; transition: background 0.2s;">
+        Start Lesson 1: Plaintext vs Ciphertext →
+    </a>
+</div>
+{% endblock %}

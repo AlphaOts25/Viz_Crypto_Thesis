@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ITN108 | Cryptography Visualizer</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+
+    <nav class="navbar">
+        <div class="nav-brand">
+            <a href="{{ url_for('home') }}"><strong>ITN108</strong> Visualizer</a>
+        </div>
+        <div class="nav-actions">
+            {% if current_user.is_authenticated %}
+                <span style="margin-right: 15px; color: #555; font-weight: 500;">Hi, {{ current_user.username }}!</span>
+                <a href="{{ url_for('logout') }}" class="btn-login">Logout</a> 
+            {% else %}
+                <a href="{{ url_for('login') }}" class="btn-login">Admin Login</a> 
+            {% endif %}
+        </div>
+    </nav>
+
+    <div class="page-wrapper">
+        
+        {% if show_sidebar %}
+        <aside class="sidebar">
+            <h3 class="sidebar-title">Curriculum</h3>
+
+            <button class="dropdown-btn">1. Encryption/Decryption 
+                <span class="arrow">▼</span>
+            </button>
+            <div class="dropdown-container">
+                <a href="{{ url_for('module1_intro') }}" style="font-weight: bold; color: #6366f1;">Introduction</a>
+                <a href="#">Plaintext vs Ciphertext</a>
+                <a href="#">Encryption Process</a>
+                <a href="#">Decryption Process</a>
+            </div>
+
+            <button class="dropdown-btn">2. Symmetric Encryption 
+                <span class="arrow">▼</span>
+            </button>
+            <div class="dropdown-container">
+                <a href="{{ url_for('module2_intro') }}" style="font-weight: bold; color: #6366f1;">Introduction</a>
+                <a href="#">Shared Key Concept</a>
+                <a href="#">AES Standard</a>
+                <a href="#">Key Distribution Problem</a>
+            </div>
+
+            <button class="dropdown-btn">3. Key Exchange Problem 
+                <span class="arrow">▼</span>
+            </button>
+            <div class="dropdown-container">
+                <a href="{{ url_for('module3_intro') }}" style="font-weight: bold; color: #6366f1;">Introduction</a>
+                <a href="#">Secure Distribution Issue</a>
+                <a href="#">Man-in-the-Middle (Eve)</a>
+                <a href="#">Diffie-Hellman Exchange</a>
+            </div>
+        </aside>
+        {% endif %}
+
+        <main class="content-area">
+            {% block content %}
+            {% endblock %}
+        </main>
+        
+    </div>
+
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>

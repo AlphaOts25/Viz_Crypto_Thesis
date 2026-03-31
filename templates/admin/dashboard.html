@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="main-container">
+    
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
+        <div>
+            <h1 style="margin: 0; font-size: 28px;">Admin Dashboard</h1>
+            <p style="color: #666; margin-top: 5px;">Manage your cryptography curriculum and materials.</p>
+        </div>
+        <a href="#" style="background: #10b981; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold; transition: background 0.2s; box-shadow: 0 4px 6px rgba(16, 185, 129, 0.2);">
+            + Add New Lesson
+        </a>
+    </div>
+
+    <div style="display: flex; gap: 20px; margin-bottom: 40px;">
+        <div class="course-card" style="flex: 1; padding: 20px; text-align: center; border-top: 4px solid #6366f1;">
+            <h3 style="margin: 0; font-size: 36px; color: #333;">{{ module_count }}</h3>
+            <p style="color: #888; margin: 5px 0 0 0; font-size: 13px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">Active Modules</p>
+        </div>
+        <div class="course-card" style="flex: 1; padding: 20px; text-align: center; border-top: 4px solid #f43f5e;">
+            <h3 style="margin: 0; font-size: 36px; color: #333;">{{ student_count }}</h3>
+            <p style="color: #888; margin: 5px 0 0 0; font-size: 13px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">Enrolled Students</p>
+        </div>
+    </div>
+
+    <div style="background: #fff; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); overflow: hidden;">
+        <div style="padding: 20px; border-bottom: 1px solid #e5e7eb; background: #f8f9fa;">
+            <h2 style="margin: 0; font-size: 18px; color: #333;">Curriculum Manager</h2>
+        </div>
+        
+        <table style="width: 100%; border-collapse: collapse;">
+            <thead>
+                <tr style="text-align: left; color: #888; border-bottom: 2px solid #e5e7eb; font-size: 14px;">
+                    <th style="padding: 15px 20px;">ID</th>
+                    <th style="padding: 15px 20px;">Module Title</th>
+                    <th style="padding: 15px 20px;">Description</th>
+                    <th style="padding: 15px 20px; text-align: right;">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for module in modules %}
+                <tr style="border-bottom: 1px solid #e5e7eb;">
+                    <td style="padding: 15px 20px; color: #666; font-size: 14px;">{{ module.id }}</td>
+                    <td style="padding: 15px 20px; font-weight: 500; color: #333;">{{ module.title }}</td>
+                    <td style="padding: 15px 20px; color: #666; font-size: 14px;">{{ module.description }}</td>
+                    <td style="padding: 15px 20px; text-align: right;">
+                        <a href="#" style="color: #6366f1; text-decoration: none; font-weight: 600; margin-right: 15px;">Edit</a>
+                        <a href="#" style="color: #f43f5e; text-decoration: none; font-weight: 600;">Delete</a>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="4" style="padding: 30px; text-align: center; color: #888;">No modules found. Start by adding a new lesson!</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
