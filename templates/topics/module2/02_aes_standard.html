@@ -1,0 +1,164 @@
+{% set show_sidebar = true %}
+{% extends "base.html" %}
+
+{% block content %}
+<div class="lesson-container" style="max-width: 850px; margin: 0 auto; padding-bottom: 60px;">
+
+    <div class="lesson-header" style="margin-bottom: 40px;">
+        <p style="color: #6366f1; font-weight: bold; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 1px;">Topic 2</p>
+        <h1 style="font-size: 36px; margin-top: 0; margin-bottom: 15px;">The AES Standard</h1>
+        <p style="font-size: 18px; color: #555; line-height: 1.6;">
+            The Advanced Encryption Standard (AES) is the global gold standard for symmetric encryption. Established in 2001, it is used by the U.S. government, banks, and secure applications worldwide to protect top-secret data.
+        </p>
+    </div>
+
+    <div class="study-section" style="background: #fff; border-radius: 12px; padding: 30px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); margin-bottom: 40px;">
+        <h2 style="margin-top: 0; color: #333; border-bottom: 2px solid #e5e7eb; padding-bottom: 10px;">How AES Works</h2>
+        
+        <div style="display: flex; gap: 30px; margin-top: 20px;">
+            <div style="flex: 1;">
+                <h3 style="color: #6366f1;">1. The Block Cipher</h3>
+                <p style="color: #555; line-height: 1.6;">
+                    Unlike the Caesar cipher which scrambles one letter at a time, AES is a <strong>Block Cipher</strong>. It chops your plaintext message up into blocks of exactly 128 bits. It then mathematically scrambles each block as a single unit.
+                </p>
+            </div>
+
+            <div style="flex: 1;">
+                <h3 style="color: #10b981;">2. The "Rounds"</h3>
+                <p style="color: #555; line-height: 1.6;">
+                    AES doesn't just scramble the data once. It runs the block through a washing machine of mathematical operations (Substitute, Shift, Mix, Add Key) either 10, 12, or 14 times in a row, depending on how large the key is.
+                </p>
+            </div>
+        </div>
+
+        <div style="background: #eff6ff; border-left: 4px solid #3b82f6; padding: 15px; margin-top: 20px; border-radius: 0 6px 6px 0;">
+            <p style="margin: 0; color: #1e3a8a; font-size: 15px;">
+                <strong>Key Sizes:</strong> AES comes in three flavors: AES-128, AES-192, and AES-256. The number represents the size of the key in bits. A 256-bit key is so large that cracking it by guessing every possible combination (Brute Force) is considered physically impossible.
+            </p>
+        </div>
+    </div>
+
+    <h1>AES</h1>
+        
+    {% include "video_player.html" %}
+
+
+    <div class="interactive-test" style="background: #1e1e2e; border-radius: 12px; padding: 30px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); color: white;">
+        <h2 style="margin-top: 0; color: #fff; font-size: 20px;">Try It: The Brute Force Simulator</h2>
+        <p style="color: #a6accd; font-size: 14px; margin-bottom: 30px;">
+            A "brute force attack" means having a computer guess every possible password until it finds the right one. Let's assume you have a supercomputer that can guess <strong>1 Billion keys per second</strong>. Select an algorithm to see how long it takes to hack.
+        </p>
+        
+        <div style="display: flex; flex-direction: column; gap: 20px;">
+            
+            <div style="display: flex; gap: 15px; align-items: flex-end;">
+                <div style="flex: 2;">
+                    <label style="color: #a6accd; font-size: 12px; text-transform: uppercase;">Select Encryption Algorithm</label>
+                    <select id="algoSelect" style="width: 100%; padding: 12px; margin-top: 5px; background: #292d3e; border: 1px solid #6366f1; color: white; border-radius: 4px; font-size: 16px;">
+                        <option value="caesar">Caesar Cipher (26 Keys)</option>
+                        <option value="des">Old DES Standard (56-bit Key)</option>
+                        <option value="aes128" selected>Modern AES-128 (128-bit Key)</option>
+                        <option value="aes256">Military AES-256 (256-bit Key)</option>
+                    </select>
+                </div>
+                <div style="flex: 1;">
+                    <button id="hackBtn" style="width: 100%; padding: 12px; background: #f43f5e; color: white; border: none; border-radius: 4px; font-size: 16px; font-weight: bold; cursor: pointer; transition: background 0.2s;">
+                        Start Hacking
+                    </button>
+                </div>
+            </div>
+
+            <div style="background: #1a1a24; padding: 20px; border-radius: 8px; border: 1px solid #444; margin-top: 10px;">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 15px;">
+                    <span style="color: #888; font-size: 12px; text-transform: uppercase;">Total Possible Keys:</span>
+                    <span id="keyCount" style="color: #10b981; font-family: monospace; font-weight: bold;">3.4 × 10³⁸ (340 Undecillion)</span>
+                </div>
+                
+                <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                    <span style="color: #888; font-size: 12px; text-transform: uppercase;">Estimated Time to Crack:</span>
+                    <span id="timeCount" style="color: #f59e0b; font-weight: bold;">10.79 Quintillion Years</span>
+                </div>
+
+                <div style="width: 100%; background: #292d3e; height: 20px; border-radius: 10px; overflow: hidden; margin-top: 20px;">
+                    <div id="hackProgress" style="width: 0%; height: 100%; background: #f43f5e; transition: width 0.5s ease-out;"></div>
+                </div>
+                <div id="statusText" style="text-align: center; color: #a6accd; font-size: 12px; margin-top: 8px;">Waiting to start...</div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    const data = {
+        caesar: { keys: "26", time: "0.000000026 Seconds", speed: 100 }, // Fills instantly
+        des: { keys: "72,057,594,037,927,936", time: "833 Days", speed: 5 }, // Fills very slowly
+        aes128: { keys: "3.4 × 10³⁸ (340 Undecillion)", time: "10.79 Quintillion Years", speed: 0 }, // Never moves
+        aes256: { keys: "1.1 × 10⁷⁷", time: "Billions of times longer than the universe has existed", speed: 0 } // Never moves
+    };
+
+    const algoSelect = document.getElementById('algoSelect');
+    const hackBtn = document.getElementById('hackBtn');
+    const keyCount = document.getElementById('keyCount');
+    const timeCount = document.getElementById('timeCount');
+    const hackProgress = document.getElementById('hackProgress');
+    const statusText = document.getElementById('statusText');
+
+    let hackingInterval;
+
+    // Update text when dropdown changes
+    algoSelect.addEventListener('change', (e) => {
+        clearInterval(hackingInterval);
+        hackProgress.style.width = '0%';
+        hackProgress.style.transition = 'width 0.5s ease-out';
+        
+        const selection = data[e.target.value];
+        keyCount.innerText = selection.keys;
+        timeCount.innerText = selection.time;
+        statusText.innerText = "Waiting to start...";
+        hackBtn.innerText = "Start Hacking";
+        hackBtn.style.background = "#f43f5e";
+    });
+
+    // Handle hack button click
+    hackBtn.addEventListener('click', () => {
+        clearInterval(hackingInterval);
+        const algo = algoSelect.value;
+        const speed = data[algo].speed;
+        
+        hackBtn.innerText = "Hacking...";
+        hackBtn.style.background = "#888";
+        statusText.innerText = `Trying 1,000,000,000 keys per second...`;
+        
+        let progress = 0;
+        hackProgress.style.width = '0%';
+        
+        if (speed === 100) {
+            // Instant hack (Caesar)
+            setTimeout(() => {
+                hackProgress.style.width = '100%';
+                statusText.innerText = "SYSTEM COMPROMISED! Password found instantly.";
+                statusText.style.color = "#f43f5e";
+            }, 100);
+        } else if (speed > 0) {
+            // Slow hack (DES)
+            hackProgress.style.transition = 'width 1s linear';
+            hackingInterval = setInterval(() => {
+                progress += (speed / 100);
+                hackProgress.style.width = `${progress}%`;
+                if (progress >= 10) {
+                    clearInterval(hackingInterval);
+                    statusText.innerText = "This will take a few years. You should probably go get a coffee.";
+                }
+            }, 100);
+        } else {
+            // Impossible hack (AES)
+            hackProgress.style.width = '0%';
+            setTimeout(() => {
+                statusText.innerText = "ERROR: Sun will burn out before process reaches 1%.";
+                statusText.style.color = "#10b981"; // Green means safe!
+            }, 2000);
+        }
+    });
+</script>
+{% endblock %}

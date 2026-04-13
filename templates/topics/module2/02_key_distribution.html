@@ -1,0 +1,126 @@
+{% set show_sidebar = true %}
+{% extends "base.html" %}
+
+{% block content %}
+<div class="lesson-container" style="max-width: 850px; margin: 0 auto; padding-bottom: 60px;">
+
+    <div class="lesson-header" style="margin-bottom: 40px;">
+        <p style="color: #6366f1; font-weight: bold; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 1px;">Topic 3</p>
+        <h1 style="font-size: 36px; margin-top: 0; margin-bottom: 15px;">The Key Distribution Problem</h1>
+        <p style="font-size: 18px; color: #555; line-height: 1.6;">
+            Symmetric algorithms like AES are mathematically unbreakable. But they all share one fatal flaw: how do you safely give the secret key to the receiver without a hacker stealing it first?
+        </p>
+    </div>
+
+    <div class="study-section" style="background: #fff; border-radius: 12px; padding: 30px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); margin-bottom: 40px;">
+        <h2 style="margin-top: 0; color: #333; border-bottom: 2px solid #e5e7eb; padding-bottom: 10px;">The Catch-22 of Cryptography</h2>
+        
+        <p style="color: #555; line-height: 1.6; font-size: 16px;">
+            Imagine Alice wants to send her credit card number to Bob (a server like Amazon). She encrypts it with AES. The ciphertext is secure. But for Bob to read it, Alice must also send him the key. 
+        </p>
+
+        <div style="display: flex; gap: 20px; margin-top: 25px;">
+            <div style="flex: 1; background: #fdf2f8; padding: 20px; border-radius: 8px; border-left: 4px solid #f43f5e;">
+                <h3 style="margin-top: 0; color: #9f1239; font-size: 18px;">Meet Eve (The Eavesdropper)</h3>
+                <p style="color: #be123c; font-size: 15px; margin-bottom: 0;">
+                    Eve is a hacker secretly listening to all traffic on the network. If Alice sends the secret key to Bob over the internet, Eve will copy it. Once Eve has the key, the unbreakable AES algorithm becomes useless.
+                </p>
+            </div>
+        </div>
+
+        <p style="color: #555; line-height: 1.6; font-size: 16px; margin-top: 25px; font-weight: 500;">
+            You can't encrypt the key before sending it, because then you'd need a <em>second</em> key to unlock the <em>first</em> key, creating an endless loop. This problem stumped scientists for thousands of years.
+        </p>
+    </div>
+
+    <h1>Key Distribution Problem</h1>
+        
+    {% include "video_player.html" %}
+
+    <div class="interactive-test" style="background: #1e1e2e; border-radius: 12px; padding: 30px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); color: white;">
+        <h2 style="margin-top: 0; color: #fff; font-size: 20px;">Try It: The Interception Simulator</h2>
+        <p style="color: #a6accd; font-size: 14px; margin-bottom: 30px;">
+            Alice has encrypted a top-secret message for Bob. She must transmit the key over the network so Bob can read it. Click the button to transmit the key and watch what happens.
+        </p>
+        
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; position: relative;">
+            
+            <div style="flex: 1; background: #292d3e; padding: 15px; border-radius: 8px; border-top: 4px solid #10b981; z-index: 2;">
+                <h3 style="color: #10b981; margin-top: 0; margin-bottom: 10px; font-size: 16px;">👩 Alice</h3>
+                <p style="color: #888; font-size: 12px; margin-bottom: 5px;">Encrypted Message:</p>
+                <div style="background: #1a1a24; padding: 8px; border-radius: 4px; font-family: monospace; color: #a6accd; font-size: 12px; margin-bottom: 10px;">8f4b2a9c...</div>
+                <p style="color: #f59e0b; font-size: 12px; margin-bottom: 5px; font-weight: bold;">Secret Key:</p>
+                <div id="aliceKeyBox" style="background: #f59e0b; color: #fff; padding: 8px; border-radius: 4px; font-family: monospace; font-size: 14px; text-align: center; font-weight: bold;">Hunter2</div>
+            </div>
+
+            <div style="flex: 1.5; margin: 0 15px; text-align: center; z-index: 1;">
+                <button id="transmitBtn" style="background: #6366f1; color: white; border: none; padding: 10px 20px; border-radius: 6px; font-weight: bold; cursor: pointer; transition: 0.2s; margin-bottom: 20px;">
+                    Transmit Key ➔
+                </button>
+                
+                <div id="eveContainer" style="background: #1a1a24; border: 2px dashed #f43f5e; padding: 15px; border-radius: 8px; opacity: 0.5; transition: 0.5s;">
+                    <h3 style="color: #f43f5e; margin-top: 0; margin-bottom: 10px; font-size: 16px;">🦹‍♀️ Eve (Network)</h3>
+                    <p style="color: #888; font-size: 12px; margin-bottom: 5px;">Intercepted Key:</p>
+                    <div id="eveKeyBox" style="background: #292d3e; color: #444; padding: 8px; border-radius: 4px; font-family: monospace; font-size: 14px; text-align: center; min-height: 20px;">???</div>
+                    <p id="eveStatus" style="color: #f43f5e; font-size: 12px; margin-top: 10px; font-weight: bold; display: none;">
+                        SYSTEM COMPROMISED! Eve is reading your messages!
+                    </p>
+                </div>
+            </div>
+
+            <div style="flex: 1; background: #292d3e; padding: 15px; border-radius: 8px; border-top: 4px solid #3b82f6; z-index: 2;">
+                <h3 style="color: #3b82f6; margin-top: 0; margin-bottom: 10px; font-size: 16px;">👨 Bob</h3>
+                <p style="color: #888; font-size: 12px; margin-bottom: 5px;">Received Message:</p>
+                <div style="background: #1a1a24; padding: 8px; border-radius: 4px; font-family: monospace; color: #a6accd; font-size: 12px; margin-bottom: 10px;">8f4b2a9c...</div>
+                <p style="color: #f59e0b; font-size: 12px; margin-bottom: 5px; font-weight: bold;">Bob's Key:</p>
+                <div id="bobKeyBox" style="background: #1a1a24; border: 1px solid #444; color: #444; padding: 8px; border-radius: 4px; font-family: monospace; font-size: 14px; text-align: center; min-height: 20px;">Empty</div>
+            </div>
+        </div>
+    </div>
+    
+    <div style="margin-top: 50px; text-align: right;">
+        <p style="color: #888; font-size: 14px; margin-bottom: 10px;">How do we solve this impossible problem?</p>
+        <a href="#" style="background: #6366f1; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold; font-size: 16px; box-shadow: 0 4px 6px rgba(99, 102, 241, 0.2);">
+            Start Module 3: Public Key Cryptography →
+        </a>
+    </div>
+
+</div>
+
+
+
+<script>
+    const transmitBtn = document.getElementById('transmitBtn');
+    const eveContainer = document.getElementById('eveContainer');
+    const eveKeyBox = document.getElementById('eveKeyBox');
+    const bobKeyBox = document.getElementById('bobKeyBox');
+    const eveStatus = document.getElementById('eveStatus');
+
+    transmitBtn.addEventListener('click', () => {
+        // Disable button
+        transmitBtn.innerText = "Transmitting...";
+        transmitBtn.disabled = true;
+        transmitBtn.style.background = "#444";
+
+        // Step 1: Eve intercepts the key
+        setTimeout(() => {
+            eveContainer.style.opacity = "1";
+            eveContainer.style.backgroundColor = "#4c0519"; // Dark red flash
+            eveKeyBox.style.background = "#f59e0b";
+            eveKeyBox.style.color = "#fff";
+            eveKeyBox.innerText = "Hunter2 (COPIED)";
+            
+            // Step 2: Bob gets the key, but it's too late
+            setTimeout(() => {
+                bobKeyBox.style.background = "#f59e0b";
+                bobKeyBox.style.color = "#fff";
+                bobKeyBox.innerText = "Hunter2";
+                
+                eveStatus.style.display = "block";
+                transmitBtn.innerText = "Network Compromised";
+            }, 800);
+            
+        }, 800);
+    });
+</script>
+{% endblock %}

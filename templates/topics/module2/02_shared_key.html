@@ -1,0 +1,147 @@
+{% set show_sidebar = true %}
+{% extends "base.html" %}
+
+{% block content %}
+<div class="lesson-container" style="max-width: 850px; margin: 0 auto; padding-bottom: 60px;">
+
+    <div class="lesson-header" style="margin-bottom: 40px;">
+        <p style="color: #10b981; font-weight: bold; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 1px;">Topic 1</p>
+        <h1 style="font-size: 36px; margin-top: 0; margin-bottom: 15px;">The Shared Key Concept</h1>
+        <p style="font-size: 18px; color: #555; line-height: 1.6;">
+            Symmetric encryption is like a physical padlock where there is only one type of key. The sender uses the key to lock the box, and the receiver must use an identical copy of that exact same key to open it.
+        </p>
+    </div>
+
+    <div class="study-section" style="background: #fff; border-radius: 12px; padding: 30px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); margin-bottom: 40px;">
+        <h2 style="margin-top: 0; color: #333; border-bottom: 2px solid #e5e7eb; padding-bottom: 10px;">How Symmetric Systems Work</h2>
+        
+        <p style="color: #555; line-height: 1.6; font-size: 16px;">
+            In cryptography, we often use characters named <strong>Alice</strong> (the sender) and <strong>Bob</strong> (the receiver) to explain how data travels.
+        </p>
+
+        <ul style="color: #555; line-height: 1.8; font-size: 15px; margin-top: 15px;">
+            <li><strong>Step 1:</strong> Alice and Bob agree on a secret password (the "Shared Key") beforehand.</li>
+            <li><strong>Step 2:</strong> Alice runs her plaintext message and the Shared Key through a mathematical algorithm.</li>
+            <li><strong>Step 3:</strong> The resulting ciphertext is sent across the internet. Even if a hacker intercepts it, it looks like random noise.</li>
+            <li><strong>Step 4:</strong> Bob receives the ciphertext and runs it through the reverse algorithm using the <em>exact same Shared Key</em>.</li>
+        </ul>
+
+        <div style="background: #fdf2f8; border-left: 4px solid #f43f5e; padding: 15px; margin-top: 20px; border-radius: 0 6px 6px 0;">
+            <p style="margin: 0; color: #9f1239; font-size: 15px;">
+                <strong>The Golden Rule:</strong> If Bob's key is even one letter or symbol different from Alice's key, the decryption will fail completely.
+            </p>
+        </div>
+    </div>
+
+    <h1>Shared Key Concept</h1>
+        
+    {% include "video_player.html" %}
+
+    <div class="interactive-test" style="background: #1e1e2e; border-radius: 12px; padding: 30px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); color: white;">
+        <h2 style="margin-top: 0; color: #fff; font-size: 20px;">Try It: The Alice & Bob Simulator</h2>
+        <p style="color: #a6accd; font-size: 14px; margin-bottom: 30px;">
+            Act as Alice and encrypt a message with a secret password. Then, act as Bob. Try typing the wrong password to see what happens, and then type the correct password to reveal the message!
+        </p>
+        
+        <div style="display: flex; flex-direction: column; gap: 20px;">
+            
+            <div style="background: #292d3e; padding: 20px; border-radius: 8px; border-top: 4px solid #10b981;">
+                <h3 style="color: #10b981; margin-top: 0; margin-bottom: 15px;">👩 Alice (Sender)</h3>
+                <div style="display: flex; gap: 15px;">
+                    <div style="flex: 2;">
+                        <label style="color: #a6accd; font-size: 12px; text-transform: uppercase;">Plaintext Message</label>
+                        <input type="text" id="aliceMessage" value="Meet me at the secure location." style="width: 100%; padding: 10px; margin-top: 5px; background: #1a1a24; border: 1px solid #444; color: white; border-radius: 4px;">
+                    </div>
+                    <div style="flex: 1;">
+                        <label style="color: #f59e0b; font-size: 12px; text-transform: uppercase;">Alice's Secret Key</label>
+                        <input type="text" id="aliceKey" value="mySecretPassword" style="width: 100%; padding: 10px; margin-top: 5px; background: #1a1a24; border: 1px solid #f59e0b; color: white; border-radius: 4px;">
+                    </div>
+                </div>
+            </div>
+
+            <div style="text-align: center; padding: 10px;">
+                <p style="color: #888; font-size: 12px; text-transform: uppercase; margin: 0 0 5px 0;">Encrypted Data traveling over the internet ↓</p>
+                <div id="networkCiphertext" style="font-family: monospace; color: #f43f5e; background: #1a1a24; padding: 10px; border-radius: 4px; border: 1px dashed #f43f5e; word-break: break-all; min-height: 20px;"></div>
+            </div>
+
+            <div style="background: #292d3e; padding: 20px; border-radius: 8px; border-top: 4px solid #6366f1;">
+                <h3 style="color: #6366f1; margin-top: 0; margin-bottom: 15px;">👨 Bob (Receiver)</h3>
+                <div style="display: flex; gap: 15px;">
+                    <div style="flex: 1;">
+                        <label style="color: #f59e0b; font-size: 12px; text-transform: uppercase;">Bob's Key Guess</label>
+                        <input type="text" id="bobKey" placeholder="Type password here..." style="width: 100%; padding: 10px; margin-top: 5px; background: #1a1a24; border: 1px solid #f59e0b; color: white; border-radius: 4px;">
+                    </div>
+                    <div style="flex: 2;">
+                        <label style="color: #a6accd; font-size: 12px; text-transform: uppercase;">Decrypted Output</label>
+                        <input type="text" id="bobOutput" readonly style="width: 100%; padding: 10px; margin-top: 5px; background: #1a1a24; border: 1px solid #444; color: white; border-radius: 4px;">
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+</div>
+
+<script>
+    const aliceMessage = document.getElementById('aliceMessage');
+    const aliceKey = document.getElementById('aliceKey');
+    const networkCiphertext = document.getElementById('networkCiphertext');
+    const bobKey = document.getElementById('bobKey');
+    const bobOutput = document.getElementById('bobOutput');
+
+    // Simple symmetric XOR encryption simulation
+    function encryptDecrypt(text, key) {
+        if (!key) return text;
+        let result = '';
+        for (let i = 0; i < text.length; i++) {
+            // XOR the character code with the key character code
+            result += String.fromCharCode(text.charCodeAt(i) ^ key.charCodeAt(i % key.length));
+        }
+        return result;
+    }
+
+    function updateSimulation() {
+        const message = aliceMessage.value;
+        const keyA = aliceKey.value;
+        const keyB = bobKey.value;
+
+        // 1. Alice Encrypts
+        const rawCipher = encryptDecrypt(message, keyA);
+        // We encode to Base64 just to make it look like scary computer ciphertext on the screen
+        networkCiphertext.innerText = btoa(rawCipher);
+
+        // 2. Bob Decrypts
+        if (keyB.length > 0) {
+            try {
+                // Decode from Base64, then run the reverse algorithm with Bob's key
+                const decodedCipher = atob(networkCiphertext.innerText);
+                bobOutput.value = encryptDecrypt(decodedCipher, keyB);
+                
+                // Visual feedback: Green if correct, Red if wrong
+                if (keyB === keyA) {
+                    bobOutput.style.color = '#10b981'; // Green
+                    bobOutput.style.borderColor = '#10b981';
+                } else {
+                    bobOutput.style.color = '#f43f5e'; // Red (Gibberish)
+                    bobOutput.style.borderColor = '#f43f5e';
+                }
+            } catch(e) {
+                bobOutput.value = "Encryption Error";
+            }
+        } else {
+            bobOutput.value = "";
+            bobOutput.style.color = 'white';
+            bobOutput.style.borderColor = '#444';
+        }
+    }
+
+    // Add event listeners to update in real-time
+    aliceMessage.addEventListener('input', updateSimulation);
+    aliceKey.addEventListener('input', updateSimulation);
+    bobKey.addEventListener('input', updateSimulation);
+
+    // Initial run
+    updateSimulation();
+</script>
+{% endblock %}

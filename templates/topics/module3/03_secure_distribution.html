@@ -1,0 +1,178 @@
+{% set show_sidebar = true %}
+{% extends "base.html" %}
+
+{% block content %}
+<div class="lesson-container" style="max-width: 850px; margin: 0 auto; padding-bottom: 60px;">
+
+    <div class="lesson-header" style="margin-bottom: 40px;">
+        <p style="color: #6366f1; font-weight: bold; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 1px;">Module 3 - Topic 1</p>
+        <h1 style="font-size: 36px; margin-top: 0; margin-bottom: 15px;">Secure Distribution (Public Keys)</h1>
+        <p style="font-size: 18px; color: #555; line-height: 1.6;">
+            To solve the Key Distribution Problem, we must stop using the same key to lock and unlock our data. Welcome to Asymmetric Cryptography, where every user generates a mathematically linked <strong>pair</strong> of keys.
+        </p>
+    </div>
+
+    <div class="study-section" style="background: #fff; border-radius: 12px; padding: 30px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); margin-bottom: 40px;">
+        <h2 style="margin-top: 0; color: #333; border-bottom: 2px solid #e5e7eb; padding-bottom: 10px;">The Padlock Metaphor</h2>
+        
+        <p style="color: #555; line-height: 1.6; font-size: 16px;">
+            In symmetric encryption (AES), sending a key over the internet is like mailing a physical house key. Anyone who steals the envelope can copy the key. Asymmetric encryption completely changes the rules:
+        </p>
+
+        <div style="display: flex; gap: 20px; margin-top: 25px;">
+            <div style="flex: 1; background: #eff6ff; padding: 20px; border-radius: 8px; border-top: 4px solid #3b82f6;">
+                <h3 style="margin-top: 0; color: #1e3a8a; font-size: 18px;">🔓 The Public Key</h3>
+                <p style="color: #555; font-size: 15px; margin-bottom: 0;">
+                    Think of this as an open padlock. You can safely send this padlock to anyone in the world over an unsecured internet connection. Even if Eve intercepts it, she just has an open padlock. It is completely safe to share.
+                </p>
+            </div>
+
+            <div style="flex: 1; background: #ecfdf5; padding: 20px; border-radius: 8px; border-top: 4px solid #10b981;">
+                <h3 style="margin-top: 0; color: #065f46; font-size: 18px;">🔑 The Private Key</h3>
+                <p style="color: #555; font-size: 15px; margin-bottom: 0;">
+                    Think of this as the physical metal key. <strong>It never leaves your computer.</strong> Once someone uses your Public Key padlock to lock a box, your Private Key is the only thing in the universe that can open it.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <h1>Secure Distribution Issue</h1>
+        
+    {% include "video_player.html" %}
+
+    <div class="interactive-test" style="background: #1e1e2e; border-radius: 12px; padding: 30px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); color: white;">
+        <h2 style="margin-top: 0; color: #fff; font-size: 20px;">Try It: Defeating Eve</h2>
+        <p style="color: #a6accd; font-size: 14px; margin-bottom: 30px;">
+            Click through the steps below to watch how Alice and Bob can safely exchange a secret message right in front of Eve without her being able to read it.
+        </p>
+        
+        <div style="display: flex; gap: 10px; margin-bottom: 30px; justify-content: center;">
+            <button class="step-btn" id="btnStep1" style="background: #10b981; color: white; border: none; padding: 10px 15px; border-radius: 6px; cursor: pointer; font-weight: bold;">1. Alice Sends Padlock</button>
+            <button class="step-btn" id="btnStep2" style="background: #444; color: white; border: none; padding: 10px 15px; border-radius: 6px; cursor: not-allowed; font-weight: bold;" disabled>2. Bob Locks Box</button>
+            <button class="step-btn" id="btnStep3" style="background: #444; color: white; border: none; padding: 10px 15px; border-radius: 6px; cursor: not-allowed; font-weight: bold;" disabled>3. Bob Sends Box</button>
+        </div>
+
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; position: relative;">
+            
+            <div style="flex: 1; background: #292d3e; padding: 15px; border-radius: 8px; border-top: 4px solid #10b981; text-align: center;">
+                <h3 style="color: #10b981; margin-top: 0; margin-bottom: 15px; font-size: 16px;">👩 Alice</h3>
+                
+                <div style="display: flex; justify-content: space-around; margin-bottom: 15px;">
+                    <div>
+                        <span style="font-size: 24px;" id="alicePrivate">🔑</span>
+                        <p style="color: #888; font-size: 10px; margin: 5px 0 0 0;">Private Key</p>
+                    </div>
+                    <div>
+                        <span style="font-size: 24px; opacity: 1;" id="alicePublic">🔓</span>
+                        <p style="color: #888; font-size: 10px; margin: 5px 0 0 0;">Public Padlock</p>
+                    </div>
+                </div>
+
+                <div id="aliceReceivedBox" style="background: #1a1a24; border: 1px solid #444; padding: 10px; border-radius: 4px; font-family: monospace; font-size: 12px; color: #888; display: none;">
+                    Waiting for box...
+                </div>
+            </div>
+
+            <div style="flex: 1; margin: 0 15px; text-align: center;">
+                <div id="networkZone" style="height: 100px; display: flex; align-items: center; justify-content: center; font-size: 30px; transition: 1s;">
+                    </div>
+
+                <div style="background: #1a1a24; border: 2px dashed #f43f5e; padding: 10px; border-radius: 8px;">
+                    <h3 style="color: #f43f5e; margin: 0 0 5px 0; font-size: 14px;">🦹‍♀️ Eve</h3>
+                    <p style="color: #888; font-size: 10px; margin-bottom: 5px;">Intercepted:</p>
+                    <div id="eveInventory" style="font-size: 20px; min-height: 25px;"></div>
+                    <p id="eveComment" style="color: #a6accd; font-size: 11px; margin-top: 5px; min-height: 15px;"></p>
+                </div>
+            </div>
+
+            <div style="flex: 1; background: #292d3e; padding: 15px; border-radius: 8px; border-top: 4px solid #3b82f6; text-align: center;">
+                <h3 style="color: #3b82f6; margin-top: 0; margin-bottom: 15px; font-size: 16px;">👨 Bob</h3>
+                
+                <div id="bobPadlockZone" style="min-height: 50px; margin-bottom: 10px;">
+                    <p style="color: #888; font-size: 10px;">Waiting for Padlock...</p>
+                </div>
+
+                <input type="text" id="bobMessage" value="Secret Data" style="width: 80%; padding: 8px; background: #1a1a24; border: 1px solid #444; color: white; border-radius: 4px; text-align: center; font-size: 12px; display: none;">
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    const btn1 = document.getElementById('btnStep1');
+    const btn2 = document.getElementById('btnStep2');
+    const btn3 = document.getElementById('btnStep3');
+
+    const alicePublic = document.getElementById('alicePublic');
+    const aliceReceivedBox = document.getElementById('aliceReceivedBox');
+    
+    const networkZone = document.getElementById('networkZone');
+    const eveInventory = document.getElementById('eveInventory');
+    const eveComment = document.getElementById('eveComment');
+
+    const bobPadlockZone = document.getElementById('bobPadlockZone');
+    const bobMessage = document.getElementById('bobMessage');
+
+    // Step 1: Alice sends Public Key
+    btn1.addEventListener('click', () => {
+        alicePublic.style.opacity = "0.2"; // Alice 'sends' it
+        networkZone.innerHTML = "🔓 <span style='font-size:12px; color:#a6accd; margin-left:10px;'>Traveling to Bob ➔</span>";
+        
+        btn1.style.background = "#444";
+        btn1.disabled = true;
+
+        setTimeout(() => {
+            // Eve intercepts a copy
+            eveInventory.innerHTML = "🔓";
+            eveComment.innerText = "Haha! I copied the padlock! But... I can't do anything with this.";
+            
+            // Bob receives it
+            networkZone.innerHTML = "";
+            bobPadlockZone.innerHTML = "<span style='font-size: 24px;'>🔓</span><br><span style='color: #10b981; font-size: 10px;'>Alice's Padlock Received</span>";
+            bobMessage.style.display = "inline-block";
+
+            btn2.style.background = "#3b82f6";
+            btn2.disabled = false;
+            btn2.style.cursor = "pointer";
+        }, 1500);
+    });
+
+    // Step 2: Bob locks message
+    btn2.addEventListener('click', () => {
+        const secretText = bobMessage.value;
+        bobPadlockZone.innerHTML = `<div style="background:#1a1a24; border:2px solid #3b82f6; padding:10px; border-radius:4px;"><span style="font-size:20px;">🔒</span><br><span style="font-size:10px; color:#888;">[Locked Box]</span></div>`;
+        bobMessage.style.display = "none";
+        
+        btn2.style.background = "#444";
+        btn2.disabled = true;
+
+        btn3.style.background = "#f59e0b";
+        btn3.disabled = false;
+        btn3.style.cursor = "pointer";
+    });
+
+    // Step 3: Bob sends locked box
+    btn3.addEventListener('click', () => {
+        bobPadlockZone.innerHTML = "<p style='color: #888; font-size: 10px;'>Box Sent!</p>";
+        networkZone.innerHTML = "<span style='font-size:12px; color:#a6accd; margin-right:10px;'> Traveling to Alice</span> 🔒";
+        
+        btn3.style.background = "#444";
+        btn3.disabled = true;
+
+        setTimeout(() => {
+            // Eve intercepts the box
+            eveInventory.innerHTML = "🔓 + 🔒";
+            eveComment.innerText = "Curses! I have the locked box, but only Alice's private key can open it! I'm locked out!";
+            eveComment.style.color = "#10b981"; // Green text because Eve failed
+            
+            // Alice receives and unlocks
+            networkZone.innerHTML = "";
+            aliceReceivedBox.style.display = "block";
+            aliceReceivedBox.style.borderColor = "#10b981";
+            aliceReceivedBox.style.color = "#10b981";
+            aliceReceivedBox.innerHTML = `Box Unlocked with 🔑!<br><br><span style="color:white; font-size:14px; font-weight:bold;">"${bobMessage.value}"</span>`;
+        }, 2000);
+    });
+</script>
+{% endblock %}

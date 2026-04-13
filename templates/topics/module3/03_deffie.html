@@ -1,0 +1,159 @@
+{% set show_sidebar = true %}
+{% extends "base.html" %}
+
+{% block content %}
+<div class="lesson-container" style="max-width: 850px; margin: 0 auto; padding-bottom: 60px;">
+
+    <div class="lesson-header" style="margin-bottom: 40px;">
+        <p style="color: #6366f1; font-weight: bold; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 1px;">Module 3 - Topic 3</p>
+        <h1 style="font-size: 36px; margin-top: 0; margin-bottom: 15px;">The Diffie-Hellman Exchange</h1>
+        <p style="font-size: 18px; color: #555; line-height: 1.6;">
+            How can Alice and Bob agree on a secret password while shouting to each other across a crowded room where everyone (including Eve) can hear them? The answer is a one-way mathematical function.
+        </p>
+    </div>
+
+    <div class="study-section" style="background: #fff; border-radius: 12px; padding: 30px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); margin-bottom: 40px;">
+        <h2 style="margin-top: 0; color: #333; border-bottom: 2px solid #e5e7eb; padding-bottom: 10px;">The Paint Mixing Metaphor</h2>
+        
+        <p style="color: #555; line-height: 1.6; font-size: 16px;">
+            In cryptography, we use complex math (like prime numbers and modulos) to act as a <strong>one-way function</strong>. A one-way function is something that is easy to do, but almost impossible to undo. 
+        </p>
+        <p style="color: #555; line-height: 1.6; font-size: 16px;">
+            The best way to understand this is by thinking about mixing paint:
+        </p>
+
+        <ul style="color: #555; line-height: 1.8; font-size: 15px; margin-top: 15px;">
+            <li><strong>Easy to mix:</strong> If you mix Yellow and Blue, you easily get Green.</li>
+            <li><strong>Hard to un-mix:</strong> If someone hands you a bucket of Green paint, it is physically impossible to separate it back out into the exact original Yellow and Blue drops.</li>
+        </ul>
+
+        <div style="background: #eff6ff; border-left: 4px solid #3b82f6; padding: 15px; margin-top: 20px; border-radius: 0 6px 6px 0;">
+            <p style="margin: 0; color: #1e3a8a; font-size: 15px;">
+                Diffie-Hellman uses this "un-mixable" math to let Alice and Bob generate a shared secret key over a public internet connection, completely locking out Eve!
+            </p>
+        </div>
+    </div>
+
+    <h1>Deffie-Hellman Exchange</h1>
+        
+    {% include "video_player.html" %}
+
+    <div class="interactive-test" style="background: #1e1e2e; border-radius: 12px; padding: 30px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); color: white;">
+        <h2 style="margin-top: 0; color: #fff; font-size: 20px;">Try It: The Paint Exchange</h2>
+        <p style="color: #a6accd; font-size: 14px; margin-bottom: 30px;">
+            Click through the steps below to watch Alice and Bob establish a shared secret color. Eve can see everything sent over the network, but she can't figure out the final color!
+        </p>
+        
+        <div style="display: flex; gap: 10px; margin-bottom: 30px; justify-content: center;">
+            <button class="step-btn" id="btnStep1" style="background: #6366f1; color: white; border: none; padding: 10px 15px; border-radius: 6px; cursor: pointer; font-weight: bold;">1. Agree on Public Color</button>
+            <button class="step-btn" id="btnStep2" style="background: #444; color: white; border: none; padding: 10px 15px; border-radius: 6px; cursor: not-allowed; font-weight: bold;" disabled>2. Mix Secrets</button>
+            <button class="step-btn" id="btnStep3" style="background: #444; color: white; border: none; padding: 10px 15px; border-radius: 6px; cursor: not-allowed; font-weight: bold;" disabled>3. Exchange Mixes</button>
+            <button class="step-btn" id="btnStep4" style="background: #444; color: white; border: none; padding: 10px 15px; border-radius: 6px; cursor: not-allowed; font-weight: bold;" disabled>4. Final Mix</button>
+        </div>
+
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; position: relative;">
+            
+            <div style="flex: 1; background: #292d3e; padding: 15px; border-radius: 8px; border-top: 4px solid #10b981; text-align: center;">
+                <h3 style="color: #10b981; margin-top: 0; margin-bottom: 15px; font-size: 16px;">👩 Alice</h3>
+                <p style="color: #888; font-size: 10px; margin-bottom: 5px;">Secret Color (Never Sent):</p>
+                <div style="width: 40px; height: 40px; background: #ef4444; border-radius: 50%; margin: 0 auto 15px auto; border: 2px solid white;"></div>
+                
+                <p style="color: #888; font-size: 10px; margin-bottom: 5px;">Alice's Current Bucket:</p>
+                <div id="aliceBucket" style="width: 60px; height: 60px; background: #1a1a24; border-radius: 8px; margin: 0 auto; border: 2px solid #444; transition: 0.5s;"></div>
+            </div>
+
+            <div style="flex: 1; margin: 0 15px; text-align: center;">
+                <div style="background: #1a1a24; border: 2px dashed #f43f5e; padding: 15px; border-radius: 8px;">
+                    <h3 style="color: #f43f5e; margin: 0 0 10px 0; font-size: 14px;">🦹‍♀️ Eve (The Network)</h3>
+                    <p style="color: #888; font-size: 10px; margin-bottom: 5px;">Publicly Visible Colors:</p>
+                    <div id="networkZone" style="display: flex; justify-content: center; gap: 10px; min-height: 40px; transition: 0.5s;">
+                        </div>
+                    <p id="eveComment" style="color: #a6accd; font-size: 11px; margin-top: 10px; min-height: 30px;">Eve is watching the network...</p>
+                </div>
+            </div>
+
+            <div style="flex: 1; background: #292d3e; padding: 15px; border-radius: 8px; border-top: 4px solid #3b82f6; text-align: center;">
+                <h3 style="color: #3b82f6; margin-top: 0; margin-bottom: 15px; font-size: 16px;">👨 Bob</h3>
+                <p style="color: #888; font-size: 10px; margin-bottom: 5px;">Secret Color (Never Sent):</p>
+                <div style="width: 40px; height: 40px; background: #3b82f6; border-radius: 50%; margin: 0 auto 15px auto; border: 2px solid white;"></div>
+                
+                <p style="color: #888; font-size: 10px; margin-bottom: 5px;">Bob's Current Bucket:</p>
+                <div id="bobBucket" style="width: 60px; height: 60px; background: #1a1a24; border-radius: 8px; margin: 0 auto; border: 2px solid #444; transition: 0.5s;"></div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    const btn1 = document.getElementById('btnStep1');
+    const btn2 = document.getElementById('btnStep2');
+    const btn3 = document.getElementById('btnStep3');
+    const btn4 = document.getElementById('btnStep4');
+
+    const aliceBucket = document.getElementById('aliceBucket');
+    const bobBucket = document.getElementById('bobBucket');
+    const networkZone = document.getElementById('networkZone');
+    const eveComment = document.getElementById('eveComment');
+
+    // Colors
+    const publicColor = "#fde047"; // Yellow
+    const aliceSecret = "#ef4444"; // Red
+    const bobSecret = "#3b82f6"; // Blue
+    const aliceMixed = "#f97316"; // Orange (Yellow + Red)
+    const bobMixed = "#22c55e"; // Green (Yellow + Blue)
+    const finalShared = "#78350f"; // Brown (All three mixed)
+
+    // Step 1: Public Color
+    btn1.addEventListener('click', () => {
+        aliceBucket.style.background = publicColor;
+        bobBucket.style.background = publicColor;
+        networkZone.innerHTML = `<div style="width:30px;height:30px;background:${publicColor};border-radius:50%;border:1px solid white;"></div>`;
+        
+        eveComment.innerText = "Alice and Bob agree to use Yellow publicly. I can see the Yellow.";
+        
+        btn1.style.background = "#444"; btn1.disabled = true;
+        btn2.style.background = "#6366f1"; btn2.disabled = false; btn2.style.cursor = "pointer";
+    });
+
+    // Step 2: Mix Secrets
+    btn2.addEventListener('click', () => {
+        aliceBucket.style.background = aliceMixed;
+        bobBucket.style.background = bobMixed;
+        
+        eveComment.innerText = "They mixed their secret colors inside their own houses. I cannot see what is in their houses.";
+        
+        btn2.style.background = "#444"; btn2.disabled = true;
+        btn3.style.background = "#6366f1"; btn3.disabled = false; btn3.style.cursor = "pointer";
+    });
+
+    // Step 3: Exchange Mixes
+    btn3.addEventListener('click', () => {
+        // Swap buckets visually
+        aliceBucket.style.background = bobMixed;
+        bobBucket.style.background = aliceMixed;
+        
+        // Eve sees the mixes on the network
+        networkZone.innerHTML = `
+            <div style="width:30px;height:30px;background:${publicColor};border-radius:50%;border:1px solid white;"></div>
+            <div style="width:30px;height:30px;background:${aliceMixed};border-radius:50%;border:1px solid white;"></div>
+            <div style="width:30px;height:30px;background:${bobMixed};border-radius:50%;border:1px solid white;"></div>
+        `;
+        
+        eveComment.innerText = "They traded buckets! I intercepted Orange and Green! But I cannot un-mix them to find their secrets.";
+        
+        btn3.style.background = "#444"; btn3.disabled = true;
+        btn4.style.background = "#10b981"; btn4.disabled = false; btn4.style.cursor = "pointer";
+    });
+
+    // Step 4: Final Mix
+    btn4.addEventListener('click', () => {
+        aliceBucket.style.background = finalShared;
+        bobBucket.style.background = finalShared;
+        
+        eveComment.innerHTML = "<span style='color:#ef4444;font-weight:bold;'>Defeated!</span> They both made Brown, but I don't know the secrets so I cannot make Brown!";
+        
+        btn4.style.background = "#444"; btn4.disabled = true;
+    });
+</script>
+{% endblock %}

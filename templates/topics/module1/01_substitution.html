@@ -1,0 +1,118 @@
+{% set show_sidebar = true %}
+{% extends "base.html" %}
+
+{% block content %}
+<div class="lesson-container" style="max-width: 850px; margin: 0 auto; padding-bottom: 60px;">
+
+    <div class="lesson-header" style="margin-bottom: 40px;">
+        <p style="color: #6366f1; font-weight: bold; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 1px;">Topic 2</p>
+        <h1 style="font-size: 36px; margin-top: 0; margin-bottom: 15px;">Classical Cryptography: The Substitution Cipher</h1>
+        <p style="font-size: 18px; color: #555; line-height: 1.6;">
+            Now that we know the difference between plaintext and ciphertext, how do we actually make the conversion? It requires two things: a mathematical <strong>Algorithm</strong>, and a secret <strong>Key</strong>.
+        </p>
+    </div>
+
+    <div class="study-section" style="background: #fff; border-radius: 12px; padding: 30px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); margin-bottom: 40px;">
+        <h2 style="margin-top: 0; color: #333; border-bottom: 2px solid #e5e7eb; padding-bottom: 10px;">The Core Processes</h2>
+        
+        <div style="display: flex; gap: 30px; margin-top: 20px;">
+            <div style="flex: 1;">
+                <h3 style="color: #10b981;">The Encryption Process</h3>
+                <p style="color: #555; line-height: 1.6; font-size: 15px;">
+                    Encryption is the process of scrambling data into a secure format. It takes readable plaintext and passes it through an algorithm using a specific cryptographic key. Without the key, the resulting ciphertext is useless.
+                </p>
+                <div style="background: #f8f9fa; padding: 15px; border-radius: 6px; border-left: 4px solid #10b981; font-family: monospace; font-size: 14px; color: #333;">
+                    Formula: E(k, m) = c<br>
+                    <span style="color: #888; font-size: 12px;">(Encrypt Message 'm' with Key 'k' to get Ciphertext 'c')</span>
+                </div>
+            </div>
+
+            <div style="flex: 1;">
+                <h3 style="color: #6366f1;">The Decryption Process</h3>
+                <p style="color: #555; line-height: 1.6; font-size: 15px;">
+                    Decryption is the exact reverse. It is the process of transforming data that has been rendered unreadable back to its unencrypted form. The receiver must use the exact same algorithm and the correct key.
+                </p>
+                <div style="background: #f8f9fa; padding: 15px; border-radius: 6px; border-left: 4px solid #6366f1; font-family: monospace; font-size: 14px; color: #333;">
+                    Formula: D(k, c) = m<br>
+                    <span style="color: #888; font-size: 12px;">(Decrypt Ciphertext 'c' with Key 'k' to get Message 'm')</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+        
+    <h1>Classical Cryptography</h1>
+        
+    {% include "video_player.html" %}
+
+    <p>Now let's talk about how substitution works...</p>
+
+    <div class="interactive-test" style="background: #1e1e2e; border-radius: 12px; padding: 30px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); color: white;">
+        <h2 style="margin-top: 0; color: #fff; font-size: 20px;">Try It: The Caesar Cipher</h2>
+        <p style="color: #a6accd; font-size: 14px; margin-bottom: 20px;">
+            The Caesar Cipher is a classic substitution cipher. The "Algorithm" is shifting letters through the alphabet. The "Key" is the number of spaces to shift. Change the key below to see how it affects the ciphertext!
+        </p>
+        
+        <div style="display: flex; gap: 20px; align-items: stretch;">
+            <div style="flex: 1; display: flex; flex-direction: column;">
+                <label style="color: #10b981; font-weight: bold; margin-bottom: 10px; font-size: 14px; text-transform: uppercase;">Plaintext (m)</label>
+                <textarea id="plain" placeholder="Attack at dawn..." style="flex: 1; min-height: 120px; background: #292d3e; border: 1px solid #444; border-radius: 8px; color: white; padding: 15px; font-family: monospace; font-size: 14px; resize: none;">attack at dawn</textarea>
+            </div>
+
+            <div style="display: flex; flex-direction: column; justify-content: center; align-items: center; width: 100px;">
+                <label style="color: #f59e0b; font-weight: bold; margin-bottom: 10px; font-size: 14px; text-transform: uppercase; text-align: center;">Key (k)</label>
+                <input type="number" id="shiftKey" value="3" min="1" max="25" style="width: 60px; padding: 10px; text-align: center; background: #292d3e; color: white; border: 2px solid #f59e0b; border-radius: 8px; font-size: 18px; font-weight: bold;">
+                <span style="color: #6366f1; font-size: 24px; font-weight: bold; margin-top: 10px;">→</span>
+            </div>
+
+            <div style="flex: 1; display: flex; flex-direction: column;">
+                <label style="color: #f43f5e; font-weight: bold; margin-bottom: 10px; font-size: 14px; text-transform: uppercase;">Ciphertext (c)</label>
+                <textarea id="cipher" readonly style="flex: 1; min-height: 120px; background: #1a1a24; border: 1px solid #f43f5e; border-radius: 8px; color: #f43f5e; padding: 15px; font-family: monospace; font-size: 14px; resize: none;"></textarea>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    const plainInput = document.getElementById('plain');
+    const shiftInput = document.getElementById('shiftKey');
+    const cipherOutput = document.getElementById('cipher');
+
+    // The Caesar Cipher Algorithm
+    function applyCipher() {
+        const text = plainInput.value;
+        const shift = parseInt(shiftInput.value) || 0;
+        let result = '';
+
+        for (let i = 0; i < text.length; i++) {
+            let char = text[i];
+            
+            // Check if it's a letter
+            if (char.match(/[a-z]/i)) {
+                const code = text.charCodeAt(i);
+                
+                // Uppercase letters
+                if (code >= 65 && code <= 90) {
+                    char = String.fromCharCode(((code - 65 + shift) % 26) + 65);
+                } 
+                // Lowercase letters
+                else if (code >= 97 && code <= 122) {
+                    char = String.fromCharCode(((code - 97 + shift) % 26) + 97);
+                }
+            }
+            // Add the character (shifted or not) to the result
+            result += char;
+        }
+        
+        cipherOutput.value = result;
+    }
+
+    // Run the algorithm whenever the user types or changes the key
+    plainInput.addEventListener('input', applyCipher);
+    shiftInput.addEventListener('input', applyCipher);
+
+    // Run once on page load to encrypt the default text
+    applyCipher();
+</script>
+{% endblock %}

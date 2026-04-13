@@ -1,0 +1,49 @@
+{% set show_sidebar = true %}
+{% extends "base.html" %}
+
+{% block content %}
+<div class="lesson-header" style="margin-bottom: 30px;">
+    <p style="color: #6366f1; font-weight: bold; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 1px;">Module 3</p>
+    <h1 style="font-size: 36px; margin-top: 0; margin-bottom: 15px;">Public Key Cryptography</h1>
+    <p style="font-size: 18px; color: #555; line-height: 1.6; max-width: 800px;">
+        For thousands of years, the Key Distribution Problem was thought to be unsolvable. Then, in the 1970s, a mathematical breakthrough changed the internet forever: Asymmetric Encryption.
+    </p>
+</div>
+
+<hr style="border: 0; height: 1px; background: #e5e7eb; margin: 40px 0;">
+
+<div class="learning-objectives">
+    <h2 style="font-size: 24px; margin-bottom: 20px;">What You Will Learn</h2>
+    
+    <div style="display: grid; gap: 20px; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));">
+        
+        <div style="background: #f8f9fa; border: 1px solid #e5e7eb; border-radius: 8px; padding: 20px; border-top: 4px solid #10b981;">
+            <h3 style="margin-top: 0; color: #333;">1. Secure key distribution</h3>
+            <p style="color: #666; font-size: 15px; margin-bottom: 0;">
+                Learn how generating a linked Public Key (for locking) and a Private Key (for unlocking) completely defeats network eavesdroppers like Eve.
+            </p>
+        </div>
+
+        <div style="background: #f8f9fa; border: 1px solid #e5e7eb; border-radius: 8px; padding: 20px; border-top: 4px solid #f59e0b;">
+            <h3 style="margin-top: 0; color: #333;">2. Man-in-the-middle</h3>
+            <p style="color: #666; font-size: 15px; margin-bottom: 0;">
+                Discover the ingenious math trick that allows Alice and Bob to magically generate a shared secret over a public network without ever actually sending it.
+            </p>
+        </div>
+
+        <div style="background: #f8f9fa; border: 1px solid #e5e7eb; border-radius: 8px; padding: 20px; border-top: 4px solid #f43f5e;">
+            <h3 style="margin-top: 0; color: #333;">3. Diffie-Hellman key exchange</h3>
+            <p style="color: #666; font-size: 15px; margin-bottom: 0;">
+                Explore the most famous asymmetric algorithm in the world, and learn how it uses the multiplication of massive prime numbers to lock your data.
+            </p>
+        </div>
+
+    </div>
+</div>
+
+<div style="margin-top: 50px; text-align: right;">
+    <a href="{{ url_for('module3_lesson1') }}" style="background: #6366f1; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold; font-size: 16px; transition: background 0.2s; box-shadow: 0 4px 6px rgba(99, 102, 241, 0.2);">
+        Start Lesson 1: Secure Distribution →
+    </a>
+</div>
+{% endblock %}

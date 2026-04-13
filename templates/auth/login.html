@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="main-container" style="max-width: 400px; margin-top: 50px;">
+    <div class="course-card" style="width: 100%; padding: 30px; box-sizing: border-box;">
+        <h2 style="margin-top: 0; margin-bottom: 20px;">Admin Login</h2>
+        
+        {% with messages = get_flashed_messages() %}
+          {% if messages %}
+            <div style="color: red; margin-bottom: 15px; font-size: 14px;">
+              {{ messages[0] }}
+            </div>
+          {% endif %}
+        {% endwith %}
+
+        <form method="POST" action="{{ url_for('login') }}">
+            <div style="margin-bottom: 15px;">
+                <label for="username" style="display: block; margin-bottom: 5px; font-weight: 500;">Username</label>
+                <input type="text" id="username" name="username" required style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box;">
+            </div>
+            <div style="margin-bottom: 20px;">
+                <label for="password" style="display: block; margin-bottom: 5px; font-weight: 500;">Password</label>
+                <input type="password" id="password" name="password" required style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box;">
+            </div>
+            <button type="submit" style="width: 100%; padding: 12px; background: #6366f1; color: white; border: none; border-radius: 6px; font-size: 16px; font-weight: bold; cursor: pointer;">Log In</button>
+        </form>
+        <div style="text-align: center; margin-top: 20px; font-size: 14px; color: #666;">
+            Don't have an account? <a href="{{ url_for('register') }}" style="color: #10b981; text-decoration: none; font-weight: bold;">Sign up here</a>.
+        </div>
+    </div>
+</div>
+{% endblock %}
