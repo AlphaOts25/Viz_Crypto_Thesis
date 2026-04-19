@@ -165,11 +165,17 @@ def add_lesson():
     lesson_code = request.form.get('lesson_code')
     title = request.form.get('title')
     
+    # NEW 1: Grab the formatted text from the TinyMCE editor
+    content = request.form.get('content')
+    
     # Grab the FILE instead of a text URL
     video_file = request.files.get('video_file')
 
-    # Prepare the data we are going to save to MongoDB
-    update_data = {"title": title}
+    # NEW 2: Add "content" to the data we are going to save to MongoDB
+    update_data = {
+        "title": title,
+        "content": content
+    }
 
     # If the admin actually selected a file...
     if video_file and video_file.filename != '':
@@ -190,7 +196,7 @@ def add_lesson():
         upsert=True
     )
     
-    flash(f'Successfully uploaded video for {title}!')
+    flash(f'Successfully uploaded video and text for {title}!')
     return redirect(url_for('admin_dashboard'))
 
 @app.route('/admin/delete_lesson/<lesson_code>', methods=['POST'])
@@ -247,7 +253,7 @@ def view_lesson(module_num, lesson_num):
 
         "module3_lesson1": "03_secure_distribution.html",
         "module3_lesson2": "03_Middle.html",
-        "module3_lesson3": "03_deffie.html",
+        "module3_lesson3": "03_deffie.html"
     }
     
     filename = file_map.get(target_code)

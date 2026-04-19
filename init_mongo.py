@@ -7,8 +7,9 @@ client = MongoClient('mongodb://localhost:27017/')
 # Create (or connect to) a database called 'thesis_db'
 db = client['thesis_db']
 
-# Drop the users collection if it exists so we start with a clean slate
+# Drop BOTH collections if they exist so we start with a clean slate
 db.users.drop()
+db.modules.drop()  # <-- ADDED THIS to clean out old videos/lessons
 
 print("Setting up MongoDB database...")
 
@@ -57,6 +58,23 @@ student_data = {
 # Insert the student into the database
 db.users.insert_one(student_data)
 print("Created Student account successfully!")
+
+
+# ---------------------------------------------------------
+# 4. CREATE THE LESSONS (MODULES) DATABASE <-- THIS IS THE NEW PART
+# ---------------------------------------------------------
+print("Setting up the Lessons database...")
+sample_lesson = {
+    "lesson_code": "module1_lesson1",
+    "module_number": 1,
+    "lesson_number": 1,
+    "title": "Plaintext vs Ciphertext",
+    "content": "<strong>Welcome!</strong><p>This is placeholder text. The Admin can edit this using the custom text editor in the Dashboard.</p>",
+    "video_url": "" # Left blank so the Admin can upload an MP4 later
+}
+db.modules.insert_one(sample_lesson)
+print("Created sample lesson successfully!")
+
 
 print("\n--- Setup Complete ---")
 print("You can now view your 'thesis_db' in MongoDB Compass.")
