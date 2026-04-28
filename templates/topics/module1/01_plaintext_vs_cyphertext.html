@@ -42,116 +42,285 @@
         </p>
     </div>
 
-    <h1>Plaintext vs Ciphertext</h1>
+    <h2>Plaintext vs Ciphertext</h2>
         
     {% include "video_player.html" %}
-
-    <p>Now let's talk about how substitution works...</p>
-
     
     <div class="interactive-test" style="background: #1e1e2e; border-radius: 12px; padding: 30px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); color: white;">
-        <h2 style="margin-top: 0; color: #fff; font-size: 20px;">Try It: The Cipher Generator</h2>
-        <p style="color: #a6accd; font-size: 14px; margin-bottom: 20px;">Click encrypt to watch the computer break down and scramble your plaintext step-by-step.</p>
-        
-        <div style="display: flex; gap: 20px; align-items: stretch;">
-            <div style="flex: 1; display: flex; flex-direction: column;">
-                <label style="color: #10b981; font-weight: bold; margin-bottom: 10px; font-size: 14px; text-transform: uppercase;">Plaintext Input</label>
-                <textarea id="plaintextArea" placeholder="Type a short secret message..." style="flex: 1; min-height: 120px; background: #292d3e; border: 1px solid #444; border-radius: 8px; color: white; padding: 15px; font-family: monospace; font-size: 14px; resize: none;"></textarea>
+        <h2 style="text-align: center; color: #fff; font-size: 30px;">An Interactive Simulation</h2>
+        <h2 style="center; color: #1f1e2e; font-size: 30px;">s</h2>
+        <h2 style="margin-top: 0; color: #fff; font-size: 20px;">How Does Encryption and Decryption Works?</h2>
+        <p style="color: #a6accd; font-size: 14px; margin-bottom: 20px;">Click the button to view a step-by-step demonstration of encryption and decryption, presented clearly and simply by the computer.</p>
+        <div class="crypto-wrap">
+            <div class="input-row">
+                <input id="msgInput" type="text" placeholder="Enter text to encrypt…" maxlength="40" />
+                <button id="runBtn">Encrypt / Decrypt</button>
             </div>
 
-            <div style="display: flex; flex-direction: column; justify-content: center; align-items: center;">
-                <button id="encryptBtn" style="background: #6366f1; color: white; border: none; padding: 12px 20px; border-radius: 8px; font-weight: bold; cursor: pointer; transition: 0.3s; font-size: 14px; text-transform: uppercase; box-shadow: 0 4px 6px rgba(0,0,0,0.2);">
-                    Encrypt →
-                </button>
+            <div class="stage" id="stage">
+                <div class="token token-plain" id="tokPlain">Hello!</div>
+                <div class="token token-key" id="tokKey">
+                    <img src="https://cdn.jsdelivr.net/npm/lucide-static@0.441.0/icons/key-round.svg"
+                        width="28" height="28"
+                        style="filter: invert(85%) sepia(40%) saturate(400%) hue-rotate(90deg); display:block;">
+                </div>
+                <div class="token token-cipher" id="tokCipher">abc123</div>
+
+                <div class="machine" id="machine">
+                <img src="{{ url_for('static', filename='machine.png') }}"
+                    id="machGear"
+                    class="machine-icon"
+                    width="48" height="48"
+                    style="object-fit: contain; display: block;">
+                <span class="machine-label" id="machLabel">Machine</span>
+                </div>
             </div>
 
-            <div style="flex: 1; display: flex; flex-direction: column;">
-                <label style="color: #f43f5e; font-weight: bold; margin-bottom: 10px; font-size: 14px; text-transform: uppercase;">Ciphertext Output</label>
-                <textarea id="ciphertextArea" readonly style="flex: 1; min-height: 120px; background: #1a1a24; border: 1px solid #f43f5e; border-radius: 8px; color: #f43f5e; padding: 15px; font-family: monospace; font-size: 14px; resize: none;"></textarea>
+            <div class="key-display" id="keyDisplay"></div>
+
+            <div class="output-area" id="outputBox">
+                <div class="output-label" id="outputLabel">Ciphertext</div>
+                <div id="outputText"></div>
             </div>
+
+            <div class="status" id="status">Enter text and press Encrypt / Decrypt to begin.</div>
         </div>
-
-        <div id="visualizerBox" style="margin-top: 25px; background: #0f0f17; border-radius: 8px; padding: 20px; border: 1px solid #333; font-family: monospace; display: none;">
-            <h4 style="color: #10b981; margin-top: 0; margin-bottom: 15px; font-size: 14px; text-transform: uppercase;">System Processing Steps:</h4>
-            <ul id="stepList" style="list-style: none; padding: 0; margin: 0; color: #a6accd; font-size: 13px; line-height: 1.8;">
-                </ul>
-        </div>
+        <p style="color: #a6accd; font-size: 14px; margin-bottom: 20px;">Note: There is no particular algorithm that is used during the process. This is just a visualization of how encryption and decryption works. </p>
     </div>
         
 </div>
 
 <script>
-    const plaintextArea = document.getElementById('plaintextArea');
-    const ciphertextArea = document.getElementById('ciphertextArea');
-    const encryptBtn = document.getElementById('encryptBtn');
-    const visualizerBox = document.getElementById('visualizerBox');
-    const stepList = document.getElementById('stepList');
+    (function () {
+    const msgInput  = document.getElementById('msgInput');
+    const runBtn    = document.getElementById('runBtn');
+    const tokPlain  = document.getElementById('tokPlain');
+    const tokKey    = document.getElementById('tokKey');
+    const tokCipher = document.getElementById('tokCipher');
+    const machGear  = document.getElementById('machGear');
+    const machLabel = document.getElementById('machLabel');
+    const keyDisplay  = document.getElementById('keyDisplay');
+    const outputBox   = document.getElementById('outputBox');
+    const outputLabel = document.getElementById('outputLabel');
+    const outputText  = document.getElementById('outputText');
+    const status      = document.getElementById('status');
 
-    encryptBtn.addEventListener('click', function() {
-        const text = plaintextArea.value.trim();
-        
-        if (text.length === 0) {
-            alert("Please enter some plaintext first!");
-            return;
+    let running = false;
+    const timers = [];
+
+    function delay(ms) {
+        return new Promise(res => {
+        const id = setTimeout(res, ms);
+        timers.push(id);
+        });
+    }
+
+    function clearTimers() {
+        timers.forEach(clearTimeout);
+        timers.length = 0;
+    }
+
+    /* ── Helpers ── */
+    function resetTokens() {
+        // plaintext: left side
+        tokPlain.style.transition = 'none';
+        tokPlain.style.opacity = '0';
+        tokPlain.style.left = '0px';
+        tokPlain.style.top  = '60px';
+
+        tokKey.style.transition = 'none';
+        tokKey.style.opacity = '0';
+        tokKey.style.left = '0px';
+        tokKey.style.top  = '130px';
+
+        tokCipher.style.transition = 'none';
+        tokCipher.style.opacity = '0';
+        tokCipher.style.right = '0px';
+        tokCipher.style.left  = 'auto';
+        tokCipher.style.top   = '95px';
+    }
+
+    function resetUI() {
+        resetTokens();
+        machGear.className = 'machine-icon';
+        machLabel.textContent = 'Machine';
+        outputBox.classList.remove('visible');
+        keyDisplay.classList.remove('visible');
+        status.textContent = 'Enter text and press Encrypt / Decrypt to begin.';
+    }
+
+    function setStatus(msg) { status.textContent = msg; }
+
+    // Simple Caesar-ish cipher (demo)
+    function encrypt(text) {
+        const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*';
+        return text.split('').map(() =>
+            chars[Math.floor(Math.random() * chars.length)]
+        ).join('');
+        }
+        function decrypt(text) {
+        return text;
         }
 
-        // 1. Reset the UI for a new animation
-        ciphertextArea.value = "";
-        stepList.innerHTML = "";
-        visualizerBox.style.display = "block";
-        encryptBtn.disabled = true;
-        encryptBtn.style.opacity = "0.5";
-        encryptBtn.innerText = "Processing...";
+    /* ── Animate tokens toward the center of the stage ── */
+    function moveToCenter() {
+        const stage = document.getElementById('stage');
+        const sw = stage.offsetWidth;
 
-        try {
-            // 2. Prepare the data transformations behind the scenes
-            const charArray = text.split('');
-            const asciiArray = charArray.map(c => c.charCodeAt(0));
-            const binArray = asciiArray.map(n => n.toString(2).padStart(8, '0'));
-            const finalCipher = btoa(text); // Base64 encoding
+        tokPlain.style.transition = 'opacity 0.6s ease, left 1.2s ease, top 1.2s ease';
+        tokKey.style.transition   = 'opacity 0.6s ease, left 1.2s ease, top 1.2s ease';
+        tokPlain.style.left = (sw / 2 - 90) + 'px';
+        tokPlain.style.top  = '70px';
+        tokKey.style.left   = (sw / 2 - 90) + 'px';
+        tokKey.style.top    = '130px';
+    }
 
-            // 3. Create the sequence of text we want to show the student
-            const steps = [
-                `[1/5] Extracting plaintext characters: <span style="color:#10b981">${charArray.join(' ')}</span>`,
-                `[2/5] Converting characters to ASCII integers: <span style="color:#fb923c">${asciiArray.join(' ')}</span>`,
-                `[3/5] Translating integers to Binary bits: <span style="color:#6366f1">${binArray.join(' ')}</span>`,
-                `[4/5] Applying Base64 cryptographic algorithm...`,
-                `[5/5] Generating final ciphertext: <strong style="color:#f43f5e">${finalCipher}</strong>`
-            ];
+    function fadePlainKey() {
+        tokPlain.style.opacity = '0';
+        tokKey.style.opacity   = '0';
+    }
 
-            let currentStepIndex = 0;
+    function showCipher(text) {
+  const stage = document.getElementById('stage');
+  const sw = stage.offsetWidth;
+  tokCipher.textContent = text.length > 22 ? text.slice(0,22)+'…' : text;
+  tokCipher.style.transition = 'none';
+  tokCipher.style.opacity = '0';
+  tokCipher.style.left  = (sw / 2 + 10) + 'px';
+  tokCipher.style.top   = '60px';
 
-            // 4. The Animation Loop
-            function showNextStep() {
-                if (currentStepIndex < steps.length) {
-                    // Create a new list item for the current step
-                    const li = document.createElement('li');
-                    li.innerHTML = steps[currentStepIndex];
-                    li.style.marginBottom = "8px";
-                    stepList.appendChild(li);
-                    
-                    currentStepIndex++;
-                    
-                    // Wait 800 milliseconds, then run this function again
-                    setTimeout(showNextStep, 800); 
-                } else {
-                    // 5. Animation Finished! Populate the final red box and reset the button
-                    ciphertextArea.value = finalCipher;
-                    encryptBtn.disabled = false;
-                    encryptBtn.style.opacity = "1";
-                    encryptBtn.innerText = "Encrypt →";
-                }
-            }
+  requestAnimationFrame(() => requestAnimationFrame(() => {
+    tokCipher.style.transition = 'opacity 0.8s ease, left 1.2s ease';
+    tokCipher.style.opacity = '1';
+    tokCipher.style.left    = (sw - 160) + 'px';
+  }));
+}
 
-            // Start the animation sequence
-            setTimeout(showNextStep, 400);
+    function moveCipherToCenter() {
+  const stage = document.getElementById('stage');
+  const sw = stage.offsetWidth;
+  tokCipher.style.transition = 'opacity 0.6s ease, left 1.2s ease, top 1.2s ease';
+  tokCipher.style.left = (sw / 2 + 10) + 'px';
+  tokCipher.style.top  = '70px';
+}
 
-        } catch (e) {
-            ciphertextArea.value = "Error encrypting characters.";
-            encryptBtn.disabled = false;
-            encryptBtn.style.opacity = "1";
-            encryptBtn.innerText = "Encrypt →";
-        }
-    });
+    function showKeyForDecrypt() {
+        const stage = document.getElementById('stage');
+        const sw = stage.offsetWidth;
+        tokKey.style.transition = 'none';
+        tokKey.style.opacity = '0';
+        tokKey.style.left = (sw - 160) + 'px';
+        tokKey.style.top  = '130px';
+
+        requestAnimationFrame(() => requestAnimationFrame(() => {
+            tokKey.style.transition = 'opacity 0.8s ease, left 1.2s ease';
+            tokKey.style.opacity = '1';
+            tokKey.style.left    = (sw / 2 + 10) + 'px';
+        }));
+    }
+
+    function showPlainResult(text) {
+        const stage = document.getElementById('stage');
+        const sw = stage.offsetWidth;
+        tokPlain.textContent = text.length > 22 ? text.slice(0,22)+'…' : text;
+        tokPlain.style.transition = 'none';
+        tokPlain.style.opacity = '0';
+        tokPlain.style.left = (sw / 2 + 10) + 'px';
+        tokPlain.style.top  = '95px';
+
+        requestAnimationFrame(() => requestAnimationFrame(() => {
+        tokPlain.style.transition = 'opacity 0.8s ease, left 1.2s ease';
+        tokPlain.style.opacity = '1';
+        tokPlain.style.left    = '0px';
+        }));
+    }
+
+    /* ── Main sequence ── */
+    async function runSequence() {
+        if (running) return;
+        const text = msgInput.value.trim();
+        if (!text) { setStatus('Please enter some text first.'); return; }
+
+        running = true;
+        runBtn.disabled = true;
+        clearTimers();
+        resetUI();
+
+        const key = Math.floor(Math.random() * 900 + 100);
+        const cipher = encrypt(text);
+        const recovered = text;
+
+        tokPlain.textContent = text.length > 22 ? text.slice(0,22)+'…' : text;
+        //keyDisplay.textContent = 'Shared key: ' + key;
+
+        // ── PHASE 1: Fade in plaintext + key on left ──
+        setStatus('Plaintext and key appear…');
+        await delay(200);
+        tokPlain.style.transition = 'opacity 0.8s ease';
+        tokKey.style.transition   = 'opacity 0.8s ease';
+        tokPlain.style.opacity = '1';
+        tokKey.style.opacity   = '1';
+        await delay(1000);
+
+        // ── PHASE 2: Slide toward machine ──
+        setStatus('Moving toward the machine…');
+        moveToCenter();
+        await delay(1400);
+
+        // ── PHASE 3: Machine spins, tokens fade ──
+        setStatus('Encrypting…');
+        machGear.className = 'machine-icon spinning';
+        machLabel.textContent = 'Encrypting';
+        fadePlainKey();
+        await delay(1800);
+
+        // ── PHASE 4: Show ciphertext on right ──
+        machGear.className = 'machine-icon';
+        machLabel.textContent = 'Done';
+        setStatus('Ciphertext produced!');
+
+        keyDisplay.classList.add('visible');
+        outputLabel.textContent = 'Ciphertext';
+        outputText.textContent  = cipher;
+        outputBox.classList.add('visible');
+
+        showCipher(cipher);
+        await delay(2200);
+
+        // ── PHASE 5: Begin decrypt — cipher + key move to center ──
+        setStatus('Starting decryption with the same key…');
+        moveCipherToCenter();
+        await delay(800);
+        showKeyForDecrypt();
+        await delay(1400);
+
+        // ── PHASE 6: Machine spins for decrypt ──
+        setStatus('Decrypting…');
+        machGear.className = 'machine-icon spinning';
+        machLabel.textContent = 'Decrypting';
+        tokCipher.style.opacity = '0';
+        tokKey.style.opacity    = '0';
+        await delay(1800);
+
+        // ── PHASE 7: Recovered plaintext slides out left ──
+        machGear.className = 'machine-icon';
+        machLabel.textContent = 'Done';
+        setStatus('Plaintext recovered!');
+
+        outputLabel.textContent = 'Recovered plaintext';
+        outputText.textContent  = recovered;
+
+        showPlainResult(recovered);
+        await delay(1800);
+
+        // ── Done ──
+        setStatus('Encryption ↔ Decryption complete. Same key, same message!');
+        running = false;
+        runBtn.disabled = false;
+    }
+
+    runBtn.addEventListener('click', runSequence);
+    msgInput.addEventListener('keydown', e => { if (e.key === 'Enter') runSequence(); });
+    })();
 </script>
 {% endblock %}

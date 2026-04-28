@@ -21,4 +21,22 @@ document.addEventListener("DOMContentLoaded", function() {
             }
         });
     }
+        const sidebar        = document.getElementById('sidebar');
+        const sidebarToggle  = document.getElementById('sidebarToggle');
+        const sidebarOverlay = document.getElementById('sidebarOverlay');
+        const toggleIcon     = document.getElementById('toggleIcon');
+
+        if (sidebarToggle) {
+            sidebarToggle.addEventListener('click', () => {
+                sidebar.classList.toggle('open');
+                sidebarOverlay.classList.toggle('active');
+                toggleIcon.textContent = sidebar.classList.contains('open') ? '✕' : '☰';
+            });
+
+            sidebarOverlay.addEventListener('click', () => {
+                sidebar.classList.remove('open');
+                sidebarOverlay.classList.remove('active');
+                toggleIcon.textContent = '☰';
+            });
+        }
 });
