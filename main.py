@@ -248,67 +248,29 @@ def view_lesson(module_num, lesson_num):
         "module1_lesson2": "01_substitution.html",
 
         "module2_lesson1": "02_shared_key.html",
-        "module2_lesson2": "02_aes_standard.html",
-        "module2_lesson3": "02_key_distribution.html",
-
-        "module3_lesson1": "03_secure_distribution.html",
-        "module3_lesson2": "03_Middle.html",
-        "module3_lesson3": "03_deffie.html"
+        "module2_lesson2": "02_key_distribution.html",
+        "module2_lesson3": "02_deffie.html"
     }
     
     filename = file_map.get(target_code)
     template_path = f"topics/module{module_num}/{filename}"
     
     return render_template(template_path, lesson_data=current_lesson)
-
-#----------------Lesson 1--------------------------------
-
-@app.route('/module1/intro')
-def module1_intro():
-    return render_template('topics/module1/01_intro.html')
     
-@app.route('/module1/lesson1')
-def module1_lesson1():
-    return render_template('topics/module1/01_plaintext_vs_cyphertext.html')
+@app.route('/module/<int:module_num>/intro')
+def module_intro(module_num):
+    intro_map = {
+        1: "01_intro.html",
+        2: "02_intro.html",
+    }
 
-@app.route('/module1/lesson2')
-def module1_lesson2():
-    return render_template('topics/module1/01_substitution.html')
+    filename = intro_map.get(module_num)
 
-#----------------Lesson 2--------------------------
+    if not filename:
+        return "Module not found", 404
 
-@app.route('/module2/intro')
-def module2_intro():
-    return render_template('topics/module2/02_intro.html')
+    return render_template(f'topics/module{module_num}/{filename}')
 
-@app.route('/module2/lesson1')
-def module2_lesson1():
-    return render_template('topics/module2/02_shared_key.html')
-
-@app.route('/module2/lesson2')
-def module2_lesson2():
-    return render_template('topics/module2/02_aes_standard.html')
-
-@app.route('/module2/lesson3')
-def module2_lesson3():
-    return render_template('topics/module2/02_key_distribution.html')
-#-----------------Lesson 3-------------------------
-
-@app.route('/module3/intro')
-def module3_intro():
-    return render_template('topics/module3/03_intro.html')
-
-@app.route('/module3/lesson1')
-def module3_lesson1():
-    return render_template('topics/module3/03_secure_distribution.html')
-
-@app.route('/module3/lesson2')
-def module3_lesson2():
-    return render_template('topics/module3/03_Middle.html')
-
-@app.route('/module3/lesson3')
-def module3_lesson3():
-    return render_template('topics/module3/03_deffie.html')
 #-----------------------MAIN------------------------------------
 UPLOAD_FOLDER = 'static/uploads/videos'
 os.makedirs(UPLOAD_FOLDER, exist_ok=True) 

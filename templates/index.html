@@ -36,7 +36,7 @@
                             <span class="stat-label">Interactive</span>
                         </div>
                     </div>
-                    <a href="{{ url_for('module1_intro') }}" class="play-btn">▶</a>
+                    <a href="{{ url_for('module_intro', module_num=1) }}" class="play-btn">▶</a>
                 </div>
             </div>
 
@@ -56,10 +56,10 @@
                             <span class="stat-label">Interactive</span>
                         </div>
                     </div>
-                    <a href="{{ url_for('module2_intro') }}" class="play-btn">▶</a>
+                    <a href="{{ url_for('module_intro', module_num=2) }}" class="play-btn">▶</a>
                 </div>
             </div>
-
+            <!--
             <div class="course-card">
                 <div class="card-top bg-orange">
                     <p class="course-subtitle">Module 3</p>
@@ -79,6 +79,7 @@
                     <a href="#" class="play-btn">▶</a>
                 </div>
             </div>
+            -->
         </div>
     </section>
 </div>
