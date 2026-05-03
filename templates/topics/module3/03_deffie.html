@@ -2,158 +2,389 @@
 {% extends "base.html" %}
 
 {% block content %}
+<style>
+    /* ── REFINED DH SIMULATOR CSS ── */
+    #dhSim * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', 'Segoe UI', sans-serif; }
+    #dhSim {
+        background: #13141c; 
+        border-radius: 16px; 
+        padding: 40px 50px; /* Increased horizontal padding for breathing room */
+        box-shadow: 0 10px 30px rgba(0,0,0,0.3); 
+        color: #fff;
+        margin-top: 40px;
+        border: 1px solid rgba(255,255,255,0.05);
+    }
+    
+    /* Progress Stepper */
+    .dh-progress {
+        display: flex; justify-content: space-between; align-items: center;
+        background: rgba(255,255,255,0.03); border-radius: 12px;
+        padding: 12px 30px; margin-bottom: 30px;
+    }
+    .dh-step {
+        font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px;
+        color: #55558a; display: flex; align-items: center; gap: 8px; transition: color 0.3s;
+    }
+    .dh-step.active { color: #fff; }
+    .dh-step.completed { color: #10b981; }
+    .dh-step-dot {
+        width: 24px; height: 24px; border-radius: 50%; background: #252537;
+        display: flex; align-items: center; justify-content: center; font-size: 11px;
+        transition: background 0.3s, color 0.3s;
+    }
+    .dh-step.active .dh-step-dot { background: #6366f1; color: #fff; box-shadow: 0 0 10px rgba(99,102,241,0.5); }
+    .dh-step.completed .dh-step-dot { background: #10b981; color: #fff; }
+
+    /* Layout Zones */
+    .dh-stage {
+        display: flex; justify-content: space-between; align-items: stretch; gap: 20px;
+        margin-bottom: 30px; position: relative;
+    }
+    .dh-actor { 
+        display: flex; flex-direction: column; align-items: center; width: 30%; 
+        background: rgba(255,255,255,0.02); border-radius: 16px; padding: 25px 20px;
+        border: 1px solid rgba(255,255,255,0.03); position: relative; z-index: 2;
+    }
+    .public-zone { 
+        width: 36%; background: rgba(245, 158, 11, 0.03); border: 1px dashed rgba(245, 158, 11, 0.2); 
+        justify-content: space-between;
+    }
+    .actor-title { font-size: 15px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 25px; display: flex; align-items: center; gap: 8px; }
+
+    /* 3D Glass Beakers */
+    .beaker-wrap { display: flex; flex-direction: column; align-items: center; gap: 12px; transition: transform 1.2s cubic-bezier(0.4, 0, 0.2, 1); width: 100%; position: relative; z-index: 5; }
+    .glass-beaker {
+        width: 80px; height: 80px; border-radius: 50%;
+        background: rgba(255,255,255,0.02); border: 2px solid rgba(255,255,255,0.08);
+        position: relative; overflow: hidden;
+        box-shadow: 0 10px 20px rgba(0,0,0,0.3), inset 0 0 15px rgba(0,0,0,0.5);
+        isolation: isolate;
+    }
+    .liquid {
+        position: absolute; bottom: 0; left: 0; right: 0; height: 0%;
+        transition: height 1s cubic-bezier(0.4, 0, 0.2, 1), background-color 1s ease, box-shadow 1s ease;
+        box-shadow: inset 0 4px 10px rgba(255,255,255,0.2);
+    }
+    .glass-glare {
+        position: absolute; top: 5%; left: 10%; width: 40%; height: 30%;
+        background: linear-gradient(135deg, rgba(255,255,255,0.3) 0%, transparent 100%);
+        border-radius: 50%; transform: rotate(-20deg); pointer-events: none; z-index: 10;
+    }
+    
+    .beaker-label { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: #a6accd; text-transform: uppercase; font-weight: 600; text-align: center; line-height: 1.5; min-height: 36px; }
+    .sub-label { display: block; color: #55558a; font-size: 10px; margin-top: 2px; font-weight: normal; }
+
+    /* Interactive Swatches */
+    .swatch-panel { background: rgba(0,0,0,0.2); padding: 12px; border-radius: 30px; border: 1px solid rgba(255,255,255,0.05); margin-top: 10px; }
+    .swatches { display: flex; gap: 12px; position: relative; z-index: 50; }
+    .swatch {
+        width: 32px; height: 32px; border-radius: 50%; cursor: pointer;
+        transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.2s;
+        border: 2px solid transparent; position: relative;
+    }
+    .swatch::after { content: ''; position: absolute; top: 2px; left: 4px; width: 10px; height: 8px; background: rgba(255,255,255,0.4); border-radius: 50%; transform: rotate(-30deg); }
+    .swatch:hover { transform: translateY(-4px) scale(1.1); }
+    .swatch.selected { border-color: #fff; box-shadow: 0 5px 15px rgba(0,0,0,0.5); transform: scale(1.1); }
+    .swatch-panel.disabled { opacity: 0.3; pointer-events: none; filter: grayscale(100%); transition: all 0.5s; }
+
+    /* STATUS & CONTROLS (Updated for Stacked/Centered Layout) */
+    .control-panel { 
+        display: flex; flex-direction: column; align-items: center; justify-content: center;
+        background: #1a1a24; border-radius: 12px; padding: 30px 40px; 
+        border: 1px solid rgba(255,255,255,0.05); text-align: center;
+    }
+    .dh-status { 
+        font-size: 15px; color: #c8cee8; line-height: 1.6; margin-bottom: 20px;
+    }
+    .dh-status strong { color: #fff; }
+    .dh-btn {
+        padding: 14px 40px; background: #6366f1; border: none; border-radius: 8px;
+        color: #fff; font-size: 14px; font-weight: 700; text-transform: uppercase;
+        cursor: pointer; transition: all 0.3s; letter-spacing: 1px; min-width: 250px;
+        box-shadow: 0 4px 15px rgba(99,102,241,0.3); margin-top: 0;
+    }
+    .dh-btn:hover:not(:disabled) { background: #4f46e5; transform: translateY(-2px); box-shadow: 0 6px 20px rgba(99,102,241,0.4); }
+    .dh-btn:active:not(:disabled) { transform: translateY(0); }
+    .dh-btn:disabled { background: #252537; color: #55558a; cursor: not-allowed; box-shadow: none; }
+</style>
+
 <div class="lesson-container" style="max-width: 850px; margin: 0 auto; padding-bottom: 60px;">
 
+    <!-- ── HEADER ── -->
     <div class="lesson-header" style="margin-bottom: 40px;">
-        <p style="color: #6366f1; font-weight: bold; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 1px;">Module 3 - Topic 3</p>
-        <h1 style="font-size: 36px; margin-top: 0; margin-bottom: 15px;">The Diffie-Hellman Exchange</h1>
+        <p style="color: #6366f1; font-weight: bold; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 1px;">Topic 3</p>
+        <h1 style="font-size: 36px; margin-top: 0; margin-bottom: 15px;">The Key Exchange Problem</h1>
         <p style="font-size: 18px; color: #555; line-height: 1.6;">
-            How can Alice and Bob agree on a secret password while shouting to each other across a crowded room where everyone (including Eve) can hear them? The answer is a one-way mathematical function.
+            AES is unbreakable, but it has a fatal flaw: Symmetric encryption requires both the sender and receiver to have the <em>exact same secret key</em>. How do you send that key across the internet without a hacker stealing it?
         </p>
     </div>
 
+    <!-- ── EXPLANATION ── -->
     <div class="study-section" style="background: #fff; border-radius: 12px; padding: 30px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); margin-bottom: 40px;">
-        <h2 style="margin-top: 0; color: #333; border-bottom: 2px solid #e5e7eb; padding-bottom: 10px;">The Paint Mixing Metaphor</h2>
-        
+        <h2 style="margin-top: 0; color: #333; border-bottom: 2px solid #e5e7eb; padding-bottom: 10px;">Enter Diffie-Hellman</h2>
         <p style="color: #555; line-height: 1.6; font-size: 16px;">
-            In cryptography, we use complex math (like prime numbers and modulos) to act as a <strong>one-way function</strong>. A one-way function is something that is easy to do, but almost impossible to undo. 
+            In 1976, Whitfield Diffie and Martin Hellman solved this problem with pure mathematics. They invented a protocol that allows two people who have never met to generate a shared secret password in broad daylight, even if a hacker is listening to every single word they say.
         </p>
-        <p style="color: #555; line-height: 1.6; font-size: 16px;">
-            The best way to understand this is by thinking about mixing paint:
-        </p>
-
-        <ul style="color: #555; line-height: 1.8; font-size: 15px; margin-top: 15px;">
-            <li><strong>Easy to mix:</strong> If you mix Yellow and Blue, you easily get Green.</li>
-            <li><strong>Hard to un-mix:</strong> If someone hands you a bucket of Green paint, it is physically impossible to separate it back out into the exact original Yellow and Blue drops.</li>
-        </ul>
-
-        <div style="background: #eff6ff; border-left: 4px solid #3b82f6; padding: 15px; margin-top: 20px; border-radius: 0 6px 6px 0;">
-            <p style="margin: 0; color: #1e3a8a; font-size: 15px;">
-                Diffie-Hellman uses this "un-mixable" math to let Alice and Bob generate a shared secret key over a public internet connection, completely locking out Eve!
+        <div style="background: #fdf2f8; border-left: 4px solid #f43f5e; padding: 15px; margin-top: 20px; border-radius: 0 6px 6px 0;">
+            <p style="margin: 0; color: #9f1239; font-size: 15px;">
+                <strong>Important:</strong> Diffie-Hellman is purely a <strong>Key Exchange Protocol</strong> used to safely establish the password that AES will use later!
             </p>
         </div>
     </div>
 
-    <h1>Deffie-Hellman Exchange</h1>
-        
+    <h2>Diffie-Hellman</h2>
     {% include "video_player.html" %}
 
-    <div class="interactive-test" style="background: #1e1e2e; border-radius: 12px; padding: 30px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); color: white;">
-        <h2 style="margin-top: 0; color: #fff; font-size: 20px;">Try It: The Paint Exchange</h2>
-        <p style="color: #a6accd; font-size: 14px; margin-bottom: 30px;">
-            Click through the steps below to watch Alice and Bob establish a shared secret color. Eve can see everything sent over the network, but she can't figure out the final color!
+    <!-- ── INTERACTIVE REFINED SIMULATOR ── -->
+    <div id="dhSim">
+        <h2 style="font-size:22px; font-weight:600; color:#fff; margin-top:0; margin-bottom: 10px;">Interactive: The Paint Mixing Analogy</h2>
+        <p style="color:#a6accd; font-size:14px; margin-bottom:30px; line-height: 1.6;">
+            Because the underlying modulo math is complex, cryptographers explain Diffie-Hellman using paint. It relies on one mathematical rule: <strong>It is easy to mix two colors, but impossible to "un-mix" them.</strong>
         </p>
-        
-        <div style="display: flex; gap: 10px; margin-bottom: 30px; justify-content: center;">
-            <button class="step-btn" id="btnStep1" style="background: #6366f1; color: white; border: none; padding: 10px 15px; border-radius: 6px; cursor: pointer; font-weight: bold;">1. Agree on Public Color</button>
-            <button class="step-btn" id="btnStep2" style="background: #444; color: white; border: none; padding: 10px 15px; border-radius: 6px; cursor: not-allowed; font-weight: bold;" disabled>2. Mix Secrets</button>
-            <button class="step-btn" id="btnStep3" style="background: #444; color: white; border: none; padding: 10px 15px; border-radius: 6px; cursor: not-allowed; font-weight: bold;" disabled>3. Exchange Mixes</button>
-            <button class="step-btn" id="btnStep4" style="background: #444; color: white; border: none; padding: 10px 15px; border-radius: 6px; cursor: not-allowed; font-weight: bold;" disabled>4. Final Mix</button>
+
+        <!-- Progress Tracker -->
+        <div class="dh-progress">
+            <div class="dh-step active" id="step1"><div class="dh-step-dot">1</div> Pick Secrets</div>
+            <div class="dh-step" id="step2"><div class="dh-step-dot">2</div> Mix Public</div>
+            <div class="dh-step" id="step3"><div class="dh-step-dot">3</div> Exchange</div>
+            <div class="dh-step" id="step4"><div class="dh-step-dot">4</div> Final Key</div>
         </div>
-
-        <div style="display: flex; justify-content: space-between; align-items: flex-start; position: relative;">
-            
-            <div style="flex: 1; background: #292d3e; padding: 15px; border-radius: 8px; border-top: 4px solid #10b981; text-align: center;">
-                <h3 style="color: #10b981; margin-top: 0; margin-bottom: 15px; font-size: 16px;">👩 Alice</h3>
-                <p style="color: #888; font-size: 10px; margin-bottom: 5px;">Secret Color (Never Sent):</p>
-                <div style="width: 40px; height: 40px; background: #ef4444; border-radius: 50%; margin: 0 auto 15px auto; border: 2px solid white;"></div>
+        
+        <div class="dh-stage">
+            <!-- ALICE -->
+            <div class="dh-actor" style="border-top: 3px solid #f43f5e;">
+                <div class="actor-title" style="color: #f43f5e;">👩 Alice</div>
                 
-                <p style="color: #888; font-size: 10px; margin-bottom: 5px;">Alice's Current Bucket:</p>
-                <div id="aliceBucket" style="width: 60px; height: 60px; background: #1a1a24; border-radius: 8px; margin: 0 auto; border: 2px solid #444; transition: 0.5s;"></div>
-            </div>
+                <div class="beaker-wrap">
+                    <div class="glass-beaker"><div class="liquid" id="aliceSecretLiquid"></div><div class="glass-glare"></div></div>
+                    <span class="beaker-label">Alice's Secret<span class="sub-label">Stays on computer</span></span>
+                </div>
+                
+                <div class="swatch-panel" id="aliceSwatches">
+                    <div class="swatches">
+                        <div class="swatch alice-swatch" style="background: rgb(239, 68, 68); box-shadow: 0 4px 10px rgba(239, 68, 68, 0.4);" data-color="239,68,68"></div>
+                        <div class="swatch alice-swatch" style="background: rgb(34, 197, 94); box-shadow: 0 4px 10px rgba(34, 197, 94, 0.4);" data-color="34,197,94"></div>
+                        <div class="swatch alice-swatch" style="background: rgb(168, 85, 247); box-shadow: 0 4px 10px rgba(168, 85, 247, 0.4);" data-color="168,85,247"></div>
+                    </div>
+                </div>
 
-            <div style="flex: 1; margin: 0 15px; text-align: center;">
-                <div style="background: #1a1a24; border: 2px dashed #f43f5e; padding: 15px; border-radius: 8px;">
-                    <h3 style="color: #f43f5e; margin: 0 0 10px 0; font-size: 14px;">🦹‍♀️ Eve (The Network)</h3>
-                    <p style="color: #888; font-size: 10px; margin-bottom: 5px;">Publicly Visible Colors:</p>
-                    <div id="networkZone" style="display: flex; justify-content: center; gap: 10px; min-height: 40px; transition: 0.5s;">
-                        </div>
-                    <p id="eveComment" style="color: #a6accd; font-size: 11px; margin-top: 10px; min-height: 30px;">Eve is watching the network...</p>
+                <div class="beaker-wrap" style="margin-top: 25px; opacity: 0; transition: opacity 0.5s;" id="aliceMixWrap">
+                    <div class="glass-beaker"><div class="liquid" id="aliceMixLiquid"></div><div class="glass-glare"></div></div>
+                    <span class="beaker-label" id="aliceMixLabel">Alice's Mixture</span>
                 </div>
             </div>
 
-            <div style="flex: 1; background: #292d3e; padding: 15px; border-radius: 8px; border-top: 4px solid #3b82f6; text-align: center;">
-                <h3 style="color: #3b82f6; margin-top: 0; margin-bottom: 15px; font-size: 16px;">👨 Bob</h3>
-                <p style="color: #888; font-size: 10px; margin-bottom: 5px;">Secret Color (Never Sent):</p>
-                <div style="width: 40px; height: 40px; background: #3b82f6; border-radius: 50%; margin: 0 auto 15px auto; border: 2px solid white;"></div>
+            <!-- PUBLIC NETWORK -->
+            <div class="dh-actor public-zone">
+                <div class="actor-title" style="color: #f59e0b;">🌐 Public Network</div>
+                <div class="beaker-wrap">
+                    <div class="glass-beaker" style="border-color: rgba(245, 158, 11, 0.3);">
+                        <div class="liquid" style="height: 100%; background: rgb(234, 179, 8); box-shadow: inset 0 4px 15px rgba(234, 179, 8, 0.5);"></div>
+                        <div class="glass-glare"></div>
+                    </div>
+                    <span class="beaker-label">Public Base Color<span class="sub-label">Visible to Hackers</span></span>
+                </div>
+                <div style="flex: 1;"></div> <!-- Spacer -->
+            </div>
+
+            <!-- BOB -->
+            <div class="dh-actor" style="border-top: 3px solid #6366f1;">
+                <div class="actor-title" style="color: #6366f1;">👨 Bob</div>
                 
-                <p style="color: #888; font-size: 10px; margin-bottom: 5px;">Bob's Current Bucket:</p>
-                <div id="bobBucket" style="width: 60px; height: 60px; background: #1a1a24; border-radius: 8px; margin: 0 auto; border: 2px solid #444; transition: 0.5s;"></div>
+                <div class="beaker-wrap">
+                    <div class="glass-beaker"><div class="liquid" id="bobSecretLiquid"></div><div class="glass-glare"></div></div>
+                    <span class="beaker-label">Bob's Secret<span class="sub-label">Stays on computer</span></span>
+                </div>
+                
+                <div class="swatch-panel" id="bobSwatches">
+                    <div class="swatches">
+                        <div class="swatch bob-swatch" style="background: rgb(59, 130, 246); box-shadow: 0 4px 10px rgba(59, 130, 246, 0.4);" data-color="59,130,246"></div>
+                        <div class="swatch bob-swatch" style="background: rgb(236, 72, 153); box-shadow: 0 4px 10px rgba(236, 72, 153, 0.4);" data-color="236,72,153"></div>
+                        <div class="swatch bob-swatch" style="background: rgb(20, 184, 166); box-shadow: 0 4px 10px rgba(20, 184, 166, 0.4);" data-color="20,184,166"></div>
+                    </div>
+                </div>
+
+                <div class="beaker-wrap" style="margin-top: 25px; opacity: 0; transition: opacity 0.5s;" id="bobMixWrap">
+                    <div class="glass-beaker"><div class="liquid" id="bobMixLiquid"></div><div class="glass-glare"></div></div>
+                    <span class="beaker-label" id="bobMixLabel">Bob's Mixture</span>
+                </div>
             </div>
         </div>
-    </div>
 
+        <!-- Controls (Stacked and Centered) -->
+        <div class="control-panel">
+            <div class="dh-status" id="dhStatus">
+                <strong>Phase 1:</strong> Select a private secret color for both Alice and Bob by clicking the paint drops above.
+            </div>
+            <button id="dhActionBtn" class="dh-btn" disabled>Waiting for Secrets...</button>
+        </div>
+    </div>
 </div>
 
 <script>
-    const btn1 = document.getElementById('btnStep1');
-    const btn2 = document.getElementById('btnStep2');
-    const btn3 = document.getElementById('btnStep3');
-    const btn4 = document.getElementById('btnStep4');
+(function() {
+    const pubColor = [234, 179, 8];
+    let aliceColor = null; let bobColor = null;
+    let aliceMixColor = null; let bobMixColor = null;
+    let state = 0; 
 
-    const aliceBucket = document.getElementById('aliceBucket');
-    const bobBucket = document.getElementById('bobBucket');
-    const networkZone = document.getElementById('networkZone');
-    const eveComment = document.getElementById('eveComment');
+    const btn = document.getElementById('dhActionBtn');
+    const statusBox = document.getElementById('dhStatus');
+    const aliceMixWrap = document.getElementById('aliceMixWrap');
+    const bobMixWrap = document.getElementById('bobMixWrap');
+    const aliceMixLiq = document.getElementById('aliceMixLiquid');
+    const bobMixLiq = document.getElementById('bobMixLiquid');
 
-    // Colors
-    const publicColor = "#fde047"; // Yellow
-    const aliceSecret = "#ef4444"; // Red
-    const bobSecret = "#3b82f6"; // Blue
-    const aliceMixed = "#f97316"; // Orange (Yellow + Red)
-    const bobMixed = "#22c55e"; // Green (Yellow + Blue)
-    const finalShared = "#78350f"; // Brown (All three mixed)
+    function toRgb(cArr) { return `rgb(${cArr[0]}, ${cArr[1]}, ${cArr[2]})`; }
+    function toGlow(cArr) { return `inset 0 4px 15px rgba(${cArr[0]}, ${cArr[1]}, ${cArr[2]}, 0.8)`; }
 
-    // Step 1: Public Color
-    btn1.addEventListener('click', () => {
-        aliceBucket.style.background = publicColor;
-        bobBucket.style.background = publicColor;
-        networkZone.innerHTML = `<div style="width:30px;height:30px;background:${publicColor};border-radius:50%;border:1px solid white;"></div>`;
+    // Mathematically perfect 3-way average for the final step to guarantee matching colors
+    function mixFinal(c1, c2, base) {
+        return [
+            Math.round((c1[0] + c2[0] + base[0]) / 3),
+            Math.round((c1[1] + c2[1] + base[1]) / 3),
+            Math.round((c1[2] + c2[2] + base[2]) / 3)
+        ];
+    }
+    // Standard 2-way mix
+    function mixColors(c1, c2) {
+        return [ Math.round((c1[0]+c2[0])/2), Math.round((c1[1]+c2[1])/2), Math.round((c1[2]+c2[2])/2) ];
+    }
+
+    function updateStepUI(activeNum) {
+        for(let i=1; i<=4; i++) {
+            let el = document.getElementById('step'+i);
+            el.classList.remove('active', 'completed');
+            if (i < activeNum) el.classList.add('completed');
+            if (i === activeNum) el.classList.add('active');
+        }
+    }
+
+    window.handleColorSelect = function(actor, rgbString, element) {
+        if (state > 0) return;
+        const rgb = rgbString.split(',').map(Number);
+
+        const parent = document.getElementById(actor + 'Swatches');
+        parent.querySelectorAll('.swatch').forEach(el => el.classList.remove('selected'));
+        element.classList.add('selected');
+
+        const liquid = document.getElementById(actor + 'SecretLiquid');
+        liquid.style.height = '100%';
+        liquid.style.backgroundColor = toRgb(rgb);
+        liquid.style.boxShadow = toGlow(rgb);
+
+        if (actor === 'alice') aliceColor = rgb;
+        if (actor === 'bob') bobColor = rgb;
+
+        if (aliceColor && bobColor) {
+            btn.disabled = false;
+            btn.innerText = "Mix with Public Base";
+            btn.style.background = "#f59e0b";
+            btn.style.boxShadow = "0 4px 15px rgba(245,158,11,0.3)";
+            statusBox.innerHTML = "<strong>Phase 2:</strong> Secrets chosen! Now, let's mix the Private Secrets with the Public Base color. (The resulting mixtures are mathematically impossible to un-mix).";
+        }
+    }
+
+    document.querySelectorAll('.alice-swatch').forEach(el => el.addEventListener('click', function() { handleColorSelect('alice', this.dataset.color, this); }));
+    document.querySelectorAll('.bob-swatch').forEach(el => el.addEventListener('click', function() { handleColorSelect('bob', this.dataset.color, this); }));
+
+    btn.addEventListener('click', () => {
         
-        eveComment.innerText = "Alice and Bob agree to use Yellow publicly. I can see the Yellow.";
-        
-        btn1.style.background = "#444"; btn1.disabled = true;
-        btn2.style.background = "#6366f1"; btn2.disabled = false; btn2.style.cursor = "pointer";
+        if (state === 0) { // Moving to Phase 2
+            updateStepUI(2);
+            document.getElementById('aliceSwatches').classList.add('disabled');
+            document.getElementById('bobSwatches').classList.add('disabled');
+
+            aliceMixColor = mixColors(pubColor, aliceColor);
+            bobMixColor = mixColors(pubColor, bobColor);
+
+            aliceMixWrap.style.opacity = '1'; bobMixWrap.style.opacity = '1';
+            
+            setTimeout(() => {
+                aliceMixLiq.style.height = '100%';
+                aliceMixLiq.style.backgroundColor = toRgb(aliceMixColor);
+                aliceMixLiq.style.boxShadow = toGlow(aliceMixColor);
+                
+                bobMixLiq.style.height = '100%';
+                bobMixLiq.style.backgroundColor = toRgb(bobMixColor);
+                bobMixLiq.style.boxShadow = toGlow(bobMixColor);
+            }, 100);
+
+            btn.innerText = "Send Over Network";
+            btn.style.background = "#f43f5e";
+            btn.style.boxShadow = "0 4px 15px rgba(244,63,94,0.3)";
+            statusBox.innerHTML = "<strong>Phase 3:</strong> Mixtures created. Now, send the mixtures across the internet. Eve the hacker will see them, but she can't un-mix the paint to find your secrets!";
+            state = 1;
+        }
+        else if (state === 1) { // Moving to Phase 3
+            updateStepUI(3);
+            const dist = bobMixWrap.getBoundingClientRect().left - aliceMixWrap.getBoundingClientRect().left;
+
+            aliceMixWrap.style.transform = `translateX(${dist}px)`;
+            bobMixWrap.style.transform = `translateX(-${dist}px)`;
+
+            document.getElementById('aliceMixLabel').innerText = "Received from Bob";
+            document.getElementById('bobMixLabel').innerText = "Received from Alice";
+
+            btn.innerText = "Add Private Secrets";
+            btn.style.background = "#10b981";
+            btn.style.boxShadow = "0 4px 15px rgba(16,185,129,0.3)";
+            statusBox.innerHTML = "<strong>Phase 4:</strong> Exchange complete! Now, Alice adds her Private Secret to Bob's mixture. Bob adds his Private Secret to Alice's mixture.";
+            state = 2;
+        }
+        else if (state === 2) { // Moving to Phase 4
+            updateStepUI(4);
+            
+            // Generate exact 3-way match
+            const finalColor = mixFinal(aliceColor, bobColor, pubColor);
+
+            // Animate liquid mixing
+            aliceMixLiq.style.height = '50%'; bobMixLiq.style.height = '50%';
+            
+            setTimeout(() => {
+                aliceMixLiq.style.backgroundColor = toRgb(finalColor);
+                aliceMixLiq.style.boxShadow = toGlow(finalColor);
+                bobMixLiq.style.backgroundColor = toRgb(finalColor);
+                bobMixLiq.style.boxShadow = toGlow(finalColor);
+                
+                aliceMixLiq.style.height = '100%'; bobMixLiq.style.height = '100%';
+            }, 600);
+
+            document.getElementById('aliceMixLabel').innerHTML = "Shared AES Key<br><span style='color:#10b981;'>Matches perfectly!</span>";
+            document.getElementById('bobMixLabel').innerHTML = "Shared AES Key<br><span style='color:#10b981;'>Matches perfectly!</span>";
+
+            btn.innerText = "Reset Simulator";
+            btn.style.background = "#6366f1";
+            btn.style.boxShadow = "0 4px 15px rgba(99,102,241,0.3)";
+            statusBox.innerHTML = "<strong>Success!</strong> Because mixing is mathematically commutative, both sides have generated the <em>exact same color</em>. They now share an AES Key, and Eve is completely locked out!";
+            state = 3;
+        }
+        else if (state === 3) { // Reset
+            updateStepUI(1);
+            aliceColor = null; bobColor = null;
+            aliceMixColor = null; bobMixColor = null;
+
+            document.getElementById('aliceSecretLiquid').style.height = '0%';
+            document.getElementById('bobSecretLiquid').style.height = '0%';
+            document.getElementById('aliceSwatches').classList.remove('disabled');
+            document.getElementById('bobSwatches').classList.remove('disabled');
+            document.querySelectorAll('.swatch').forEach(el => el.classList.remove('selected'));
+
+            aliceMixWrap.style.opacity = '0'; bobMixWrap.style.opacity = '0';
+            aliceMixWrap.style.transform = `translateX(0)`; bobMixWrap.style.transform = `translateX(0)`;
+            aliceMixLiq.style.height = '0%'; bobMixLiq.style.height = '0%';
+
+            document.getElementById('aliceMixLabel').innerText = "Alice's Mixture";
+            document.getElementById('bobMixLabel').innerText = "Bob's Mixture";
+
+            btn.disabled = true;
+            btn.innerText = "Waiting for Secrets...";
+            btn.style.background = "#6366f1";
+            btn.style.boxShadow = "0 4px 15px rgba(99,102,241,0.3)";
+            statusBox.innerHTML = "<strong>Phase 1:</strong> Select a private secret color for both Alice and Bob by clicking the paint drops above.";
+            state = 0;
+        }
     });
-
-    // Step 2: Mix Secrets
-    btn2.addEventListener('click', () => {
-        aliceBucket.style.background = aliceMixed;
-        bobBucket.style.background = bobMixed;
-        
-        eveComment.innerText = "They mixed their secret colors inside their own houses. I cannot see what is in their houses.";
-        
-        btn2.style.background = "#444"; btn2.disabled = true;
-        btn3.style.background = "#6366f1"; btn3.disabled = false; btn3.style.cursor = "pointer";
-    });
-
-    // Step 3: Exchange Mixes
-    btn3.addEventListener('click', () => {
-        // Swap buckets visually
-        aliceBucket.style.background = bobMixed;
-        bobBucket.style.background = aliceMixed;
-        
-        // Eve sees the mixes on the network
-        networkZone.innerHTML = `
-            <div style="width:30px;height:30px;background:${publicColor};border-radius:50%;border:1px solid white;"></div>
-            <div style="width:30px;height:30px;background:${aliceMixed};border-radius:50%;border:1px solid white;"></div>
-            <div style="width:30px;height:30px;background:${bobMixed};border-radius:50%;border:1px solid white;"></div>
-        `;
-        
-        eveComment.innerText = "They traded buckets! I intercepted Orange and Green! But I cannot un-mix them to find their secrets.";
-        
-        btn3.style.background = "#444"; btn3.disabled = true;
-        btn4.style.background = "#10b981"; btn4.disabled = false; btn4.style.cursor = "pointer";
-    });
-
-    // Step 4: Final Mix
-    btn4.addEventListener('click', () => {
-        aliceBucket.style.background = finalShared;
-        bobBucket.style.background = finalShared;
-        
-        eveComment.innerHTML = "<span style='color:#ef4444;font-weight:bold;'>Defeated!</span> They both made Brown, but I don't know the secrets so I cannot make Brown!";
-        
-        btn4.style.background = "#444"; btn4.disabled = true;
-    });
+})();
 </script>
 {% endblock %}

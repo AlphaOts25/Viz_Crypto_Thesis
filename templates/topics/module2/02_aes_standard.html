@@ -2,8 +2,81 @@
 {% extends "base.html" %}
 
 {% block content %}
+<style>
+    /* ── AES SIMULATOR CSS ── */
+    #aesSim * { box-sizing: border-box; margin: 0; padding: 0; }
+    #aesSim {
+        background: #1e1e2e;
+        border-radius: 12px;
+        padding: 30px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        color: #fff;
+        font-family: 'Segoe UI', system-ui, sans-serif;
+        margin-top: 40px;
+    }
+    
+    /* State Array Cells */
+    .ac {
+        width: 62px; height: 62px;
+        background: #252537;
+        border: 1.5px solid #3a3a58;
+        border-radius: 8px;
+        display: flex; align-items: center; justify-content: center;
+        font-family: 'Courier New', monospace; font-size: 16px; font-weight: 700;
+        color: #c8cee8;
+        /* SLOWED DOWN CSS TRANSITIONS */
+        transition: background 0.6s, border-color 0.6s, color 0.6s, transform 1s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.5s;
+        position: relative; user-select: none;
+    }
+    .ac.ag { background: #082a1a; border-color: #10b981; color: #10b981; }
+    .ac.am { background: #241600; border-color: #f59e0b; color: #f59e0b; }
+    .ac.ar { background: #2a0610; border-color: #f43f5e; color: #f43f5e; }
+    .ac.ai { background: #18174a; border-color: #6366f1; color: #a5b4fc; }
+    
+    .agrid { display: grid !important; grid-template-columns: repeat(4, 62px) !important; gap: 8px !important; overflow: visible; position: relative; }
+    
+    /* Navigation Dots */
+    .sdot { width: 8px; height: 8px; border-radius: 50%; background: #2a2a42; transition: background .3s; flex-shrink: 0; }
+    .sdot.act { background: #6366f1; }
+    .sdot.dn { background: #10b981; }
+    
+    /* Buttons */
+    #aesPrev { padding: 9px 20px; background: #1a1a2c; border: 1.5px solid #32325a; border-radius: 6px; color: #5a5a7a; font-size: 13px; cursor: pointer; transition: all .2s; }
+    #aesNext { padding: 9px 24px; background: #6366f1; border: none; border-radius: 6px; color: #fff; font-size: 13px; font-weight: 600; cursor: pointer; transition: filter .2s, background .2s; }
+    #aesPrev:hover:not(:disabled) { background: #25253a; border-color: #55558a; color: #aaaacc; }
+    #aesNext:hover:not(:disabled) { filter: brightness(1.12); }
+    #aesPrev:disabled, #aesNext:disabled { opacity: .45; cursor: not-allowed; }
+
+    /* ── S-BOX SPECIFIC CSS ── */
+    #sboxGrid {
+        display: grid;
+        grid-template-columns: repeat(17, 16px);
+        gap: 2px;
+        background: #1a1a24;
+        padding: 10px;
+        border-radius: 8px;
+        border: 1px solid #333;
+    }
+    .sb-cell {
+        width: 16px; height: 16px;
+        display: flex; align-items: center; justify-content: center;
+        font-family: monospace; font-size: 9px;
+        border-radius: 2px;
+        color: #666a8a;
+        background: #252537;
+        transition: all 0.3s;
+    }
+    .sb-hdr { background: transparent; color: #10b981; font-weight: bold; font-size: 10px; }
+    .sb-active-line { background: rgba(16,185,129,0.25); color: #fff; }
+    .sb-active-cell { 
+        background: #10b981; color: #fff; font-weight: bold; 
+        box-shadow: 0 0 8px #10b981; transform: scale(1.3); z-index: 10; 
+    }
+</style>
+
 <div class="lesson-container" style="max-width: 850px; margin: 0 auto; padding-bottom: 60px;">
 
+    <!-- ── HEADER ── -->
     <div class="lesson-header" style="margin-bottom: 40px;">
         <p style="color: #6366f1; font-weight: bold; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 1px;">Topic 2</p>
         <h1 style="font-size: 36px; margin-top: 0; margin-bottom: 15px;">The AES Standard</h1>
@@ -12,9 +85,9 @@
         </p>
     </div>
 
+    <!-- ── EXPLANATION ── -->
     <div class="study-section" style="background: #fff; border-radius: 12px; padding: 30px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); margin-bottom: 40px;">
         <h2 style="margin-top: 0; color: #333; border-bottom: 2px solid #e5e7eb; padding-bottom: 10px;">How AES Works</h2>
-        
         <div style="display: flex; gap: 30px; margin-top: 20px;">
             <div style="flex: 1;">
                 <h3 style="color: #6366f1;">1. The Block Cipher</h3>
@@ -22,7 +95,6 @@
                     Unlike the Caesar cipher which scrambles one letter at a time, AES is a <strong>Block Cipher</strong>. It chops your plaintext message up into blocks of exactly 128 bits. It then mathematically scrambles each block as a single unit.
                 </p>
             </div>
-
             <div style="flex: 1;">
                 <h3 style="color: #10b981;">2. The "Rounds"</h3>
                 <p style="color: #555; line-height: 1.6;">
@@ -30,135 +102,332 @@
                 </p>
             </div>
         </div>
-
-        <div style="background: #eff6ff; border-left: 4px solid #3b82f6; padding: 15px; margin-top: 20px; border-radius: 0 6px 6px 0;">
-            <p style="margin: 0; color: #1e3a8a; font-size: 15px;">
-                <strong>Key Sizes:</strong> AES comes in three flavors: AES-128, AES-192, and AES-256. The number represents the size of the key in bits. A 256-bit key is so large that cracking it by guessing every possible combination (Brute Force) is considered physically impossible.
-            </p>
-        </div>
     </div>
 
-    <h1>AES</h1>
-        
+    <h2>AES</h2>
     {% include "video_player.html" %}
 
-
-    <div class="interactive-test" style="background: #1e1e2e; border-radius: 12px; padding: 30px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); color: white;">
-        <h2 style="margin-top: 0; color: #fff; font-size: 20px;">Try It: The Brute Force Simulator</h2>
-        <p style="color: #a6accd; font-size: 14px; margin-bottom: 30px;">
-            A "brute force attack" means having a computer guess every possible password until it finds the right one. Let's assume you have a supercomputer that can guess <strong>1 Billion keys per second</strong>. Select an algorithm to see how long it takes to hack.
-        </p>
+    <!-- ── INTERACTIVE: SLOWED AES ROUND VISUALIZER ── -->
+    <div id="aesSim">
+        <div style="display:flex; align-items:baseline; justify-content:space-between; margin-bottom:6px">
+            <h2 style="font-size:20px; font-weight:600; color:#fff; margin-top:0;">AES Single Round Visualizer</h2>
+            <span id="aesCtr" style="font-size:12px; color:#5a5a7a; font-family:monospace; letter-spacing:1px">1 / 5</span>
+        </div>
+        <p style="color:#a6accd; font-size:13px; margin-bottom:26px">Step through one complete AES round — watch each operation transform your 16 bytes of data.</p>
         
-        <div style="display: flex; flex-direction: column; gap: 20px;">
+        <div id="aesStage" style="display:flex; justify-content:center; align-items:center; gap:40px; overflow:visible; position:relative; min-height:350px; padding: 20px 0; flex-wrap: wrap;">
             
-            <div style="display: flex; gap: 15px; align-items: flex-end;">
-                <div style="flex: 2;">
-                    <label style="color: #a6accd; font-size: 12px; text-transform: uppercase;">Select Encryption Algorithm</label>
-                    <select id="algoSelect" style="width: 100%; padding: 12px; margin-top: 5px; background: #292d3e; border: 1px solid #6366f1; color: white; border-radius: 4px; font-size: 16px;">
-                        <option value="caesar">Caesar Cipher (26 Keys)</option>
-                        <option value="des">Old DES Standard (56-bit Key)</option>
-                        <option value="aes128" selected>Modern AES-128 (128-bit Key)</option>
-                        <option value="aes256">Military AES-256 (256-bit Key)</option>
-                    </select>
+            <!-- THE STATE ARRAY -->
+            <div style="overflow:visible;">
+                <div style="display:flex; gap:8px; margin-left:44px; margin-bottom:5px">
+                    <div style="width:62px; text-align:center; font-size:10px; color:#4a4a6a; font-family:monospace; letter-spacing:.5px">col 0</div>
+                    <div style="width:62px; text-align:center; font-size:10px; color:#4a4a6a; font-family:monospace; letter-spacing:.5px">col 1</div>
+                    <div style="width:62px; text-align:center; font-size:10px; color:#4a4a6a; font-family:monospace; letter-spacing:.5px">col 2</div>
+                    <div style="width:62px; text-align:center; font-size:10px; color:#4a4a6a; font-family:monospace; letter-spacing:.5px">col 3</div>
                 </div>
-                <div style="flex: 1;">
-                    <button id="hackBtn" style="width: 100%; padding: 12px; background: #f43f5e; color: white; border: none; border-radius: 4px; font-size: 16px; font-weight: bold; cursor: pointer; transition: background 0.2s;">
-                        Start Hacking
-                    </button>
+                <div style="display:flex; gap:8px; align-items:flex-start; overflow:visible">
+                    <div style="display:flex; flex-direction:column; gap:8px">
+                        <div style="width:36px; height:62px; display:flex; align-items:center; justify-content:flex-end; padding-right:6px; font-size:10px; color:#4a4a6a; font-family:monospace">r0</div>
+                        <div style="width:36px; height:62px; display:flex; align-items:center; justify-content:flex-end; padding-right:6px; font-size:10px; color:#4a4a6a; font-family:monospace">r1</div>
+                        <div style="width:36px; height:62px; display:flex; align-items:center; justify-content:flex-end; padding-right:6px; font-size:10px; color:#4a4a6a; font-family:monospace">r2</div>
+                        <div style="width:36px; height:62px; display:flex; align-items:center; justify-content:flex-end; padding-right:6px; font-size:10px; color:#4a4a6a; font-family:monospace">r3</div>
+                    </div>
+                    <div style="overflow:visible; position:relative">
+                        <div id="aesMg" class="agrid"></div>
+                    </div>
+                    <!-- ShiftRows Indicators -->
+                    <div id="aesShiftInd" style="display:flex; flex-direction:column; gap:8px; opacity:0; transition:opacity .4s; pointer-events:none; min-width:36px">
+                        <div style="height:62px; display:flex; align-items:center; padding-left:8px; font-size:11px; color:#4a4a6a; font-family:monospace; font-weight:700">+0</div>
+                        <div style="height:62px; display:flex; align-items:center; padding-left:8px; font-size:13px; color:#f59e0b; font-family:monospace; font-weight:700">&#8592;1</div>
+                        <div style="height:62px; display:flex; align-items:center; padding-left:8px; font-size:13px; color:#f59e0b; font-family:monospace; font-weight:700">&#8592;2</div>
+                        <div style="height:62px; display:flex; align-items:center; padding-left:8px; font-size:13px; color:#f59e0b; font-family:monospace; font-weight:700">&#8592;3</div>
+                    </div>
                 </div>
             </div>
-
-            <div style="background: #1a1a24; padding: 20px; border-radius: 8px; border: 1px solid #444; margin-top: 10px;">
-                <div style="display: flex; justify-content: space-between; margin-bottom: 15px;">
-                    <span style="color: #888; font-size: 12px; text-transform: uppercase;">Total Possible Keys:</span>
-                    <span id="keyCount" style="color: #10b981; font-family: monospace; font-weight: bold;">3.4 × 10³⁸ (340 Undecillion)</span>
-                </div>
-                
-                <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
-                    <span style="color: #888; font-size: 12px; text-transform: uppercase;">Estimated Time to Crack:</span>
-                    <span id="timeCount" style="color: #f59e0b; font-weight: bold;">10.79 Quintillion Years</span>
-                </div>
-
-                <div style="width: 100%; background: #292d3e; height: 20px; border-radius: 10px; overflow: hidden; margin-top: 20px;">
-                    <div id="hackProgress" style="width: 0%; height: 100%; background: #f43f5e; transition: width 0.5s ease-out;"></div>
-                </div>
-                <div id="statusText" style="text-align: center; color: #a6accd; font-size: 12px; margin-top: 8px;">Waiting to start...</div>
+        
+            <!-- THE S-BOX CONTAINER -->
+            <div id="sboxContainer" style="display:none; flex-direction:column; align-items:center; opacity:0; transition:opacity 0.5s;">
+                <div style="font-size:10px; color:#10b981; text-transform:uppercase; letter-spacing:1px; margin-bottom:8px; font-family:monospace; font-weight:bold;">16×16 S-Box Lookup</div>
+                <div id="sboxGrid"></div>
             </div>
+
+            <!-- THE ROUND KEY CONTAINER -->
+            <div id="aesKa" style="display:none; align-items:center; gap: 14px; opacity:0; transition:opacity .8s">
+                <div style="font-size:38px; color:#6366f1; font-weight:700; line-height:1;">&#8853;</div>
+                <div>
+                    <div style="font-size:10px; color:#6366f1; text-transform:uppercase; letter-spacing:1px; margin-bottom:5px; text-align:center; font-family:monospace; font-weight:bold;">Round Key</div>
+                    <div id="aesKg" class="agrid"></div>
+                </div>
+            </div>
+            
+        </div>
+        
+        <div id="aesExp" style="background:#13131e; border-radius:8px; padding:16px 20px; margin-top:26px; margin-bottom:18px; border-left:3px solid #6366f1; min-height:90px; transition:border-left-color .4s">
+            <div id="aesStepLbl" style="font-size:11px; text-transform:uppercase; letter-spacing:1.5px; margin-bottom:7px; font-weight:700; color:#6366f1; font-family:monospace; transition:color .3s"></div>
+            <p id="aesStepTxt" style="color:#b8c0d0; font-size:14px; line-height:1.7; margin:0;"></p>
+        </div>
+        
+        <div style="display:flex; justify-content:space-between; align-items:center">
+            <button id="aesPrev" disabled>&#8592; Previous</button>
+            <div style="display:flex; gap:8px" id="aesDots"></div>
+            <button id="aesNext">Next Step &#8594;</button>
         </div>
     </div>
 
 </div>
 
 <script>
-    const data = {
-        caesar: { keys: "26", time: "0.000000026 Seconds", speed: 100 }, // Fills instantly
-        des: { keys: "72,057,594,037,927,936", time: "833 Days", speed: 5 }, // Fills very slowly
-        aes128: { keys: "3.4 × 10³⁸ (340 Undecillion)", time: "10.79 Quintillion Years", speed: 0 }, // Never moves
-        aes256: { keys: "1.1 × 10⁷⁷", time: "Billions of times longer than the universe has existed", speed: 0 } // Never moves
-    };
+    (function(){
+        var U = 70;
+        var STEPS = [
+            {n:'The State Array', c:'#6366f1', t:'The 16-byte plaintext block is loaded into a 4×4 grid called the State Array. Bytes fill in column by column — top to bottom, left to right. These 16 bytes are the unit AES will now scramble through multiple transformation rounds.'},
+            {n:'SubBytes (The S-Box)', c:'#10b981', t:'SubBytes: Every byte is replaced using a 256-entry lookup table called the S-Box. The algorithm traces the grid coordinates to find the new value. This is a non-linear substitution that provides confusion — destroying mathematical patterns.'},
+            {n:'ShiftRows', c:'#f59e0b', t:'ShiftRows: Rows are cyclically shifted to the left by their row index. Row 0 stays unchanged. Row 1 shifts ←1. Row 2 shifts ←2. Row 3 shifts ←3, wrapping around. This disperses bytes across different columns.'},
+            {n:'MixColumns', c:'#f59e0b', t:'MixColumns: Each column of 4 bytes is mathematically multiplied. Changing any single byte changes all 4 bytes of its column. Together with ShiftRows, this guarantees complete diffusion.'},
+            {n:'AddRoundKey', c:'#f43f5e', t:'AddRoundKey: The state is XOR’d byte-by-byte with the Round Key. This is the only step that uses your secret password — without it, none of the scrambling can be reversed. Full AES repeats all 5 steps 10, 12, or 14 times!'},
+        ];
+        var INI = [['S','E','S','E'],['E','T','S','1'],['C','M','A','2'],['R','E','G','3']];
+        var SUB = [['A4','9F','C7','2B'],['E8','3D','6A','F1'],['1C','B5','47','8E'],['D2','0F','95','63']];
+        var SHF = [['A4','9F','C7','2B'],['3D','6A','F1','E8'],['47','8E','1C','B5'],['0F','95','63','D2']];
+        var MIX = [['7E','4A','D8','31'],['C5','92','1F','B6'],['8D','27','F4','5C'],['A1','6E','39','0B']];
+        var RKY = [['5A','E3','2C','91'],['B7','48','DA','0F'],['62','F5','3E','C8'],['14','9D','76','A5']];
+        var ARK = [['24','A9','F4','A0'],['72','DA','C5','B9'],['EF','D2','CA','94'],['B5','F3','4F','AE']];
 
-    const algoSelect = document.getElementById('algoSelect');
-    const hackBtn = document.getElementById('hackBtn');
-    const keyCount = document.getElementById('keyCount');
-    const timeCount = document.getElementById('timeCount');
-    const hackProgress = document.getElementById('hackProgress');
-    const statusText = document.getElementById('statusText');
+        var step = 0, busy = false;
+        var mg = document.getElementById('aesMg');
+        var kg = document.getElementById('aesKg');
+        var ka = document.getElementById('aesKa');
+        var si = document.getElementById('aesShiftInd');
+        var sboxContainer = document.getElementById('sboxContainer');
+        var sboxGrid = document.getElementById('sboxGrid');
+        
+        var expLbl = document.getElementById('aesStepLbl');
+        var expTxt = document.getElementById('aesStepTxt');
+        var expBox = document.getElementById('aesExp');
+        var prevB = document.getElementById('aesPrev');
+        var nextB = document.getElementById('aesNext');
+        var dotsC = document.getElementById('aesDots');
+        var ctr = document.getElementById('aesCtr');
 
-    let hackingInterval;
-
-    // Update text when dropdown changes
-    algoSelect.addEventListener('change', (e) => {
-        clearInterval(hackingInterval);
-        hackProgress.style.width = '0%';
-        hackProgress.style.transition = 'width 0.5s ease-out';
-        
-        const selection = data[e.target.value];
-        keyCount.innerText = selection.keys;
-        timeCount.innerText = selection.time;
-        statusText.innerText = "Waiting to start...";
-        hackBtn.innerText = "Start Hacking";
-        hackBtn.style.background = "#f43f5e";
-    });
-
-    // Handle hack button click
-    hackBtn.addEventListener('click', () => {
-        clearInterval(hackingInterval);
-        const algo = algoSelect.value;
-        const speed = data[algo].speed;
-        
-        hackBtn.innerText = "Hacking...";
-        hackBtn.style.background = "#888";
-        statusText.innerText = `Trying 1,000,000,000 keys per second...`;
-        
-        let progress = 0;
-        hackProgress.style.width = '0%';
-        
-        if (speed === 100) {
-            // Instant hack (Caesar)
-            setTimeout(() => {
-                hackProgress.style.width = '100%';
-                statusText.innerText = "SYSTEM COMPROMISED! Password found instantly.";
-                statusText.style.color = "#f43f5e";
-            }, 100);
-        } else if (speed > 0) {
-            // Slow hack (DES)
-            hackProgress.style.transition = 'width 1s linear';
-            hackingInterval = setInterval(() => {
-                progress += (speed / 100);
-                hackProgress.style.width = `${progress}%`;
-                if (progress >= 10) {
-                    clearInterval(hackingInterval);
-                    statusText.innerText = "This will take a few years. You should probably go get a coffee.";
+        // Build 16x16 S-Box
+        function initSBox() {
+            for (let i = 0; i < 17; i++) {
+                for (let j = 0; j < 17; j++) {
+                    let cell = document.createElement('div');
+                    if (i === 0 && j === 0) {
+                        cell.className = 'sb-cell';
+                        cell.style.background = 'transparent';
+                    } else if (i === 0) {
+                        cell.className = 'sb-cell sb-hdr';
+                        cell.innerText = (j - 1).toString(16).toUpperCase();
+                    } else if (j === 0) {
+                        cell.className = 'sb-cell sb-hdr';
+                        cell.innerText = (i - 1).toString(16).toUpperCase();
+                    } else {
+                        cell.className = 'sb-cell';
+                        cell.id = `sb-${i-1}-${j-1}`;
+                        cell.innerText = Math.floor(Math.random()*256).toString(16).padStart(2,'0').toUpperCase();
+                    }
+                    sboxGrid.appendChild(cell);
                 }
-            }, 100);
-        } else {
-            // Impossible hack (AES)
-            hackProgress.style.width = '0%';
-            setTimeout(() => {
-                statusText.innerText = "ERROR: Sun will burn out before process reaches 1%.";
-                statusText.style.color = "#10b981"; // Green means safe!
-            }, 2000);
+            }
         }
-    });
+        initSBox();
+
+        function highlightSBox(r, c, targetHex) {
+            document.querySelectorAll('.sb-active-line, .sb-active-cell').forEach(el => {
+                el.classList.remove('sb-active-line', 'sb-active-cell');
+            });
+            for(let i=0; i<16; i++) {
+                document.getElementById(`sb-${r}-${i}`).classList.add('sb-active-line');
+                document.getElementById(`sb-${i}-${c}`).classList.add('sb-active-line');
+            }
+            let targetCell = document.getElementById(`sb-${r}-${c}`);
+            targetCell.innerText = targetHex;
+            targetCell.classList.remove('sb-active-line');
+            targetCell.classList.add('sb-active-cell');
+        }
+
+        function clearSBoxHighlights() {
+            document.querySelectorAll('.sb-active-line, .sb-active-cell').forEach(el => {
+                el.classList.remove('sb-active-line', 'sb-active-cell');
+            });
+        }
+
+        function cl(r,c){return document.getElementById('ac'+r+c);}
+
+        function bldMain(data,cls){
+            mg.innerHTML='';
+            for(var r=0;r<4;r++)for(var c=0;c<4;c++){
+                var d=document.createElement('div');
+                d.className='ac'+(cls?' '+cls:'');
+                d.id='ac'+r+c;
+                d.textContent=data[r][c];
+                mg.appendChild(d);
+            }
+        }
+
+        function bldKey(){
+            kg.innerHTML='';
+            for(var r=0;r<4;r++)for(var c=0;c<4;c++){
+                var d=document.createElement('div');
+                d.className='ac ai';
+                d.textContent=RKY[r][c];
+                kg.appendChild(d);
+            }
+        }
+
+        function bldDots(){
+            dotsC.innerHTML='';
+            for(var i=0;i<STEPS.length;i++){
+                var d=document.createElement('div');
+                d.className='sdot';
+                dotsC.appendChild(d);
+            }
+        }
+
+        function updDots(){
+            dotsC.querySelectorAll('.sdot').forEach(function(d,i){
+                d.classList.remove('act','dn');
+                if(i<step)d.classList.add('dn');
+                else if(i===step)d.classList.add('act');
+            });
+        }
+
+        function setExp(i){
+            expLbl.textContent='Step '+(i+1)+' / 5 — '+STEPS[i].n;
+            expLbl.style.color=STEPS[i].c;
+            expTxt.textContent=STEPS[i].t;
+            expBox.style.borderLeftColor=STEPS[i].c;
+        }
+
+        function setAll(data,cls){
+            for(var r=0;r<4;r++)for(var c=0;c<4;c++){
+                var e=cl(r,c);
+                e.className='ac'+(cls?' '+cls:'');
+                e.textContent=data[r][c];
+            }
+        }
+
+        function dl(ms){return new Promise(function(r){setTimeout(r,ms);});}
+
+        // SLOWED DOWN ANIMATIONS BELOW
+        
+        async function doSub(){
+            sboxContainer.style.display = 'flex';
+            await dl(100);
+            sboxContainer.style.opacity = '1';
+            await dl(600); // Give time for S-box to fully appear
+
+            for(let r=0; r<4; r++){
+                for(let c=0; c<4; c++){
+                    let targetHex = SUB[r][c];
+                    let sboxRow = Math.floor(Math.random() * 16);
+                    let sboxCol = Math.floor(Math.random() * 16);
+                    
+                    highlightSBox(sboxRow, sboxCol, targetHex);
+                    
+                    // Pause to let student see the coordinate mapping
+                    await dl(500); 
+
+                    var e = cl(r,c);
+                    e.className = 'ac ag';
+                    e.textContent = targetHex;
+                    
+                    // Pause before moving to next cell
+                    await dl(300); 
+                }
+            }
+            await dl(800);
+            clearSBoxHighlights();
+        }
+
+        async function doShift(){
+            si.style.opacity='1';
+            await dl(800); // Wait for arrows to appear
+            for(var r=1;r<4;r++){
+                for(var c=0;c<4;c++){
+                    var nC=(c-r+4)%4, delta=nC-c;
+                    var e=cl(r,c);
+                    e.style.zIndex='8';
+                    e.style.transform='translateX('+(delta*U)+'px)';
+                }
+            }
+            await dl(1100); // Wait for sliding CSS animation (1s) to finish
+            for(var r=0;r<4;r++)for(var c=0;c<4;c++){
+                var e=cl(r,c);
+                e.style.transition='background 0.6s, border-color 0.6s, color 0.6s, opacity 0.5s';
+                e.style.transform=''; e.style.zIndex='';
+                e.textContent=SHF[r][c]; e.className='ac am';
+            }
+            await dl(100);
+            for(var r=0;r<4;r++)for(var c=0;c<4;c++)cl(r,c).style.transition='';
+            await dl(600); // Pause before allowing next step
+        }
+
+        async function doMix(){
+            si.style.opacity='0';
+            for(var c=0;c<4;c++){
+                for(var r=0;r<4;r++){var e=cl(r,c);e.className='ac am';e.textContent=MIX[r][c];}
+                await dl(500); // Slowed down column-by-column cascade
+            }
+        }
+
+        async function doArk(){
+            setAll(MIX,'');
+            bldKey();
+            ka.style.display='flex';
+            await dl(100);
+            ka.style.opacity='1';
+            await dl(1200); // Let them look at the key
+            for(var r=0;r<4;r++)for(var c=0;c<4;c++){
+                (function(r,c){setTimeout(function(){
+                    var e=cl(r,c);e.className='ac ar';e.textContent=ARK[r][c];
+                },(r+c)*150);})(r,c); // Slower XOR stagger effect
+            }
+            await dl(1200);
+        }
+
+        async function render(i,dir){
+            busy=true;
+            prevB.disabled=true;nextB.disabled=true;
+            setExp(i);updDots();
+            ctr.textContent=(i+1)+' / 5';
+
+            if(i !== 1) {
+                sboxContainer.style.opacity = '0';
+                setTimeout(() => { if(step !== 1) sboxContainer.style.display = 'none'; }, 600);
+            }
+            if(i !== 4) {
+                ka.style.opacity = '0';
+                setTimeout(() => { if(step !== 4) ka.style.display = 'none'; }, 600);
+            }
+            if(i !== 2) si.style.opacity = '0';
+
+            if(dir<0){
+                if(i===0) bldMain(INI);
+                else if(i===1){ setAll(SUB,'ag'); sboxContainer.style.display='flex'; sboxContainer.style.opacity='1'; }
+                else if(i===2){ setAll(SHF,'am'); si.style.opacity='1'; }
+                else if(i===3){ setAll(MIX,'am'); }
+            } else {
+                if(i===0) bldMain(INI);
+                else if(i===1) await doSub();
+                else if(i===2) await doShift();
+                else if(i===3) await doMix();
+                else if(i===4) await doArk();
+            }
+
+            prevB.disabled = i===0;
+            nextB.disabled = i===STEPS.length-1;
+            nextB.textContent = i===STEPS.length-1 ? 'Complete ✓' : 'Next Step →';
+            nextB.style.background = i===STEPS.length-1 ? '#10b981' : '#6366f1';
+            busy=false;
+        }
+
+        prevB.addEventListener('click',function(){if(!busy&&step>0){step--;render(step,-1);}});
+        nextB.addEventListener('click',function(){if(!busy&&step<STEPS.length-1){step++;render(step,1);}});
+
+        bldDots();render(0,1);
+    })();
 </script>
 {% endblock %}

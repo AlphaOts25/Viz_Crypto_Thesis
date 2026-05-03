@@ -4,179 +4,279 @@
 {% block content %}
 <div class="lesson-container" style="max-width: 850px; margin: 0 auto; padding-bottom: 60px;">
 
+    <!-- ── TOPIC HEADER (Light Theme) ── -->
     <div class="lesson-header" style="margin-bottom: 40px;">
         <p style="color: #6366f1; font-weight: bold; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 1px;">Topic 2</p>
-        <h1 style="font-size: 36px; margin-top: 0; margin-bottom: 15px;">Classical Cryptography: The Substitution Cipher</h1>
+        <h1 style="font-size: 36px; margin-top: 0; margin-bottom: 15px; color: #333;">The Caesar Cipher</h1>
         <p style="font-size: 18px; color: #555; line-height: 1.6;">
-            Now that we know the difference between plaintext and ciphertext, how do we actually make the conversion? It requires two things: a mathematical <strong>Algorithm</strong>, and a secret <strong>Key</strong>.
+            Named after Julius Caesar, who used it to communicate with his generals, the Caesar Cipher is one of the simplest and most widely known encryption techniques. It is a type of <strong>substitution cipher</strong> where each letter in the plaintext is replaced by a letter some fixed number of positions down the alphabet.
+        </p>
+        <p style="font-size: 18px; color: #555; line-height: 1.6;">
+            For example, with a shift of 3, <strong style="color: #10b981;">A</strong> would be replaced by <strong style="color: #f43f5e;">D</strong>, <strong style="color: #10b981;">B</strong> would become <strong style="color: #f43f5e;">E</strong>, and so on. The method wraps around the alphabet, meaning <strong style="color: #10b981;">Z</strong> becomes <strong style="color: #f43f5e;">C</strong>. While easy to crack today, it formed the foundation for centuries of cryptographic advancements!
         </p>
     </div>
 
-    <div class="study-section" style="background: #fff; border-radius: 12px; padding: 30px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); margin-bottom: 40px;">
-        <h2 style="margin-top: 0; color: #333; border-bottom: 2px solid #e5e7eb; padding-bottom: 10px;">The Core Processes</h2>
-        
-        <div style="display: flex; gap: 30px; margin-top: 20px;">
-            <div style="flex: 1;">
-                <h3 style="color: #10b981;">The Encryption Process</h3>
-                <p style="color: #555; line-height: 1.6; font-size: 15px;">
-                    Encryption is the process of scrambling data into a secure format. It takes readable plaintext and passes it through an algorithm using a specific cryptographic key. Without the key, the resulting ciphertext is useless.
-                </p>
-                <div style="background: #f8f9fa; padding: 15px; border-radius: 6px; border-left: 4px solid #10b981; font-family: monospace; font-size: 14px; color: #333;">
-                    Formula: E(k, m) = c<br>
-                    <span style="color: #888; font-size: 12px;">(Encrypt Message 'm' with Key 'k' to get Ciphertext 'c')</span>
-                </div>
-            </div>
-
-            <div style="flex: 1;">
-                <h3 style="color: #6366f1;">The Decryption Process</h3>
-                <p style="color: #555; line-height: 1.6; font-size: 15px;">
-                    Decryption is the exact reverse. It is the process of transforming data that has been rendered unreadable back to its unencrypted form. The receiver must use the exact same algorithm and the correct key.
-                </p>
-                <div style="background: #f8f9fa; padding: 15px; border-radius: 6px; border-left: 4px solid #6366f1; font-family: monospace; font-size: 14px; color: #333;">
-                    Formula: D(k, c) = m<br>
-                    <span style="color: #888; font-size: 12px;">(Decrypt Ciphertext 'c' with Key 'k' to get Message 'm')</span>
-                </div>
-            </div>
-        </div>
-    </div>
-
-        
-    <h1>Classical Cryptography</h1>
-        
+    <!-- ── VIDEO HOLDER ── -->
+    <h2 style="color: #333;">Lesson Video</h2>
     {% include "video_player.html" %}
 
-    <p>Now let's talk about how substitution works...</p>
-
-    
-    <div class="interactive-test" style="background: #1e1e2e; border-radius: 12px; padding: 30px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); color: white;">
-        <h2 style="margin-top: 0; color: #fff; font-size: 20px;">Try It: The Caesar Cipher</h2>
-        <p style="color: #a6accd; font-size: 14px; margin-bottom: 20px;">
-            The Caesar Cipher is a classic substitution cipher. Set your shift key, then click encrypt to watch the algorithm shift each letter one by one!
+    <!-- ── INTERACTIVE SIMULATOR (Dark Theme) ── -->
+    <div class="interactive-test" style="background: #1e1e2e; border-radius: 12px; padding: 30px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); color: white; margin-top: 40px;">
+        <h2 style="margin-top: 0; color: #fff; font-size: 24px;">Try It: The Caesar Cipher</h2>
+        <p style="color: #a6accd; font-size: 14px; margin-bottom: 24px;">
+            Set your shift key, then click Encrypt. The simulator will process one letter at a time — watch the <strong style="color: #10b981;">alphabet ruler</strong> highlight, the <strong style="color: #f43f5e;">character spotlight</strong> show the math, and the log fill in step by step.
         </p>
-        
-        <div style="display: flex; gap: 20px; align-items: stretch;">
-            <div style="flex: 1; display: flex; flex-direction: column;">
-                <label style="color: #10b981; font-weight: bold; margin-bottom: 10px; font-size: 14px; text-transform: uppercase;">Plaintext (m)</label>
-                <textarea id="plain" placeholder="Attack at dawn..." style="flex: 1; min-height: 120px; background: #292d3e; border: 1px solid #444; border-radius: 8px; color: white; padding: 15px; font-family: monospace; font-size: 14px; resize: none;">attack at dawn</textarea>
-            </div>
 
-            <div style="display: flex; flex-direction: column; justify-content: center; align-items: center; width: 130px;">
-                <label style="color: #f59e0b; font-weight: bold; margin-bottom: 10px; font-size: 14px; text-transform: uppercase; text-align: center;">Key (k)</label>
-                <input type="number" id="shiftKey" value="3" min="1" max="25" style="width: 60px; padding: 10px; text-align: center; background: #292d3e; color: white; border: 2px solid #f59e0b; border-radius: 8px; font-size: 18px; font-weight: bold; margin-bottom: 15px;">
-                
-                <button id="encryptBtn" style="background: #6366f1; color: white; border: none; padding: 10px 15px; border-radius: 8px; font-weight: bold; cursor: pointer; transition: 0.3s; font-size: 12px; text-transform: uppercase; box-shadow: 0 4px 6px rgba(0,0,0,0.2); width: 100%;">
-                    Encrypt →
-                </button>
-            </div>
+        <!-- ALPHABET RULER -->
+        <div style="margin-bottom: 24px;">
+            <p style="font-size: 11px; font-weight: 700; letter-spacing: 0.1em; color: #a6accd; text-transform: uppercase; margin: 0 0 8px;">Alphabet shift ruler</p>
+            <p style="font-size: 11px; color: #888; margin: 0 0 4px; font-family: monospace;">Plaintext →</p>
+            <div id="plainRow" style="display: flex; gap: 3px; flex-wrap: nowrap; overflow-x: auto; margin-bottom: 6px; padding-bottom: 4px;"></div>
+            <p style="font-size: 11px; color: #888; margin: 0 0 4px; font-family: monospace;">Ciphertext →</p>
+            <div id="cipherRow" style="display: flex; gap: 3px; flex-wrap: nowrap; overflow-x: auto; padding-bottom: 4px;"></div>
+        </div>
 
-            <div style="flex: 1; display: flex; flex-direction: column;">
-                <label style="color: #f43f5e; font-weight: bold; margin-bottom: 10px; font-size: 14px; text-transform: uppercase;">Ciphertext (c)</label>
-                <textarea id="cipher" readonly style="flex: 1; min-height: 120px; background: #1a1a24; border: 1px solid #f43f5e; border-radius: 8px; color: #f43f5e; padding: 15px; font-family: monospace; font-size: 14px; resize: none;"></textarea>
+        <!-- CHARACTER SPOTLIGHT -->
+        <div style="background: #0f0f17; border-radius: 10px; padding: 20px; margin-bottom: 24px; border: 1px solid #333;">
+            <p style="font-size: 11px; font-weight: 700; letter-spacing: 0.1em; color: #a6accd; text-transform: uppercase; margin: 0 0 14px;">Current character</p>
+            <div style="display: grid; grid-template-columns: 1fr 100px 1fr; gap: 16px; align-items: center;">
+                <div style="background: #1a1a28; border: 1px solid #333; border-radius: 8px; padding: 14px; text-align: center;">
+                    <div id="spotPlain" style="font-size: 48px; font-family: monospace; color: #10b981; min-height: 56px; display: flex; align-items: center; justify-content: center;">—</div>
+                    <div style="font-size: 11px; color: #666; margin-top: 4px;">plaintext</div>
+                </div>
+                <div style="text-align: center;">
+                    <div style="font-size: 11px; color: #888; margin-bottom: 4px;">shift key</div>
+                    <div id="arrowKeyDisplay" style="font-size: 24px; font-weight: bold; color: #f59e0b;">+3</div>
+                    <div style="font-size: 22px; color: #555; margin-top: 4px;">→</div>
+                </div>
+                <div style="background: #1a1a28; border: 1px solid #333; border-radius: 8px; padding: 14px; text-align: center;">
+                    <div id="spotCipher" style="font-size: 48px; font-family: monospace; color: #f43f5e; min-height: 56px; display: flex; align-items: center; justify-content: center;">—</div>
+                    <div style="font-size: 11px; color: #666; margin-top: 4px;">ciphertext</div>
+                </div>
+            </div>
+            <div id="mathLine" style="margin-top: 14px; text-align: center; font-family: monospace; font-size: 13px; color: #a6accd; min-height: 18px;"></div>
+        </div>
+
+        <!-- INPUTS -->
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px;">
+            <div>
+                <label style="display: block; font-size: 11px; font-weight: 700; letter-spacing: 0.1em; color: #10b981; text-transform: uppercase; margin-bottom: 8px;">Plaintext (m)</label>
+                <textarea id="plain" style="width: 100%; box-sizing: border-box; min-height: 90px; background: #292d3e; border: 1px solid #444; border-radius: 8px; color: white; padding: 12px; font-family: monospace; font-size: 14px; resize: none;">attack at dawn</textarea>
+            </div>
+            <div>
+                <label style="display: block; font-size: 11px; font-weight: 700; letter-spacing: 0.1em; color: #f43f5e; text-transform: uppercase; margin-bottom: 8px;">Ciphertext (c)</label>
+                <textarea id="cipher" readonly style="width: 100%; box-sizing: border-box; min-height: 90px; background: #1a1a24; border: 1px solid #f43f5e; border-radius: 8px; color: #f43f5e; padding: 12px; font-family: monospace; font-size: 14px; resize: none;"></textarea>
             </div>
         </div>
 
-        <div id="visualizerBox" style="margin-top: 25px; background: #0f0f17; border-radius: 8px; padding: 20px; border: 1px solid #333; font-family: monospace; display: none;">
-            <h4 style="color: #10b981; margin-top: 0; margin-bottom: 15px; font-size: 14px; text-transform: uppercase;">Character Shift Processing:</h4>
-            
-            <div style="max-height: 200px; overflow-y: auto; padding-right: 10px;">
-                <ul id="stepList" style="list-style: none; padding: 0; margin: 0; color: #a6accd; font-size: 13px; line-height: 1.8;">
-                    </ul>
+        <!-- CONTROLS -->
+        <div style="display: flex; align-items: center; gap: 16px; flex-wrap: wrap; margin-bottom: 24px;">
+            <div style="display: flex; align-items: center; gap: 8px;">
+                <label style="font-size: 13px; color: #a6accd;">Key (k):</label>
+                <input type="number" id="shiftKey" value="3" min="1" max="25" style="width: 60px; padding: 8px; text-align: center; background: #292d3e; color: white; border: 2px solid #f59e0b; border-radius: 8px; font-size: 16px; font-weight: bold;">
             </div>
+            <div style="display: flex; align-items: center; gap: 8px;">
+                <label style="font-size: 13px; color: #a6accd;">Speed:</label>
+                <input type="range" id="speedSlider" min="300" max="2000" step="100" value="1200" style="width: 100px; accent-color: #6366f1;">
+                <span id="speedLabel" style="font-size: 12px; color: #a6accd; width: 60px;">Slow</span>
+            </div>
+            <button id="encryptBtn" style="background: #6366f1; color: white; border: none; padding: 10px 20px; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 13px; text-transform: uppercase; letter-spacing: 0.05em;">Encrypt →</button>
+            <button id="resetBtn" style="background: transparent; color: #a6accd; border: 1px solid #444; padding: 10px 16px; border-radius: 8px; cursor: pointer; font-size: 13px;">Reset</button>
+        </div>
+
+        <!-- LOG -->
+        <div style="background: #0f0f17; border-radius: 8px; padding: 20px; border: 1px solid #333;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                <p style="font-size: 11px; font-weight: 700; letter-spacing: 0.1em; color: #a6accd; text-transform: uppercase; margin: 0;">Processing log</p>
+                <span id="statusText" style="font-size: 12px; color: #555;"></span>
+            </div>
+            <div style="height: 4px; background: #1e1e2e; border-radius: 2px; margin-bottom: 14px; overflow: hidden;">
+                <div id="progressBar" style="height: 100%; width: 0; background: #10b981; border-radius: 2px; transition: width 0.4s;"></div>
+            </div>
+            <ul id="stepList" style="list-style: none; padding: 0; margin: 0; max-height: 200px; overflow-y: auto; font-family: monospace; font-size: 13px; color: #a6accd; display: flex; flex-direction: column; gap: 4px;">
+                <li style="color: #444;">Press Encrypt to begin…</li>
+            </ul>
         </div>
     </div>
-    
-
 </div>
 
 <script>
-    const plainInput = document.getElementById('plain');
-    const shiftInput = document.getElementById('shiftKey');
-    const cipherOutput = document.getElementById('cipher');
-    const encryptBtn = document.getElementById('encryptBtn');
-    const visualizerBox = document.getElementById('visualizerBox');
-    const stepList = document.getElementById('stepList');
+(function() {
+    const ALPHA = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    const plainRowEl    = document.getElementById('plainRow');
+    const cipherRowEl   = document.getElementById('cipherRow');
+    const plainInput    = document.getElementById('plain');
+    const cipherOutput  = document.getElementById('cipher');
+    const shiftInput    = document.getElementById('shiftKey');
+    const speedSlider   = document.getElementById('speedSlider');
+    const speedLabel    = document.getElementById('speedLabel');
+    const encryptBtn    = document.getElementById('encryptBtn');
+    const resetBtn      = document.getElementById('resetBtn');
+    const spotPlain     = document.getElementById('spotPlain');
+    const spotCipher    = document.getElementById('spotCipher');
+    const arrowKey      = document.getElementById('arrowKeyDisplay');
+    const mathLine      = document.getElementById('mathLine');
+    const stepList      = document.getElementById('stepList');
+    const progressBar   = document.getElementById('progressBar');
+    const statusText    = document.getElementById('statusText');
 
-    encryptBtn.addEventListener('click', function() {
+    let plainCells = [], cipherCells = [];
+
+    const cellStyle = 'min-width:22px;height:28px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:bold;border-radius:4px;border:1px solid #333;color:#a6accd;background:#1e1e2e;font-family:monospace;transition:background 0.3s,color 0.3s;flex-shrink:0;';
+
+    function buildRuler(shift) {
+        plainRowEl.innerHTML = '';
+        cipherRowEl.innerHTML = '';
+        plainCells = [];
+        cipherCells = [];
+        for (let i = 0; i < 26; i++) {
+            const p = document.createElement('div');
+            p.style.cssText = cellStyle;
+            p.textContent = ALPHA[i];
+            plainRowEl.appendChild(p);
+            plainCells.push(p);
+
+            const c = document.createElement('div');
+            c.style.cssText = cellStyle;
+            c.textContent = ALPHA[(i + shift) % 26];
+            cipherRowEl.appendChild(c);
+            cipherCells.push(c);
+        }
+    }
+
+    function clearHighlights() {
+        plainCells.forEach(c => { c.style.background = '#1e1e2e'; c.style.color = '#a6accd'; c.style.border = '1px solid #333'; });
+        cipherCells.forEach(c => { c.style.background = '#1e1e2e'; c.style.color = '#a6accd'; c.style.border = '1px solid #333'; });
+    }
+
+    function highlightRuler(pi) {
+        clearHighlights();
+        if (pi >= 0 && pi < 26) {
+            plainCells[pi].style.background = '#10b981';
+            plainCells[pi].style.color = '#fff';
+            plainCells[pi].style.border = '1px solid #10b981';
+            cipherCells[pi].style.background = '#f43f5e';
+            cipherCells[pi].style.color = '#fff';
+            cipherCells[pi].style.border = '1px solid #f43f5e';
+        }
+    }
+
+    function getSpeedLabel(v) {
+        if (v >= 1700) return 'Very slow';
+        if (v >= 1100) return 'Slow';
+        if (v >= 600)  return 'Medium';
+        return 'Fast';
+    }
+
+    speedSlider.addEventListener('input', () => { speedLabel.textContent = getSpeedLabel(parseInt(speedSlider.value)); });
+    
+    shiftInput.addEventListener('input', () => {
+        const k = Math.min(25, Math.max(1, parseInt(shiftInput.value) || 1));
+        arrowKey.textContent = '+' + k;
+        buildRuler(k);
+    });
+
+    function resetAll() {
+        cipherOutput.value = '';
+        spotPlain.textContent = '—';
+        spotCipher.textContent = '—';
+        mathLine.textContent = '';
+        stepList.innerHTML = '<li style="color:#444;">Press Encrypt to begin…</li>';
+        progressBar.style.width = '0';
+        statusText.textContent = '';
+        clearHighlights();
+        encryptBtn.disabled = false;
+        encryptBtn.textContent = 'Encrypt →';
+    }
+
+    resetBtn.addEventListener('click', resetAll);
+
+    encryptBtn.addEventListener('click', () => {
         const text = plainInput.value;
-        const shift = parseInt(shiftInput.value) || 0;
-        
-        if (text.length === 0) return;
+        if (!text) return;
+        const shift = Math.min(25, Math.max(1, parseInt(shiftInput.value) || 1));
+        const delay = parseInt(speedSlider.value);
 
-        // 1. Reset UI for animation
-        cipherOutput.value = "";
-        stepList.innerHTML = "";
-        visualizerBox.style.display = "block";
+        arrowKey.textContent = '+' + shift;
+        buildRuler(shift);
+        cipherOutput.value = '';
+        stepList.innerHTML = '';
+        progressBar.style.width = '0';
         encryptBtn.disabled = true;
-        encryptBtn.style.opacity = "0.5";
-        encryptBtn.innerText = "Processing...";
+        encryptBtn.textContent = 'Running…';
+        spotPlain.textContent = '—';
+        spotCipher.textContent = '—';
+        mathLine.textContent = '';
 
-        let currentIndex = 0;
-        let currentResult = "";
+        let i = 0, result = '';
 
-        // 2. The Animation Loop
-        function processNextCharacter() {
-            if (currentIndex < text.length) {
-                let char = text[currentIndex];
-                let logMessage = "";
-                
-                // Check if it's a letter
-                if (char.match(/[a-z]/i)) {
-                    // Determine if uppercase or lowercase to find the starting point
-                    const isUpper = (char === char.toUpperCase());
-                    const baseAscii = isUpper ? 65 : 97;
-                    const charAscii = text.charCodeAt(currentIndex);
-                    
-                    // Convert to standard 0-25 Alphabet Position (A=0, B=1... Z=25)
-                    const alphabetPos = charAscii - baseAscii; 
-                    
-                    // Calculate the new shifted position (using modulo 26 to wrap around Z back to A)
-                    const newAlphabetPos = (alphabetPos + shift) % 26;
-                    
-                    // Convert back to an actual letter
-                    const newChar = String.fromCharCode(newAlphabetPos + baseAscii);
-
-                    // Build the highly visual alphabetical math string!
-                    logMessage = `Letter <strong style="color:#10b981">'${char}'</strong> (Index ${alphabetPos}) → Shift +${shift} → New Index ${newAlphabetPos} → Result: <strong style="color:#f43f5e">'${newChar}'</strong>`;
-                    
-                    currentResult += newChar;
-
-                } else {
-                    // Handle spaces and punctuation
-                    logMessage = `<span style="color:#666;">Character '${char}' is not a letter. Skipped.</span>`;
-                    currentResult += char;
-                }
-
-                // 3. Update the UI
-                cipherOutput.value = currentResult; 
-                
-                const li = document.createElement('li');
-                li.innerHTML = `[${currentIndex + 1}/${text.length}] ${logMessage}`;
-                li.style.borderBottom = "1px solid #222";
-                li.style.padding = "4px 0";
-                stepList.appendChild(li);
-
-                // Auto-scroll the terminal to the bottom
-                const scrollContainer = stepList.parentElement;
-                scrollContainer.scrollTop = scrollContainer.scrollHeight;
-                
-                currentIndex++;
-                
-                // Wait 500ms before processing the next character
-                setTimeout(processNextCharacter, 500); 
-            } else {
-                // 4. Animation Finished!
+        function step() {
+            if (i >= text.length) {
+                clearHighlights();
+                spotPlain.textContent = '✓';
+                spotCipher.textContent = '✓';
+                spotPlain.style.color = '#10b981';
+                spotCipher.style.color = '#10b981';
+                mathLine.textContent = '';
                 encryptBtn.disabled = false;
-                encryptBtn.style.opacity = "1";
-                encryptBtn.innerText = "Encrypt →";
-                
-                const finalLi = document.createElement('li');
-                finalLi.innerHTML = `<br><span style="color:#a6accd; font-size:11px;">*Note: Alphabet Index uses A=0 to Z=25</span><br><strong style="color:#6366f1;">✓ Encryption Complete!</strong>`;
-                stepList.appendChild(finalLi);
+                encryptBtn.textContent = 'Encrypt →';
+                progressBar.style.width = '100%';
+                statusText.textContent = 'Done — ' + text.length + ' characters processed';
+                const done = document.createElement('li');
+                done.style.cssText = 'color:#6366f1;margin-top:6px;font-family:sans-serif;';
+                done.textContent = '✓ Encryption complete!';
+                stepList.appendChild(done);
+                stepList.scrollTop = stepList.scrollHeight;
+                return;
             }
+
+            const ch = text[i];
+            const isLetter = /[a-zA-Z]/.test(ch);
+            const li = document.createElement('li');
+            li.style.cssText = 'border-bottom:1px solid #1e1e2e;padding-bottom:4px;';
+
+            if (isLetter) {
+                const isUpper = ch === ch.toUpperCase();
+                const base = isUpper ? 65 : 97;
+                const pos = ch.toUpperCase().charCodeAt(0) - 65;
+                const newPos = (pos + shift) % 26;
+                const newCh = String.fromCharCode(newPos + base);
+                result += newCh;
+
+                highlightRuler(pos);
+                spotPlain.textContent = ch.toUpperCase();
+                spotPlain.style.color = '#10b981';
+                spotCipher.textContent = newCh.toUpperCase();
+                spotCipher.style.color = '#f43f5e';
+                mathLine.textContent = `pos('${ch.toUpperCase()}') = ${pos}  →  (${pos} + ${shift}) mod 26 = ${newPos}  →  '${newCh.toUpperCase()}'`;
+
+                li.innerHTML = `<span style="color:#666;">[${i+1}/${text.length}]</span> '<span style="color:#10b981;">${ch}</span>' (index <strong>${pos}</strong>) + ${shift} mod 26 = index <strong>${newPos}</strong> → '<span style="color:#f43f5e;">${newCh}</span>'`;
+            } else {
+                result += ch;
+                clearHighlights();
+                const display = ch === ' ' ? '⎵' : ch;
+                spotPlain.textContent = display;
+                spotPlain.style.color = '#555';
+                spotCipher.textContent = display;
+                spotCipher.style.color = '#555';
+                mathLine.textContent = `'${ch === ' ' ? 'space' : ch}' is not a letter — passed through unchanged`;
+                li.style.color = '#555';
+                li.innerHTML = `<span style="color:#555;">[${i+1}/${text.length}]</span> '${ch === ' ' ? 'space' : ch}' — not a letter, kept as-is`;
+            }
+
+            cipherOutput.value = result;
+            stepList.appendChild(li);
+            stepList.scrollTop = stepList.scrollHeight;
+            progressBar.style.width = (((i + 1) / text.length) * 100) + '%';
+            statusText.textContent = `Character ${i + 1} of ${text.length}`;
+            i++;
+            setTimeout(step, delay);
         }
 
-        // Start the animation
-        setTimeout(processNextCharacter, 200);
+        setTimeout(step, 300);
     });
+
+    buildRuler(3);
+})();
 </script>
 {% endblock %}
