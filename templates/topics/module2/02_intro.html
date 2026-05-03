@@ -17,32 +17,37 @@
     
     <div style="display: grid; gap: 20px; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));">
         
-        <div style="background: #f8f9fa; border: 1px solid #e5e7eb; border-radius: 8px; padding: 20px; border-top: 4px solid #10b981;">
+        <div style="background: #f8f9fa; border: 1px solid #e5e7eb; border-radius: 8px; padding: 20px; border-top: 4px solid #1f1e2e">
             <h3 style="margin-top: 0; color: #333;">1. The Shared Key Concept</h3>
             <p style="color: #666; font-size: 15px; margin-bottom: 0;">
                 Explore the foundation of symmetric systems. Just like a physical padlock, the exact same key that secures the data is required to open it.
             </p>
         </div>
-
+        <!--
         <div style="background: #f8f9fa; border: 1px solid #e5e7eb; border-radius: 8px; padding: 20px; border-top: 4px solid #6366f1;">
             <h3 style="margin-top: 0; color: #333;">2. The AES Standard</h3>
             <p style="color: #666; font-size: 15px; margin-bottom: 0;">
                 Get introduced to the Advanced Encryption Standard (AES). Learn why governments, banks, and the military trust this specific algorithm to protect their most sensitive files.
             </p>
         </div>
-
-        <div style="background: #f8f9fa; border: 1px solid #e5e7eb; border-radius: 8px; padding: 20px; border-top: 4px solid #f43f5e;">
-            <h3 style="margin-top: 0; color: #333;">3. The Key Distribution Problem</h3>
+        -->
+        <div style="background: #f8f9fa; border: 1px solid #e5e7eb; border-radius: 8px; padding: 20px; border-top: 4px solid #1f1e2e">
+            <h3 style="margin-top: 0; color: #333;">2. The Key Distribution Problem</h3>
             <p style="color: #666; font-size: 15px; margin-bottom: 0;">
                 Discover the fatal flaw of symmetric encryption. If Alice and Bob are across the world, how can they safely share the secret key over the internet without a hacker stealing it?
             </p>
         </div>
-
+        <div style="background: #f8f9fa; border: 1px solid #e5e7eb; border-radius: 8px; padding: 20px; border-top: 4px solid #1f1e2e;">
+            <h3 style="margin-top: 0; color: #333;">3. Diffie-Hellman key exchange</h3>
+            <p style="color: #666; font-size: 15px; margin-bottom: 0;">
+                Explore the most famous asymmetric algorithm in the world, and learn how it uses the multiplication of massive prime numbers to lock your data.
+            </p>
+        </div>
     </div>
 </div>
 
 <div style="margin-top: 50px; text-align: right;">
-    <a href="{{ url_for('module2_intro') }}" style="background: #10b981; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold; font-size: 16px; transition: background 0.2s;">
+    <a href="{{ url_for('view_lesson', module_num=2, lesson_num=1) }}" style="background: #10b981; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold; font-size: 16px; transition: background 0.2s;">
         Start Lesson: The Shared Key Concept →
     </a>
 </div>

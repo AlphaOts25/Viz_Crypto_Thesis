@@ -48,7 +48,7 @@
     
     <div class="interactive-test" style="background: #1e1e2e; border-radius: 12px; padding: 30px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); color: white;">
         <h2 style="text-align: center; color: #fff; font-size: 30px;">An Interactive Simulation</h2>
-        <h2 style="center; color: #1f1e2e; font-size: 30px;">s</h2>
+        <h2 style="text-align:center; color: #1f1e2e; font-size: 30px;">s</h2>
         <h2 style="margin-top: 0; color: #fff; font-size: 20px;">How Does Encryption and Decryption Works?</h2>
         <p style="color: #a6accd; font-size: 14px; margin-bottom: 20px;">Click the button to view a step-by-step demonstration of encryption and decryption, presented clearly and simply by the computer.</p>
         <div class="crypto-wrap">
@@ -86,6 +86,12 @@
             <div class="status" id="status">Enter text and press Encrypt / Decrypt to begin.</div>
         </div>
         <p style="color: #a6accd; font-size: 14px; margin-bottom: 20px;">Note: There is no particular algorithm that is used during the process. This is just a visualization of how encryption and decryption works. </p>
+    </div>
+
+    <div style="margin-top: 50px; text-align: right;">
+        <a href="{{ url_for('view_lesson', module_num=1, lesson_num=2) }}" style="background: #10b981; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold; font-size: 16px; transition: background 0.2s;">
+            Start Lesson 2: Caesar Cipher →
+        </a>
     </div>
         
 </div>

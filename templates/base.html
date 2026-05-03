@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ITN108 | Cryptography Visualizer</title>
+    <title>Cryptography Visualizer</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body>
@@ -11,9 +11,9 @@
     <nav class="navbar">
         <div class="nav-brand">
             {% if current_user.is_authenticated %}
-                <a href="{{ url_for('home') }}"><strong>ITN108</strong> Visualizer</a>
+                <a href="{{ url_for('home') }}"><strong>Cryptography</strong> Visualizer</a>
             {% else %}
-                <a href="#"><strong>ITN108</strong> Visualizer</a>
+                <a href="#"><strong>Cryptography</strong> Visualizer</a>
             {% endif %}
         </div>
         <div class="nav-actions">
@@ -36,7 +36,7 @@
                 <span class="arrow">▼</span>
             </button>
             <div class="dropdown-container">
-                <a href="{{ url_for('module1_intro') }}" style="font-weight: bold; color: #6366f1;">Introduction</a>
+                <a href="{{ url_for('module_intro', module_num=1) }}" style="font-weight: bold; color: #6366f1;">Introduction</a>
                 <a href="{{ url_for('view_lesson', module_num=1, lesson_num=1) }}">Plaintext vs Ciphertext</a>
                 <a href="{{ url_for('view_lesson', module_num=1, lesson_num=2) }}">Classical Cryptography</a>
             </div>
@@ -45,20 +45,10 @@
                 <span class="arrow">▼</span>
             </button>
             <div class="dropdown-container">
-                <a href="{{ url_for('module2_intro') }}" style="font-weight: bold; color: #6366f1;">Introduction</a>
+                <a href="{{ url_for('module_intro', module_num=2) }}" style="font-weight: bold; color: #6366f1;">Introduction</a>
                 <a href="{{ url_for('view_lesson', module_num=2, lesson_num=1) }}">Shared Key Concept</a>
-                <a href="{{ url_for('view_lesson', module_num=2, lesson_num=2) }}">AES Standard</a>
-                <a href="{{ url_for('view_lesson', module_num=2, lesson_num=3) }}">Key Distribution Problem</a>
-            </div>
-
-            <button class="dropdown-btn">3. Key Exchange Problem 
-                <span class="arrow">▼</span>
-            </button>
-            <div class="dropdown-container">
-                <a href="{{ url_for('module3_intro') }}" style="font-weight: bold; color: #6366f1;">Introduction</a>
-                <a href="{{ url_for('view_lesson', module_num=3, lesson_num=1)  }}">Secure Distribution Issue</a>
-                <a href="{{ url_for('view_lesson', module_num=3, lesson_num=2)  }}">Man-in-the-Middle (Eve)</a>
-                <a href="{{ url_for('view_lesson', module_num=3, lesson_num=3)  }}">Diffie-Hellman Exchange</a>
+                <a href="{{ url_for('view_lesson', module_num=2, lesson_num=2) }}">Key Distribution Problem</a>
+                <a href="{{ url_for('view_lesson', module_num=2, lesson_num=3)  }}">Diffie-Hellman Exchange</a>
             </div>
         </aside>
         {% endif %}
