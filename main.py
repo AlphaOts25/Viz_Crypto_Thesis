@@ -7,6 +7,9 @@ from pymongo import MongoClient
 import os
 from werkzeug.utils import secure_filename
 from dotenv import load_dotenv
+import random
+from collections import defaultdict
+from datetime import datetime
 
 app = Flask(__name__)
 # IMPORTANT: In a real app, this should be a random string hidden in a .env file
@@ -56,54 +59,45 @@ def create_admin():
 """
 
 #----------LOGIN----------------------------------------------
+# ---------- LOGIN ----------------------------------------------
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     if request.method == 'POST':
-        # 1. Grab the data from the form
         username = request.form.get('username')
         email = request.form.get('email')
         password = request.form.get('password')
         confirm_password = request.form.get('confirm_password')
         professor_id = request.form.get('professor_id')
 
-        # 2. Basic Validation
         if password != confirm_password:
             flash('Passwords do not match!')
             return redirect(url_for('register'))
 
-        # 3. Check if user already exists
         existing_user = db.users.find_one({
             "$or": [{"username": username}, {"email": email}]
         })
         
         if existing_user:
-            flash('Username or Email already exists. Please choose another.')
+            flash('Username or Email already exists.')
             return redirect(url_for('register'))
 
-        # 4. Build the new Student Document
         new_student = {
             "username": username,
             "email": email,
             "password_hash": generate_password_hash(password),
             "role": "student",
-            "quiz_scores": {
-                "module1": 0,
-                "module2": 0,
-                "module3": 0
-            },
+            "quiz_scores": defaultdict(int),
             "total_score": 0,
-            # We convert the string from the dropdown back into a MongoDB ObjectId
             "professor_id": ObjectId(professor_id) 
         }
 
-        # 5. Save to MongoDB!
         db.users.insert_one(new_student)
-        flash('Account created successfully! You can now log in.')
+        flash('Account created successfully!')
         return redirect(url_for('login'))
 
-    # If it's a GET request, fetch all admins so the student can select their professor
     admins = list(db.users.find({"role": "admin"}))
     return render_template('auth/register.html', admins=admins)
+
 
 @app.route('/logout')
 @login_required
@@ -111,13 +105,13 @@ def logout():
     logout_user()
     return redirect(url_for('home'))
 
+
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
         submitted_username = request.form['username']
         submitted_password = request.form['password']
 
-        # Look up the user in the MongoDB 'users' collection
         user = db.users.find_one({"username": submitted_username})
 
         if user and check_password_hash(user['password_hash'], submitted_password):
@@ -129,108 +123,185 @@ def login():
             else:
                 return redirect(url_for('home'))
         else:
-            flash('Invalid username or password. Please try again.')
+            flash('Invalid username or password.')
             return redirect(url_for('login'))
 
     return render_template('auth/login.html')
 
 
-# ------------------------------ ADMIN -------------------------------------------------
-
-
-
+# ------------------------------ ADMIN ------------------------------
 
 @app.route('/admin/dashboard')
 @login_required
 def admin_dashboard():
-    # 1. Security Check: Kick them out if they aren't an admin!
+
     if current_user.role != 'admin':
         return redirect(url_for('home'))
 
-    # 2. Get Dashboard Stats using MongoDB commands!
-    # Count how many total modules exist
     module_count = db.modules.count_documents({})
-    
-    # Count how many students are registered (this is much cleaner than SQL!)
     student_count = db.users.count_documents({"role": "student"})
-    
-    # Grab all the modules to display in the table
-    modules = list(db.modules.find())
 
-    # 3. Send the data to the HTML template
-    return render_template('admin/dashboard.html', 
-                           modules=modules, 
-                           module_count=module_count, 
-                           student_count=student_count)
+    modules = list(db.modules.find())
+    tests = list(db.tests.find())
+
+    for m in modules:
+        m["type"] = "lesson"
+
+    for t in tests:
+        t["type"] = "test"
+        t["lesson_code"] = f"{t['type'].upper()}_TEST"
+        t["title"] = f"{t['type'].capitalize()} Test"
+        t["video_url"] = None
+
+    curriculum = modules + tests
+
+    return render_template(
+        'admin/dashboard.html',
+        modules=curriculum,
+        module_count=module_count,
+        student_count=student_count
+    )
+
 
 @app.route('/admin/add_lesson', methods=['POST'])
 @login_required
 def add_lesson():
-    # Security check!
+
     if current_user.role != 'admin':
         return redirect(url_for('home'))
 
     lesson_code = request.form.get('lesson_code')
     title = request.form.get('title')
-    
-    # NEW 1: Grab the formatted text from the TinyMCE editor
     content = request.form.get('content')
-    
-    # Grab the FILE instead of a text URL
     video_file = request.files.get('video_file')
 
-    # NEW 2: Add "content" to the data we are going to save to MongoDB
     update_data = {
         "title": title,
         "content": content
     }
 
-    # If the admin actually selected a file...
     if video_file and video_file.filename != '':
-        # 1. Clean the filename (removes spaces and weird characters)
         filename = secure_filename(video_file.filename)
-        
-        # 2. Save the physical MP4 file to your computer's static folder
         file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
         video_file.save(file_path)
-        
-        # 3. Add the web-friendly path to our MongoDB update data
         update_data["video_url"] = f"/static/uploads/videos/{filename}"
 
-    # UPSERT: Update the lesson if it exists, or create it if it doesn't
     db.modules.update_one(
         {"lesson_code": lesson_code},
         {"$set": update_data},
         upsert=True
     )
     
-    flash(f'Successfully uploaded video and text for {title}!')
+    flash(f'Successfully uploaded video for {title}!')
     return redirect(url_for('admin_dashboard'))
+
 
 @app.route('/admin/delete_lesson/<lesson_code>', methods=['POST'])
 @login_required
 def delete_lesson(lesson_code):
-    # 1. Security Check
+
     if current_user.role != 'admin':
         return redirect(url_for('home'))
 
-    # 2. Find the lesson to see if there is an MP4 file we need to trash
     lesson = db.modules.find_one({"lesson_code": lesson_code})
-    
+
     if lesson and lesson.get('video_url'):
-        # Extract just the filename (e.g., "intro.mp4") from the URL
         filename = lesson['video_url'].split('/')[-1]
         file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-        
-        # Safely delete the physical file from the computer
+
         if os.path.exists(file_path):
             os.remove(file_path)
 
-    # 3. Delete the text record from MongoDB
     db.modules.delete_one({"lesson_code": lesson_code})
-    
-    flash(f'Lesson {lesson_code} has been completely deleted.')
+
     return redirect(url_for('admin_dashboard'))
+
+
+# ------------------------------ TESTS ------------------------------
+
+def create_test(test_type):
+    test = {
+        "type": test_type,   # "pre" or "post"
+        "title": f"{test_type.capitalize()} Test",
+        "created_at": datetime.utcnow()
+    }
+
+    result = db.tests.insert_one(test)
+    return result.inserted_id
+
+@app.route('/add_test', methods=['POST'])
+@login_required
+def add_test():
+
+    if current_user.role != 'admin':
+        return redirect(url_for('home'))
+
+    test_type = request.form.get("type")
+
+    test_id = db.tests.insert_one({
+        "type": test_type
+    }).inserted_id
+
+    grouped = defaultdict(dict)
+
+    for key, value in request.form.items():
+        if key.startswith("questions"):
+            parts = key.replace("]", "").split("[")
+            grouped[parts[1]][parts[2]] = value
+
+    for q in grouped.values():
+        db.questions.insert_one({
+            "test_id": test_id,
+            "question_text": q.get("text"),
+            "choices": {
+                "a": q.get("a"),
+                "b": q.get("b"),
+                "c": q.get("c"),
+                "d": q.get("d")
+            },
+            "correct_answer": q.get("correct")
+        })
+
+    return redirect(url_for('admin_dashboard'))
+
+
+@app.route('/delete_test/<test_id>', methods=['POST'])
+@login_required
+def delete_test(test_id):
+
+    if current_user.role != 'admin':
+        return redirect(url_for('home'))
+
+    db.tests.delete_one({"_id": ObjectId(test_id)})
+    db.questions.delete_many({"test_id": ObjectId(test_id)})
+
+    return redirect(url_for('admin_dashboard'))
+
+
+def get_test(test_type):
+    test = db.tests.find_one({"type": test_type})
+    if not test:
+        return []
+
+    questions = list(db.questions.find({"test_id": test["_id"]}))
+    random.shuffle(questions)
+
+    for q in questions:
+        items = list(q["choices"].items())
+        random.shuffle(items)
+
+        new_choices = {}
+        correct = q["correct_answer"]
+
+        for i, (k, v) in enumerate(items):
+            new_key = ["a","b","c","d"][i]
+            new_choices[new_key] = v
+            if k == correct:
+                q["correct_answer"] = new_key
+
+        q["choices"] = new_choices
+
+    return questions
 
 #---------------------------------------TEMPLATES--------------------------------------------
 
