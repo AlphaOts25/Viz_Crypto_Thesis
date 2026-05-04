@@ -3,223 +3,456 @@
 
 {% block content %}
 <style>
-  /* ── VIGENÈRE SIMULATOR SCOPED CSS ── */
-  .vigenere-sim {
-    --bg-card:    #292d3e;
-    --bg-well:    #1a1a24;
-    --bg-inset:   #13131c;
-    --text-bright: #ffffff;
-    --text-muted:  #a6accd;
-    --text-dim:    #666a8a;
-    --green:  #10b981;
-    --green-dim: rgba(16,185,129,0.15);
-    --green-border: rgba(16,185,129,0.35);
-    --red:    #f43f5e;
-    --red-dim: rgba(244,63,94,0.15);
-    --red-border: rgba(244,63,94,0.35);
-    --indigo: #6366f1;
-    --indigo-dim: rgba(99,102,241,0.15);
-    --indigo-border: rgba(99,102,241,0.35);
-    --amber:  #f59e0b;
-    --amber-dim: rgba(245,158,11,0.12);
-    --amber-border: rgba(245,158,11,0.35);
-    --border: rgba(255,255,255,0.08);
-    --mono: monospace;
-    --sans: sans-serif;
-  }
+    /* ── MINIMALIST SYMMETRIC SIMULATOR CSS ── */
+    #symSim * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', 'Segoe UI', sans-serif; }
+    #symSim {
+        background: #11141e; 
+        border-radius: 16px;
+        padding: 40px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+        color: #fff;
+        margin-top: 40px;
+        border: 1px solid rgba(255,255,255,0.05);
+        position: relative;
+        overflow: hidden;
+    }
 
-  /* Minimized Step Wrapper */
-  .vigenere-sim .step { background: var(--bg-card); border-radius: 10px; padding: 16px 20px; margin-bottom: 10px; border: 1px solid var(--border); }
-  .vigenere-sim .step-header { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
-  .vigenere-sim .step-badge { width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-family: var(--mono); font-size: 12px; font-weight: bold; flex-shrink: 0; }
-  .vigenere-sim .badge-green  { background: var(--green-dim); color: var(--green); border: 1px solid var(--green-border); }
-  .vigenere-sim .badge-amber  { background: var(--amber-dim); color: var(--amber); border: 1px solid var(--amber-border); }
-  .vigenere-sim .badge-red    { background: var(--red-dim); color: var(--red); border: 1px solid var(--red-border); }
-  .vigenere-sim .badge-indigo { background: var(--indigo-dim); color: var(--indigo); border: 1px solid var(--indigo-border); }
-  .vigenere-sim .step-title { font-size: 15px; font-weight: 600; margin: 0; color: white; }
-  .vigenere-sim .step-desc  { font-size: 12px; color: var(--text-muted); margin-top: 2px; margin-bottom: 0; }
+    .sim-header { margin-bottom: 30px; text-align: center; }
+    .sim-header h2 { margin: 0 0 10px 0; color: #fff; font-size: 24px; font-weight: 600; letter-spacing: -0.5px;}
+    .sim-header p { color: #8b92b2; font-size: 14px; margin: 0; line-height: 1.6; }
 
-  /* Connectors */
-  .vigenere-sim .connector { display: flex; flex-direction: column; align-items: center; gap: 2px; margin: 0; color: var(--text-dim); font-size: 10px; text-transform: uppercase; letter-spacing: .05em; }
-  .vigenere-sim .connector-line { width: 1px; height: 16px; background: linear-gradient(to bottom, var(--border), transparent); }
+    /* Layout */
+    .sim-stage {
+        display: flex;
+        justify-content: space-between;
+        align-items: stretch;
+        gap: 0px;
+        margin-bottom: 30px;
+        position: relative;
+        min-height: 550px;
+        background: #151822;
+        border-radius: 12px;
+        border: 1px solid rgba(255,255,255,0.03);
+    }
 
-  /* Inputs */
-  .vigenere-sim label { display: block; font-size: 10px; font-weight: bold; text-transform: uppercase; letter-spacing: .05em; margin-bottom: 4px; }
-  .vigenere-sim input[type="text"] { width: 100%; padding: 8px 12px; background: var(--bg-well); border: 1px solid var(--border); border-radius: 6px; color: var(--text-bright); font-family: var(--mono); font-size: 13px; outline: none; box-sizing: border-box; }
-  .vigenere-sim .field-group { display: flex; gap: 12px; flex-wrap: wrap; }
-  .vigenere-sim .field { flex: 1; min-width: 150px; }
-  .vigenere-sim .label-green  { color: var(--green); }
-  .vigenere-sim .label-amber  { color: var(--amber); }
-  .vigenere-sim .label-indigo { color: var(--indigo); }
-  .vigenere-sim input.input-green  { border-color: var(--green-border); }
-  .vigenere-sim input.input-amber  { border-color: var(--amber-border); }
+    .sim-col {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 25px 15px;
+        position: relative;
+        z-index: 2;
+    }
+    
+    .eve-col { background: rgba(244,63,94,0.02); border-left: 1px solid rgba(255,255,255,0.03); border-right: 1px solid rgba(255,255,255,0.03); }
 
-  /* Pairing Grid */
-  .vigenere-sim .pairing-grid { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
-  .vigenere-sim .pair-cell { display: flex; flex-direction: column; align-items: center; background: var(--bg-inset); border: 1px solid var(--border); border-radius: 6px; padding: 6px 0; width: 34px; font-family: var(--mono); }
-  .vigenere-sim .pair-plain { font-size: 14px; font-weight: bold; color: var(--green); line-height: 1; }
-  .vigenere-sim .pair-key { font-size: 14px; font-weight: bold; color: var(--amber); line-height: 1; }
-  .vigenere-sim .pair-divider { width: 20px; height: 1px; background: var(--border); margin: 4px 0; }
-  .vigenere-sim .pair-index { font-size: 8px; color: var(--text-dim); margin-top: 3px; }
-  .vigenere-sim .space-cell { opacity: .3; }
-  .vigenere-sim .placeholder-text { color: var(--text-dim); font-size: 12px; font-style: italic; text-align: center; padding: 10px 0; margin: 0; }
+    /* Pill Headers */
+    .pill-header {
+        border: 1.5px solid #fff;
+        border-radius: 30px;
+        padding: 8px 20px;
+        font-size: 12px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin-bottom: 25px;
+        background: transparent;
+    }
+    .pill-blue { border-color: #60a5fa; color: #fff; }
+    .pill-red { border-color: #f43f5e; color: #fff; }
+    .pill-green { border-color: #10b981; color: #fff; }
 
-  /* Math Table */
-  .vigenere-sim .math-table { width: 100%; border-collapse: collapse; font-size: 12px; font-family: var(--mono); margin-top: 10px; }
-  .vigenere-sim .math-table th { padding: 6px 8px; text-align: center; border-bottom: 1px solid var(--border); font-size: 9px; text-transform: uppercase; color: var(--text-dim); }
-  .vigenere-sim .math-table td { padding: 5px 8px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.04); }
-  .vigenere-sim .col-p { color: var(--green); }
-  .vigenere-sim .col-k { color: var(--amber); }
-  .vigenere-sim .col-c { color: var(--red); }
-  .vigenere-sim .col-op { color: var(--text-dim); }
+    /* Icons */
+    .sim-icon {
+        width: 36px; height: 36px;
+        fill: none; stroke: currentColor; stroke-width: 2;
+        stroke-linecap: round; stroke-linejoin: round;
+        margin-bottom: 10px;
+    }
+    .icon-blue { color: #818cf8; }
+    .icon-red { color: #fb7185; }
+    .icon-green { color: #34d399; }
 
-  /* Buttons & Boxes */
-  .vigenere-sim #encryptBtn { width: 100%; padding: 10px; background: var(--green-dim); border: 1px solid var(--green-border); border-radius: 6px; color: var(--green); font-size: 13px; font-weight: bold; cursor: pointer; margin-top: 8px; }
-  .vigenere-sim .transit-box { background: var(--bg-inset); border: 1px dashed var(--red-border); border-radius: 8px; padding: 12px; }
-  .vigenere-sim #transitCipher { font-family: var(--mono); font-size: 13px; color: var(--red); word-break: break-all; margin: 0; }
-  
-  /* Bob Output & Banners */
-  .vigenere-sim #bobOutput.correct { border-color: var(--green); color: var(--green); }
-  .vigenere-sim #bobOutput.wrong   { border-color: var(--red); color: var(--red); }
-  .vigenere-sim #resultBanner { border-radius: 6px; padding: 10px; font-size: 13px; display: none; margin-top: 10px; }
-  .vigenere-sim #resultBanner.correct { background: var(--green-dim); border: 1px solid var(--green-border); color: var(--green); display: block; }
-  .vigenere-sim #resultBanner.wrong   { background: var(--red-dim); border: 1px solid var(--red-border); color: var(--red); display: block; }
+    /* Data Pills */
+    .data-pill {
+        border: 1.5px solid rgba(255,255,255,0.2);
+        border-radius: 20px;
+        padding: 8px 16px;
+        font-size: 12px;
+        font-weight: 700;
+        color: #fff;
+        background: transparent;
+        text-align: center;
+        margin-bottom: 12px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        transition: all 0.3s ease;
+        width: 90%;
+        justify-content: center;
+    }
+    input.data-pill {
+        background: rgba(0,0,0,0.2); outline: none; cursor: text; border-color: rgba(255,255,255,0.4); font-family: 'JetBrains Mono', monospace;
+    }
+    input.data-pill:focus { border-color: #6366f1; box-shadow: 0 0 10px rgba(99,102,241,0.3); }
+    
+    .pill-highlight { border-color: #10b981; box-shadow: 0 0 15px rgba(16,185,129,0.2); }
+    .pill-error { border-color: #f43f5e; box-shadow: 0 0 15px rgba(244,63,94,0.2); color: #f43f5e; }
+    .pill-locked { border-color: #c084fc; box-shadow: 0 0 15px rgba(192,132,252,0.2); }
+    .pill-hidden { opacity: 0.1; pointer-events: none; border-style: dashed; }
+
+    /* Math Tables */
+    .math-wrap {
+        width: 100%;
+        background: rgba(0,0,0,0.3);
+        border-radius: 8px;
+        border: 1px dashed rgba(255,255,255,0.1);
+        padding: 10px;
+        margin-top: 10px;
+        display: none;
+        overflow-x: auto;
+    }
+    .math-table { width: 100%; border-collapse: collapse; font-size: 11px; font-family: 'JetBrains Mono', monospace; text-align: center; }
+    .math-table th { color: #8b92b2; padding: 4px; border-bottom: 1px solid rgba(255,255,255,0.1); font-weight: normal; font-size: 9px; }
+    .math-table td { padding: 4px; border-bottom: 1px solid rgba(255,255,255,0.03); }
+
+    /* Animated Flying Packet */
+    #flying-packet {
+        position: absolute; top: 180px; left: 16%; 
+        background: #11141e; border: 1.5px solid #c084fc; color: #fff;
+        padding: 8px 16px; border-radius: 20px; font-weight: 700; font-size: 12px; font-family: 'JetBrains Mono', monospace;
+        box-shadow: 0 5px 15px rgba(192,132,252,0.4); z-index: 100;
+        opacity: 0; transition: left 2.5s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.5s;
+        pointer-events: none; display: flex; align-items: center; gap: 8px;
+    }
+
+    /* Terminal Log */
+    .log-container {
+        background: #080a0f; border: 1px solid rgba(255,255,255,0.05); border-radius: 12px;
+        padding: 15px; height: 160px; overflow-y: auto;
+        font-family: 'JetBrains Mono', 'Courier New', monospace; font-size: 12px; line-height: 1.6;
+        margin-bottom: 20px; box-shadow: inset 0 0 20px rgba(0,0,0,0.5);
+    }
+    .log-container::-webkit-scrollbar { width: 6px; }
+    .log-container::-webkit-scrollbar-thumb { background: #333; border-radius: 3px; }
+    .log-line { margin-bottom: 4px; color: #8b92b2; }
+    .log-time { color: #4b5563; margin-right: 8px; }
+    .log-info { color: #60a5fa; }
+    .log-success { color: #34d399; }
+    .log-error { color: #fb7185; }
+    .log-warn { color: #fbbf24; }
+
+    /* Buttons */
+    .btn-run {
+        width: 100%; padding: 16px; background: #6366f1; border: none; border-radius: 8px;
+        color: #fff; font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px;
+        cursor: pointer; transition: all 0.2s; box-shadow: 0 4px 15px rgba(99,102,241,0.2);
+    }
+    .btn-run:hover:not(:disabled) { background: #4f46e5; transform: translateY(-2px); box-shadow: 0 6px 20px rgba(99,102,241,0.4); }
+    .btn-run:disabled { background: #1e212b; color: #4b5563; cursor: not-allowed; box-shadow: none; transform: none; }
 </style>
 
-<div class="lesson-container" style="max-width: 850px; margin: 0 auto; padding-bottom: 60px;">
+<div class="lesson-container" style="max-width: 950px; margin: 0 auto; padding-bottom: 60px;">
 
-    <!-- ── TOPIC HEADER ── -->
+    <!-- HEADER -->
     <div class="lesson-header" style="margin-bottom: 40px;">
         <p style="color: #10b981; font-weight: bold; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 1px;">Topic 1</p>
         <h1 style="font-size: 36px; margin-top: 0; margin-bottom: 15px;">The Shared Key Concept</h1>
         <p style="font-size: 18px; color: #555; line-height: 1.6;">
-            Symmetric encryption is like a physical padlock where there is only one type of key. The sender uses the key to lock the box, and the receiver must use an identical copy of that exact same key to open it.
+            Symmetric encryption relies on a single shared key. Below, we use a simplified mathematical cipher (where Letters + Key = Ciphertext) to visualize exactly how a key transforms data, and why the receiver must have the <em>exact same key</em> to reverse the math.
         </p>
     </div>
 
-    <!-- ── STUDY SECTION ── -->
-    <div class="study-section" style="background: #fff; border-radius: 12px; padding: 30px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); margin-bottom: 40px;">
-        <h2 style="margin-top: 0; color: #333; border-bottom: 2px solid #e5e7eb; padding-bottom: 10px;">How Symmetric Systems Work</h2>
-        <p style="color: #555; line-height: 1.6; font-size: 16px;">
-            In cryptography, we often use characters named <strong>Alice</strong> (the sender) and <strong>Bob</strong> (the receiver) to explain how data travels.
-        </p>
-        <ul style="color: #555; line-height: 1.8; font-size: 15px; margin-top: 15px;">
-            <li><strong>Step 1:</strong> Alice and Bob agree on a secret password (the "Shared Key") beforehand.</li>
-            <li><strong>Step 2:</strong> Alice runs her plaintext message and the Shared Key through a mathematical algorithm.</li>
-            <li><strong>Step 3:</strong> The resulting ciphertext is sent across the internet. Even if a hacker intercepts it, it looks like random noise.</li>
-            <li><strong>Step 4:</strong> Bob receives the ciphertext and runs it through the reverse algorithm using the <em>exact same Shared Key</em>.</li>
-        </ul>
-        <div style="background: #fdf2f8; border-left: 4px solid #f43f5e; padding: 15px; margin-top: 20px; border-radius: 0 6px 6px 0;">
-            <p style="margin: 0; color: #9f1239; font-size: 15px;">
-                <strong>The Golden Rule:</strong> If Bob's key is even one letter or symbol different from Alice's key, the decryption will fail completely.
-            </p>
+    <!-- ── INTERACTIVE SYMMETRIC SIMULATOR ── -->
+    <div id="symSim">
+        <div class="sim-header">
+            <h2>Interactive: Symmetric Math & Interception</h2>
+            <p>Type a message and a secret key (A-Z letters only). Watch the mathematics calculate the ciphertext, transit through Eve's network, and wait for Bob to decrypt it.</p>
         </div>
+
+        <!-- Flying Animation Packet -->
+        <div id="flying-packet">📦 <span id="packetText">CIPH</span></div>
+
+        <div class="sim-stage" id="stage-area">
+            
+            <!-- ALICE -->
+            <div class="sim-col alice-col" id="col-alice">
+                <div class="pill-header pill-blue">ALICE (SENDER)</div>
+                
+                <!-- Document Icon -->
+                <svg class="sim-icon icon-blue" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                <input type="text" id="aMsg" class="data-pill pill-highlight" value="SECRET" placeholder="Message (A-Z)">
+                
+                <!-- Key Icon -->
+                <svg class="sim-icon icon-blue" viewBox="0 0 24 24" style="margin-top: 5px;"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"></path></svg>
+                <input type="text" id="aKey" class="data-pill" value="KEY" placeholder="Key (A-Z)">
+
+                <div id="aliceMathWrap" class="math-wrap">
+                    <div style="font-size: 10px; color: #60a5fa; text-align: center; margin-bottom: 5px;">Encryption Math: P + K = C</div>
+                    <div id="aliceMathTable"></div>
+                </div>
+
+                <div id="aCiphOut" class="data-pill pill-locked" style="display: none; margin-top: 15px;">--</div>
+            </div>
+
+            <!-- EVE -->
+            <div class="sim-col eve-col" id="col-eve">
+                <div class="pill-header pill-red">NETWORK (EVE)</div>
+                
+                <!-- Hacker Shield Icon -->
+                <svg class="sim-icon icon-red" viewBox="0 0 24 24" style="margin-top: 30px; width: 48px; height: 48px;"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+                
+                <div id="eveProcess" style="display: flex; flex-direction: column; align-items: center; width: 100%; margin-top: auto; opacity: 0;">
+                    <div id="eCiph" class="data-pill pill-locked" style="margin-bottom: 10px; font-family: 'JetBrains Mono';">--</div>
+                    <div class="data-pill pill-error" style="font-size: 10px;">❌ Cannot read without Key</div>
+                </div>
+            </div>
+
+            <!-- BOB -->
+            <div class="sim-col bob-col" id="col-bob">
+                <div class="pill-header pill-green">BOB (RECEIVER)</div>
+                
+                <!-- User Icon -->
+                <svg class="sim-icon icon-green" viewBox="0 0 24 24" style="margin-top: 0px;"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                
+                <div id="bCiph" class="data-pill pill-hidden" style="margin-top: 10px; font-family: 'JetBrains Mono'; font-size: 11px;">Waiting for data...</div>
+                
+                <div id="bobInputArea" style="width: 100%; display: flex; flex-direction: column; align-items: center; opacity: 0; transition: opacity 1s; pointer-events: none;">
+                    <input type="text" id="bKey" class="data-pill" placeholder="Enter Shared Key">
+                    <button id="btnDecrypt" class="btn-run" onclick="runDecryption()" style="padding: 10px; font-size: 11px; width: 90%; background: #10b981; margin-bottom: 15px;">Decrypt</button>
+                </div>
+
+                <div id="bobMathWrap" class="math-wrap">
+                    <div style="font-size: 10px; color: #34d399; text-align: center; margin-bottom: 5px;">Decryption Math: C - K = P</div>
+                    <div id="bobMathTable"></div>
+                </div>
+
+                <div id="bPlainOut" class="data-pill" style="display: none; margin-top: 15px;">--</div>
+            </div>
+
+        </div>
+
+        <!-- TERMINAL LOG -->
+        <div class="log-container" id="sysLog">
+            <div class="log-line"><span class="log-time">[00:00:00]</span> <span class="log-info">SYSTEM:</span> Ready. Enter plaintext and key (A-Z only), then start.</div>
+        </div>
+
+        <button id="btnRunSym" class="btn-run" onclick="runEncryption()">Encrypt & Transmit</button>
+        <button id="btnReset" class="btn-run" onclick="resetUI()" style="background: #1e212b; color: #a6accd; box-shadow: none; display: none;">Reset Simulator</button>
     </div>
-
-    <h2>Shared Key Concept</h2>
-    {% include "video_player.html" %}
-
- <div class="interactive-test" style="background: #1e1e2e; border-radius: 12px; padding: 30px; color: white;">
-    <h2>Alice → Bob (Key Required)</h2>
-
-    <div style="display: flex; gap: 20px;">
-
-        <!-- Alice -->
-        <div style="flex: 1; background: #292d3e; padding: 15px; border-radius: 8px;">
-            <h3>Alice</h3>
-
-            <input id="plaintextInput" placeholder="Enter message"
-                style="width: 100%; padding: 8px; margin-bottom: 10px;" />
-
-            <button id="encryptBtn">Encrypt</button>
-
-            <p style="margin-top: 10px;">Encrypted:</p>
-            <div id="cipherBox" style="background: #1a1a24; padding: 8px;">---</div>
-
-            <p style="margin-top: 10px;">Key:</p>
-            <div id="aliceKeyBox" style="background: #f59e0b; padding: 8px;">---</div>
-        </div>
-
-        <!-- User Input -->
-        <div style="flex: 1; text-align: center;">
-            <h3>Enter Key</h3>
-
-            <input id="userKeyInput" placeholder="Enter key"
-                style="padding: 8px; margin-bottom: 10px;" />
-
-            <br>
-
-            <button id="decryptBtn">Decrypt</button>
-
-            <p id="statusMsg"></p>
-        </div>
-
-        <!-- Bob -->
-        <div style="flex: 1; background: #292d3e; padding: 15px; border-radius: 8px;">
-            <h3>Bob</h3>
-
-            <p>Decrypted:</p>
-            <div id="bobMessage" style="background: #1a1a24; padding: 8px;">Locked</div>
-        </div>
-
-    </div>
-</div>
-
 </div>
 
 <script>
-const encryptBtn = document.getElementById('encryptBtn');
-const decryptBtn = document.getElementById('decryptBtn');
+    const sleep = ms => new Promise(r => setTimeout(r, ms));
+    const ALPHA = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    
+    function clean(s) { return s.toUpperCase().replace(/[^A-Z]/g, ''); }
+    function letterOf(c) { return ALPHA.indexOf(c); }
 
-const plaintextInput = document.getElementById('plaintextInput');
-const cipherBox = document.getElementById('cipherBox');
-const aliceKeyBox = document.getElementById('aliceKeyBox');
-
-const userKeyInput = document.getElementById('userKeyInput');
-const bobMessage = document.getElementById('bobMessage');
-const statusMsg = document.getElementById('statusMsg');
-
-let currentKey = null;
-let currentCipher = "";
-let originalText = "";
-
-// Caesar Encrypt
-function caesarEncrypt(text, key) {
-    return text.split("").map(char => {
-        if (char.match(/[a-z]/i)) {
-            const base = char === char.toUpperCase() ? 65 : 97;
-            return String.fromCharCode((char.charCodeAt(0) - base + key) % 26 + base);
-        }
-        return char;
-    }).join("");
-}
-
-encryptBtn.addEventListener('click', () => {
-    const text = plaintextInput.value;
-    if (!text) return;
-
-    originalText = text;
-    currentKey = Math.floor(Math.random() * 25) + 1;
-
-    currentCipher = caesarEncrypt(text, currentKey);
-
-    cipherBox.innerText = currentCipher;
-    aliceKeyBox.innerText = currentKey;
-});
-
-decryptBtn.addEventListener('click', () => {
-    const inputKey = parseInt(userKeyInput.value);
-
-    if (inputKey === currentKey) {
-        bobMessage.innerText = originalText;
-        bobMessage.style.color = "#10b981";
-        statusMsg.innerText = "Success";
-        statusMsg.style.color = "#10b981";
-    } else {
-        bobMessage.innerText = "Locked";
-        statusMsg.innerText = "Error: Wrong key";
-        statusMsg.style.color = "#f43f5e";
+    function getTimestamp() {
+        const now = new Date();
+        return `[${now.getHours().toString().padStart(2,'0')}:${now.getMinutes().toString().padStart(2,'0')}:${now.getSeconds().toString().padStart(2,'0')}]`;
     }
-});
+
+    function addLog(msg, type = 'info') {
+        const logBox = document.getElementById('sysLog');
+        logBox.innerHTML += `<div class="log-line"><span class="log-time">${getTimestamp()}</span> <span class="log-${type}">${msg}</span></div>`;
+        logBox.scrollTop = logBox.scrollHeight;
+    }
+
+    // Build Math Table
+    function buildMathTable(text, key, mode) {
+        const cleanT = clean(text); const cleanK = clean(key);
+        let rows = '';
+        const headers = mode === 'encrypt' ? ['P', 'K', 'P+K', 'C'] : ['C', 'K', 'C-K', 'P'];
+        
+        let finalOutput = '';
+
+        for(let i=0; i<cleanT.length; i++) {
+            const charVal = letterOf(cleanT[i]);
+            const keyVal = letterOf(cleanK[i % cleanK.length]);
+            let mathStr, resVal;
+            
+            if(mode === 'encrypt') {
+                mathStr = `${charVal}+${keyVal}`;
+                resVal = (charVal + keyVal) % 26;
+            } else {
+                mathStr = `${charVal}-${keyVal}`;
+                resVal = (charVal - keyVal + 26) % 26;
+            }
+            
+            finalOutput += ALPHA[resVal];
+
+            rows += `<tr>
+                <td style="color:${mode==='encrypt'?'#34d399':'#fb7185'};">${cleanT[i]}</td>
+                <td style="color:#fbbf24;">${cleanK[i % cleanK.length]}</td>
+                <td style="color:#8b92b2; font-size:10px;">${mathStr}</td>
+                <td style="color:${mode==='encrypt'?'#fb7185':'#34d399'}; font-weight:bold;">${ALPHA[resVal]}</td>
+            </tr>`;
+        }
+        
+        const tableHTML = `<table class="math-table">
+            <thead><tr>${headers.map(h=>`<th>${h}</th>`).join('')}</tr></thead>
+            <tbody>${rows}</tbody>
+        </table>`;
+
+        return { tableHTML, finalOutput };
+    }
+
+    let globalCipher = "";
+    let globalMsg = "";
+    let globalKey = "";
+
+    async function runEncryption() {
+        globalMsg = clean(document.getElementById('aMsg').value) || "SECRET";
+        globalKey = clean(document.getElementById('aKey').value) || "KEY";
+        
+        if(!globalMsg || !globalKey) {
+            alert("Please enter letters only for both fields.");
+            return;
+        }
+
+        document.getElementById('aMsg').value = globalMsg;
+        document.getElementById('aKey').value = globalKey;
+
+        // Lock inputs
+        document.getElementById('aMsg').disabled = true;
+        document.getElementById('aKey').disabled = true;
+        document.getElementById('btnRunSym').disabled = true;
+
+        addLog("ALICE: Generating ciphertext using Shared Key...", "warn");
+        
+        // Build Alice's Math
+        const encData = buildMathTable(globalMsg, globalKey, 'encrypt');
+        globalCipher = encData.finalOutput;
+
+        document.getElementById('aliceMathWrap').style.display = 'block';
+        document.getElementById('aliceMathTable').innerHTML = encData.tableHTML;
+        
+        await sleep(1500); 
+
+        const aCiphOut = document.getElementById('aCiphOut');
+        aCiphOut.innerText = `📦 ${globalCipher}`;
+        aCiphOut.style.display = 'flex';
+        
+        await sleep(1500);
+
+        // Transmission
+        addLog("SYSTEM: Transmitting Ciphertext across the network...", "info");
+        
+        const packet = document.getElementById('flying-packet');
+        document.getElementById('packetText').innerText = globalCipher;
+        
+        packet.style.transition = 'none';
+        packet.style.left = '16%';
+        packet.style.opacity = '1';
+        void packet.offsetWidth;
+        
+        // Move to Eve (50%)
+        packet.style.transition = 'left 2.5s cubic-bezier(0.4, 0, 0.2, 1)';
+        packet.style.left = '46%';
+        await sleep(2500);
+
+        // Eve Intercepts
+        addLog("EVE: Intercepted data!", "error");
+        document.getElementById('eveProcess').style.opacity = '1';
+        document.getElementById('eCiph').innerText = `📦 ${globalCipher}`;
+        
+        await sleep(1500); 
+        addLog("EVE ERROR: Without the key, the mathematical transformation cannot be reversed.", "error");
+        await sleep(2000);
+
+        // Move to Bob (80%)
+        addLog("SYSTEM: Data arrives at Bob's computer.", "info");
+        packet.style.transition = 'left 2.5s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.5s';
+        packet.style.left = '82%';
+        await sleep(2500);
+        
+        packet.style.opacity = '0';
+        
+        // Update Bob's UI
+        const bCiphDisplay = document.getElementById('bCiph');
+        bCiphDisplay.classList.remove('pill-hidden');
+        bCiphDisplay.classList.add('pill-locked');
+        bCiphDisplay.innerText = `📦 ${globalCipher}`;
+        
+        const bInput = document.getElementById('bobInputArea');
+        bInput.style.opacity = '1';
+        bInput.style.pointerEvents = 'auto';
+        
+        document.getElementById('btnRunSym').style.display = 'none';
+        document.getElementById('btnReset').style.display = 'block';
+        addLog("BOB: Awaiting Shared Key input to perform decryption math...", "warn");
+    }
+
+    async function runDecryption() {
+        const bobEnteredKey = clean(document.getElementById('bKey').value);
+        if(!bobEnteredKey) {
+            alert("Please enter a key for Bob first!");
+            return;
+        }
+
+        document.getElementById('bKey').value = bobEnteredKey;
+        document.getElementById('bKey').disabled = true;
+        document.getElementById('btnDecrypt').disabled = true;
+
+        addLog(`BOB: Calculating (Ciphertext - Key) using key [${bobEnteredKey}]...`, "warn");
+
+        const decData = buildMathTable(globalCipher, bobEnteredKey, 'decrypt');
+
+        document.getElementById('bobMathWrap').style.display = 'block';
+        document.getElementById('bobMathTable').innerHTML = decData.tableHTML;
+
+        await sleep(2000); // Give time to read table
+
+        const resultEl = document.getElementById('bPlainOut');
+        resultEl.style.display = 'flex';
+        resultEl.innerText = `📄 ${decData.finalOutput}`;
+
+        if (bobEnteredKey === globalKey) {
+            resultEl.className = 'data-pill pill-highlight';
+            addLog("BOB SUCCESS: Key matches! Mathematical reversal yielded original plaintext.", "success");
+        } else {
+            resultEl.className = 'data-pill pill-error';
+            addLog("BOB ERROR: Incorrect key used. The math produced gibberish.", "error");
+            
+            setTimeout(() => {
+                document.getElementById('bKey').disabled = false;
+                document.getElementById('btnDecrypt').disabled = false;
+                document.getElementById('bobMathWrap').style.display = 'none';
+                resultEl.style.display = 'none';
+                addLog("SYSTEM: Try again with the exact key Alice used.", "info");
+            }, 3000);
+        }
+    }
+
+    function resetUI() {
+        document.getElementById('aMsg').disabled = false;
+        document.getElementById('aKey').disabled = false;
+        document.getElementById('bKey').disabled = false;
+        document.getElementById('bKey').value = "";
+        document.getElementById('btnRunSym').disabled = false;
+        document.getElementById('btnDecrypt').disabled = false;
+
+        document.getElementById('aliceMathWrap').style.display = 'none';
+        document.getElementById('aCiphOut').style.display = 'none';
+        
+        document.getElementById('eveProcess').style.opacity = '0';
+        
+        document.getElementById('bobInputArea').style.opacity = '0';
+        document.getElementById('bobInputArea').style.pointerEvents = 'none';
+        document.getElementById('bobMathWrap').style.display = 'none';
+        document.getElementById('bPlainOut').style.display = 'none';
+
+        const bCiphDisplay = document.getElementById('bCiph');
+        bCiphDisplay.className = 'data-pill pill-hidden';
+        bCiphDisplay.innerText = "Waiting for data...";
+
+        document.getElementById('btnRunSym').style.display = 'block';
+        document.getElementById('btnReset').style.display = 'none';
+
+        document.getElementById('sysLog').innerHTML = '<div class="log-line"><span class="log-time">[00:00:00]</span> <span class="log-info">SYSTEM:</span> Simulator reset.</div>';
+    }
 </script>
 {% endblock %}
