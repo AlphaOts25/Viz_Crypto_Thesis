@@ -3,119 +3,82 @@
 
 {% block content %}
 <style>
-    /* ── REFINED DH SIMULATOR CSS ── */
+    /* ── GENERAL LAYOUT ── */
     #dhSim * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', 'Segoe UI', sans-serif; }
     #dhSim {
-        background: #13141c; 
+        background: #0c0d14; 
         border-radius: 16px; 
-        padding: 40px 50px; /* Increased horizontal padding for breathing room */
+        padding: 40px 50px; 
         box-shadow: 0 10px 30px rgba(0,0,0,0.3); 
         color: #fff;
         margin-top: 40px;
         border: 1px solid rgba(255,255,255,0.05);
     }
     
-    /* Progress Stepper */
-    .dh-progress {
-        display: flex; justify-content: space-between; align-items: center;
-        background: rgba(255,255,255,0.03); border-radius: 12px;
-        padding: 12px 30px; margin-bottom: 30px;
+    /* ── CLOCK SIMULATOR CSS ── */
+    .ms-wrap { font-family: var(--font-sans, 'Inter', sans-serif); padding: 4px 0 16px; }
+    .ms-ctrl-row { display: flex; gap: 12px; align-items: flex-end; margin-bottom: 24px; flex-wrap: wrap; background: rgba(255,255,255,0.02); padding: 16px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05); }
+    .ms-ctrl { display: flex; flex-direction: column; gap: 5px; flex: 1; min-width: 100px; }
+    .ms-ctrl label { font-size: 11px; color: var(--color-text-secondary, #a6accd); text-transform: uppercase; letter-spacing: 1px; font-weight: 600; }
+    .ms-ctrl input[type=number], .ms-ctrl input[type=range] { 
+        background: var(--color-background-secondary, #1a1a24); 
+        border: 1px solid rgba(255,255,255,0.15); 
+        color: #fff; 
+        padding: 10px 12px; border-radius: 8px; font-size: 14px; font-weight: 600; font-family: 'JetBrains Mono', monospace; 
     }
-    .dh-step {
-        font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px;
-        color: #55558a; display: flex; align-items: center; gap: 8px; transition: color 0.3s;
-    }
-    .dh-step.active { color: #fff; }
-    .dh-step.completed { color: #10b981; }
-    .dh-step-dot {
-        width: 24px; height: 24px; border-radius: 50%; background: #252537;
-        display: flex; align-items: center; justify-content: center; font-size: 11px;
-        transition: background 0.3s, color 0.3s;
-    }
-    .dh-step.active .dh-step-dot { background: #6366f1; color: #fff; box-shadow: 0 0 10px rgba(99,102,241,0.5); }
-    .dh-step.completed .dh-step-dot { background: #10b981; color: #fff; }
-
-    /* Layout Zones */
-    .dh-stage {
-        display: flex; justify-content: space-between; align-items: stretch; gap: 20px;
-        margin-bottom: 30px; position: relative;
-    }
-    .dh-actor { 
-        display: flex; flex-direction: column; align-items: center; width: 30%; 
-        background: rgba(255,255,255,0.02); border-radius: 16px; padding: 25px 20px;
-        border: 1px solid rgba(255,255,255,0.03); position: relative; z-index: 2;
-    }
-    .public-zone { 
-        width: 36%; background: rgba(245, 158, 11, 0.03); border: 1px dashed rgba(245, 158, 11, 0.2); 
-        justify-content: space-between;
-    }
-    .actor-title { font-size: 15px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 25px; display: flex; align-items: center; gap: 8px; }
-
-    /* 3D Glass Beakers */
-    .beaker-wrap { display: flex; flex-direction: column; align-items: center; gap: 12px; transition: transform 1.2s cubic-bezier(0.4, 0, 0.2, 1); width: 100%; position: relative; z-index: 5; }
-    .glass-beaker {
-        width: 80px; height: 80px; border-radius: 50%;
-        background: rgba(255,255,255,0.02); border: 2px solid rgba(255,255,255,0.08);
-        position: relative; overflow: hidden;
-        box-shadow: 0 10px 20px rgba(0,0,0,0.3), inset 0 0 15px rgba(0,0,0,0.5);
-        isolation: isolate;
-    }
-    .liquid {
-        position: absolute; bottom: 0; left: 0; right: 0; height: 0%;
-        transition: height 1s cubic-bezier(0.4, 0, 0.2, 1), background-color 1s ease, box-shadow 1s ease;
-        box-shadow: inset 0 4px 10px rgba(255,255,255,0.2);
-    }
-    .glass-glare {
-        position: absolute; top: 5%; left: 10%; width: 40%; height: 30%;
-        background: linear-gradient(135deg, rgba(255,255,255,0.3) 0%, transparent 100%);
-        border-radius: 50%; transform: rotate(-20deg); pointer-events: none; z-index: 10;
-    }
+    .ms-ctrl input[type=number]:focus { outline: none; border-color: #6366f1; box-shadow: 0 0 0 2px rgba(99,102,241,0.3); }
     
-    .beaker-label { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: #a6accd; text-transform: uppercase; font-weight: 600; text-align: center; line-height: 1.5; min-height: 36px; }
-    .sub-label { display: block; color: #55558a; font-size: 10px; margin-top: 2px; font-weight: normal; }
-
-    /* Interactive Swatches */
-    .swatch-panel { background: rgba(0,0,0,0.2); padding: 12px; border-radius: 30px; border: 1px solid rgba(255,255,255,0.05); margin-top: 10px; }
-    .swatches { display: flex; gap: 12px; position: relative; z-index: 50; }
-    .swatch {
-        width: 32px; height: 32px; border-radius: 50%; cursor: pointer;
-        transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.2s;
-        border: 2px solid transparent; position: relative;
+    .ms-body { display: flex; gap: 24px; align-items: flex-start; flex-wrap: wrap; }
+    .ms-right { flex: 1; min-width: 250px; display: flex; flex-direction: column; gap: 14px; }
+    .ms-card { 
+        background: var(--color-background-secondary, #1a1a24); 
+        border-radius: 12px; padding: 18px; 
+        border: 1px solid rgba(255,255,255,0.07); 
     }
-    .swatch::after { content: ''; position: absolute; top: 2px; left: 4px; width: 10px; height: 8px; background: rgba(255,255,255,0.4); border-radius: 50%; transform: rotate(-30deg); }
-    .swatch:hover { transform: translateY(-4px) scale(1.1); }
-    .swatch.selected { border-color: #fff; box-shadow: 0 5px 15px rgba(0,0,0,0.5); transform: scale(1.1); }
-    .swatch-panel.disabled { opacity: 0.3; pointer-events: none; filter: grayscale(100%); transition: all 0.5s; }
-
-    /* STATUS & CONTROLS (Updated for Stacked/Centered Layout) */
-    .control-panel { 
-        display: flex; flex-direction: column; align-items: center; justify-content: center;
-        background: #1a1a24; border-radius: 12px; padding: 30px 40px; 
-        border: 1px solid rgba(255,255,255,0.05); text-align: center;
-    }
-    .dh-status { 
-        font-size: 15px; color: #c8cee8; line-height: 1.6; margin-bottom: 20px;
-    }
-    .dh-status strong { color: #fff; }
-    .dh-btn {
-        padding: 14px 40px; background: #6366f1; border: none; border-radius: 8px;
-        color: #fff; font-size: 14px; font-weight: 700; text-transform: uppercase;
-        cursor: pointer; transition: all 0.3s; letter-spacing: 1px; min-width: 250px;
-        box-shadow: 0 4px 15px rgba(99,102,241,0.3); margin-top: 0;
-    }
-    .dh-btn:hover:not(:disabled) { background: #4f46e5; transform: translateY(-2px); box-shadow: 0 6px 20px rgba(99,102,241,0.4); }
-    .dh-btn:active:not(:disabled) { transform: translateY(0); }
-    .dh-btn:disabled { background: #252537; color: #55558a; cursor: not-allowed; box-shadow: none; }
+    .ms-card-lbl { font-size: 11px; color: var(--color-text-tertiary, #55558a); text-transform: uppercase; letter-spacing: 1px; font-weight: 700; margin-bottom: 12px; }
+    .ms-formula { font-size: 24px; font-family: var(--font-mono, 'JetBrains Mono', 'Courier New', monospace); line-height: 1.5; margin-bottom: 10px; background: rgba(0,0,0,0.2); padding: 12px; border-radius: 8px; text-align: center; border: 1px solid rgba(255,255,255,0.03); }
+    
+    /* Syntax Highlighting */
+    .f-g { color: #7c7fef; }
+    .f-x { color: #f59e0b; }
+    .f-m { color: var(--color-text-tertiary, #55558a); font-size: 15px; }
+    .f-p { color: var(--color-text-secondary, #a6accd); }
+    .f-eq { color: var(--color-text-tertiary, #55558a); }
+    .f-r { color: #10b981; font-weight: 700; }
+    
+    .ms-hint { font-size: 13px; color: #a6accd; margin-top: 8px; line-height: 1.6; text-align: center; }
+    
+    /* Actor Dashboard */
+    .dh-actor-cards { display: flex; gap: 12px; margin-bottom: 6px; }
+    .actor-col { flex: 1; background: rgba(255,255,255,0.02); border-radius: 12px; padding: 16px; border-top: 3px solid transparent; }
+    .actor-col.alice { border-top-color: #f43f5e; }
+    .actor-col.bob { border-top-color: #3b82f6; }
+    .actor-name { font-size: 14px; font-weight: 700; text-transform: uppercase; margin-bottom: 12px; letter-spacing: 1px; }
+    .actor-col.alice .actor-name { color: #f43f5e; }
+    .actor-col.bob .actor-name { color: #3b82f6; }
+    
+    .data-row { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 13px; color: #8b92b2; }
+    .data-val { font-family: 'JetBrains Mono', monospace; font-weight: 600; color: #fff; }
+    .data-val.highlight { color: #10b981; font-size: 15px; text-shadow: 0 0 10px rgba(16,185,129,0.4); }
+    
+    /* Buttons */
+    .ms-btns { display: flex; gap: 12px; margin-top: 10px; }
+    .ms-btn { flex: 1; padding: 14px 24px; border: none; border-radius: 8px; font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; cursor: pointer; transition: all .2s; font-family: inherit; }
+    .ms-pri { background: #6366f1; color: #fff; box-shadow: 0 4px 15px rgba(99,102,241,0.3); }
+    .ms-pri:hover:not(:disabled) { background: #4f46e5; transform: translateY(-2px); box-shadow: 0 6px 20px rgba(99,102,241,0.4); }
+    .ms-pri:disabled { background: #252537; color: #55558a; cursor: not-allowed; box-shadow: none; transform: none; }
+    .ms-rst { background: rgba(244,63,94,0.1); color: #f43f5e; border: 1px solid rgba(244,63,94,0.2); flex: 0.3; }
+    .ms-rst:hover:not(:disabled) { background: rgba(244,63,94,0.2); }
 </style>
 
-<div class="lesson-container" style="max-width: 850px; margin: 0 auto; padding-bottom: 60px;">
+<div class="lesson-container" style="max-width: 900px; margin: 0 auto; padding-bottom: 60px;">
 
     <!-- ── HEADER ── -->
     <div class="lesson-header" style="margin-bottom: 40px;">
         <p style="color: #6366f1; font-weight: bold; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 1px;">Topic 3</p>
-        <h1 style="font-size: 36px; margin-top: 0; margin-bottom: 15px;">Diffie–Hellman Key Exchange</h1>
+        <h1 style="font-size: 36px; margin-top: 0; margin-bottom: 15px;">The Key Exchange Problem</h1>
         <p style="font-size: 18px; color: #555; line-height: 1.6;">
-            Diffie–Hellman is a key exchange method that solves the problem of securely sharing a secret key over an insecure network. It allows two parties to create the same shared key without ever sending that key directly, making it safe even if someone is listening.
+            AES is unbreakable, but it has a fatal flaw: Symmetric encryption requires both the sender and receiver to have the <em>exact same secret key</em>. How do you send that key across the internet without a hacker stealing it?
         </p>
     </div>
 
@@ -124,7 +87,6 @@
         <h2 style="margin-top: 0; color: #333; border-bottom: 2px solid #e5e7eb; padding-bottom: 10px;">Enter Diffie-Hellman</h2>
         <p style="color: #555; line-height: 1.6; font-size: 16px;">
             In 1976, Whitfield Diffie and Martin Hellman solved this problem with pure mathematics. They invented a protocol that allows two people who have never met to generate a shared secret password in broad daylight, even if a hacker is listening to every single word they say.
-            In this process, both sides exchange public values and use their own private values to compute the same shared key. An attacker can see the public values but cannot derive the final key. This shared key is then used for symmetric encryption
         </p>
         <div style="background: #fdf2f8; border-left: 4px solid #f43f5e; padding: 15px; margin-top: 20px; border-radius: 0 6px 6px 0;">
             <p style="margin: 0; color: #9f1239; font-size: 15px;">
@@ -136,261 +98,332 @@
     <h2>Diffie-Hellman</h2>
     {% include "video_player.html" %}
 
-    <!-- ── INTERACTIVE REFINED SIMULATOR ── -->
+    <!-- ── INTERACTIVE MODULAR MATH SIMULATOR ── -->
     <div id="dhSim">
-        <h2 style="font-size:22px; font-weight:600; color:#fff; margin-top:0; margin-bottom: 10px;">Interactive: The Paint Mixing Analogy</h2>
-        <p style="color:#a6accd; font-size:14px; margin-bottom:30px; line-height: 1.6;">
-            Because the underlying modulo math is complex, cryptographers explain Diffie-Hellman using paint. It relies on one mathematical rule: <strong>It is easy to mix two colors, but impossible to "un-mix" them.</strong>
+        <h2 style="font-size:24px; font-weight:600; color:#fff; margin-top:0; margin-bottom: 10px;">Interactive: The Mathematical Reality</h2>
+        <p style="color:#a6accd; font-size:15px; margin-bottom:30px; line-height: 1.6;">
+            Watch how computers use <strong>Modular Exponentiation</strong>. By wrapping numbers around a clock (the prime modulus <span style="font-family:monospace">p</span>), the results jump chaotically. <br><br>
+            <em>Note: The inputs below are pre-filled with the exact values from <strong>image_64aaad.png</strong>. Change them to test your own numbers!</em>
         </p>
 
-        <!-- Progress Tracker -->
-        <div class="dh-progress">
-            <div class="dh-step active" id="step1"><div class="dh-step-dot">1</div> Pick Secrets</div>
-            <div class="dh-step" id="step2"><div class="dh-step-dot">2</div> Mix Public</div>
-            <div class="dh-step" id="step3"><div class="dh-step-dot">3</div> Exchange</div>
-            <div class="dh-step" id="step4"><div class="dh-step-dot">4</div> Final Key</div>
+        <div class="ms-wrap">
+          <!-- INPUT CONTROLS -->
+          <div class="ms-ctrl-row">
+            <div class="ms-ctrl" title="The clock size. Must be a prime number.">
+              <label>Prime Modulus (p)</label>
+              <input type="number" id="val-p" value="7" min="3" max="47">
+            </div>
+            <div class="ms-ctrl" title="The base number.">
+              <label>Generator (g)</label>
+              <input type="number" id="val-g" value="5" min="2">
+            </div>
+            <div style="width: 1px; background: rgba(255,255,255,0.1); margin: 0 10px;"></div>
+            <div class="ms-ctrl" title="Alice's secret exponent">
+              <label style="color:#f43f5e">Alice Private (x)</label>
+              <input type="number" id="val-x" value="2" min="1">
+            </div>
+            <div class="ms-ctrl" title="Bob's secret exponent">
+              <label style="color:#3b82f6">Bob Private (y)</label>
+              <input type="number" id="val-y" value="3" min="1">
+            </div>
+          </div>
+
+          <div class="ms-body">
+            <!-- CANVAS CLOCK -->
+            <canvas id="ms-cv" width="340" height="340" style="border-radius:12px;flex-shrink:0; background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.05);"></canvas>
+            
+            <div class="ms-right">
+              
+              <!-- ACTOR DASHBOARD -->
+              <div class="dh-actor-cards">
+                <div class="actor-col alice">
+                  <div class="actor-name">👩 Alice</div>
+                  <div class="data-row"><span>Private (x):</span> <span class="data-val" id="out-x">?</span></div>
+                  <div class="data-row"><span>Public (A):</span> <span class="data-val" id="out-a">?</span></div>
+                  <div class="data-row" style="margin-top: 10px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 10px;">
+                    <span>Shared Key:</span> <span class="data-val" id="out-ka">?</span>
+                  </div>
+                </div>
+                
+                <div class="actor-col bob">
+                  <div class="actor-name">👨 Bob</div>
+                  <div class="data-row"><span>Private (y):</span> <span class="data-val" id="out-y">?</span></div>
+                  <div class="data-row"><span>Public (B):</span> <span class="data-val" id="out-b">?</span></div>
+                  <div class="data-row" style="margin-top: 10px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 10px;">
+                    <span>Shared Key:</span> <span class="data-val" id="out-kb">?</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- LIVE COMPUTATION TRACKER -->
+              <div class="ms-card" style="margin-top: auto;">
+                <div class="ms-card-lbl" id="act-title" style="color:#6366f1; font-size: 12px;">System Ready</div>
+                <div class="ms-formula">
+                  <span class="f-g" id="act-base">g</span><sup><span class="f-x" id="act-exp">power</span></sup>
+                  <span class="f-m"> mod </span><span class="f-p" id="act-mod">p</span>
+                  <span class="f-eq"> = </span><span id="act-res" class="f-r">result</span>
+                </div>
+                <div class="ms-hint" id="act-hint">Enter your parameters above and click <strong>Run Exchange</strong> to visualize the mathematics.</div>
+              </div>
+
+              <div class="ms-btns">
+                <button class="ms-btn ms-pri" id="btn-run" onclick="runDH()">▶ Run Exchange Sequence</button>
+                <button class="ms-btn ms-rst" id="btn-rst" onclick="resetUI()">Reset</button>
+              </div>
+            </div>
+          </div>
         </div>
-        
-        <div class="dh-stage">
-            <!-- ALICE -->
-            <div class="dh-actor" style="border-top: 3px solid #f43f5e;">
-                <div class="actor-title" style="color: #f43f5e;">👩 Alice</div>
-                
-                <div class="beaker-wrap">
-                    <div class="glass-beaker"><div class="liquid" id="aliceSecretLiquid"></div><div class="glass-glare"></div></div>
-                    <span class="beaker-label">Alice's Secret<span class="sub-label">Stays on computer</span></span>
-                </div>
-                
-                <div class="swatch-panel" id="aliceSwatches">
-                    <div class="swatches">
-                        <div class="swatch alice-swatch" style="background: rgb(239, 68, 68); box-shadow: 0 4px 10px rgba(239, 68, 68, 0.4);" data-color="239,68,68"></div>
-                        <div class="swatch alice-swatch" style="background: rgb(34, 197, 94); box-shadow: 0 4px 10px rgba(34, 197, 94, 0.4);" data-color="34,197,94"></div>
-                        <div class="swatch alice-swatch" style="background: rgb(168, 85, 247); box-shadow: 0 4px 10px rgba(168, 85, 247, 0.4);" data-color="168,85,247"></div>
-                    </div>
-                </div>
-
-                <div class="beaker-wrap" style="margin-top: 25px; opacity: 0; transition: opacity 0.5s;" id="aliceMixWrap">
-                    <div class="glass-beaker"><div class="liquid" id="aliceMixLiquid"></div><div class="glass-glare"></div></div>
-                    <span class="beaker-label" id="aliceMixLabel">Alice's Mixture</span>
-                </div>
-            </div>
-
-            <!-- PUBLIC NETWORK -->
-            <div class="dh-actor public-zone">
-                <div class="actor-title" style="color: #f59e0b;">🌐 Public Network</div>
-                <div class="beaker-wrap">
-                    <div class="glass-beaker" style="border-color: rgba(245, 158, 11, 0.3);">
-                        <div class="liquid" style="height: 100%; background: rgb(234, 179, 8); box-shadow: inset 0 4px 15px rgba(234, 179, 8, 0.5);"></div>
-                        <div class="glass-glare"></div>
-                    </div>
-                    <span class="beaker-label">Public Base Color<span class="sub-label">Visible to Hackers</span></span>
-                </div>
-                <div style="flex: 1;"></div> <!-- Spacer -->
-            </div>
-
-            <!-- BOB -->
-            <div class="dh-actor" style="border-top: 3px solid #6366f1;">
-                <div class="actor-title" style="color: #6366f1;">👨 Bob</div>
-                
-                <div class="beaker-wrap">
-                    <div class="glass-beaker"><div class="liquid" id="bobSecretLiquid"></div><div class="glass-glare"></div></div>
-                    <span class="beaker-label">Bob's Secret<span class="sub-label">Stays on computer</span></span>
-                </div>
-                
-                <div class="swatch-panel" id="bobSwatches">
-                    <div class="swatches">
-                        <div class="swatch bob-swatch" style="background: rgb(59, 130, 246); box-shadow: 0 4px 10px rgba(59, 130, 246, 0.4);" data-color="59,130,246"></div>
-                        <div class="swatch bob-swatch" style="background: rgb(236, 72, 153); box-shadow: 0 4px 10px rgba(236, 72, 153, 0.4);" data-color="236,72,153"></div>
-                        <div class="swatch bob-swatch" style="background: rgb(20, 184, 166); box-shadow: 0 4px 10px rgba(20, 184, 166, 0.4);" data-color="20,184,166"></div>
-                    </div>
-                </div>
-
-                <div class="beaker-wrap" style="margin-top: 25px; opacity: 0; transition: opacity 0.5s;" id="bobMixWrap">
-                    <div class="glass-beaker"><div class="liquid" id="bobMixLiquid"></div><div class="glass-glare"></div></div>
-                    <span class="beaker-label" id="bobMixLabel">Bob's Mixture</span>
-                </div>
-            </div>
-        </div>
-    </div>
-        <!-- Controls (Stacked and Centered) -->
-        <div class="control-panel">
-            <div class="dh-status" id="dhStatus">
-                <strong>Phase 1:</strong> Select a private secret color for both Alice and Bob by clicking the paint drops above.
-            </div>
-            <button id="dhActionBtn" class="dh-btn" disabled>Waiting for Secrets...</button>
-        </div>
-    </div>
-    <div style="margin-top: -30px; text-align: right;">
-        <a href="#" style="background: #10b981; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold; font-size: 16px; transition: background 0.2s;">
-            Next | Module 2: Symmetric Encryption →
-        </a>
     </div>
 </div>
 
 <script>
-(function() {
-    const pubColor = [234, 179, 8];
-    let aliceColor = null; let bobColor = null;
-    let aliceMixColor = null; let bobMixColor = null;
-    let state = 0; 
+(function(){
+  const cv=document.getElementById('ms-cv'), ctx=cv.getContext('2d');
+  const W=340, H=340, CX=170, CY=170, R=120;
+  let anim=null, isRunning=false;
+  
+  // Variables
+  let p, g, x, y, A, B, Ka, Kb;
+  let hist = [];
 
-    const btn = document.getElementById('dhActionBtn');
-    const statusBox = document.getElementById('dhStatus');
-    const aliceMixWrap = document.getElementById('aliceMixWrap');
-    const bobMixWrap = document.getElementById('bobMixWrap');
-    const aliceMixLiq = document.getElementById('aliceMixLiquid');
-    const bobMixLiq = document.getElementById('bobMixLiquid');
+  function ang(n){ return (n/p)*2*Math.PI - Math.PI/2; }
+  function pt(n, r){ const a=ang(n), rad=r??R; return [CX+rad*Math.cos(a), CY+rad*Math.sin(a)]; }
+  function mpow(b, e, m){ let res=1; for(let i=0; i<e; i++) res=(res*b)%m; return res; }
+  function ez(t){ return t<.5 ? 4*t*t*t : 1-Math.pow(-2*t+2, 3)/2; }
 
-    function toRgb(cArr) { return `rgb(${cArr[0]}, ${cArr[1]}, ${cArr[2]})`; }
-    function toGlow(cArr) { return `inset 0 4px 15px rgba(${cArr[0]}, ${cArr[1]}, ${cArr[2]}, 0.8)`; }
+  // Draw the clock
+  function draw(dotX, dotY, t) {
+    ctx.clearRect(0,0,W,H);
 
-    // Mathematically perfect 3-way average for the final step to guarantee matching colors
-    function mixFinal(c1, c2, base) {
-        return [
-            Math.round((c1[0] + c2[0] + base[0]) / 3),
-            Math.round((c1[1] + c2[1] + base[1]) / 3),
-            Math.round((c1[2] + c2[2] + base[2]) / 3)
-        ];
-    }
-    // Standard 2-way mix
-    function mixColors(c1, c2) {
-        return [ Math.round((c1[0]+c2[0])/2), Math.round((c1[1]+c2[1])/2), Math.round((c1[2]+c2[2])/2) ];
-    }
+    // Rings
+    ctx.beginPath(); ctx.arc(CX,CY,R+25,0,2*Math.PI); ctx.strokeStyle='rgba(99,102,241,0.05)'; ctx.lineWidth=1; ctx.stroke();
+    ctx.beginPath(); ctx.arc(CX,CY,R,0,2*Math.PI); ctx.strokeStyle='rgba(255,255,255,0.05)'; ctx.lineWidth=1; ctx.stroke();
 
-    function updateStepUI(activeNum) {
-        for(let i=1; i<=4; i++) {
-            let el = document.getElementById('step'+i);
-            el.classList.remove('active', 'completed');
-            if (i < activeNum) el.classList.add('completed');
-            if (i === activeNum) el.classList.add('active');
-        }
-    }
+    const visited = new Set(hist.map(h=>h.r));
 
-    window.handleColorSelect = function(actor, rgbString, element) {
-        if (state > 0) return;
-        const rgb = rgbString.split(',').map(Number);
+    // Numbers & Ticks
+    for(let n=0; n<p; n++){
+      const a = ang(n);
+      const [lx, ly] = pt(n, R+22);
+      
+      // Tick marks
+      ctx.beginPath(); ctx.moveTo(CX+(R+4)*Math.cos(a), CY+(R+4)*Math.sin(a)); ctx.lineTo(CX+R*Math.cos(a), CY+R*Math.sin(a));
+      ctx.strokeStyle='rgba(255,255,255,0.1)'; ctx.lineWidth=1; ctx.stroke();
 
-        const parent = document.getElementById(actor + 'Swatches');
-        parent.querySelectorAll('.swatch').forEach(el => el.classList.remove('selected'));
-        element.classList.add('selected');
+      // Highlight visited nodes
+      if(visited.has(n)){
+        ctx.beginPath(); ctx.arc(...pt(n, R-10), 11, 0, 2*Math.PI); ctx.fillStyle='rgba(99,102,241,0.15)'; ctx.fill();
+      }
 
-        const liquid = document.getElementById(actor + 'SecretLiquid');
-        liquid.style.height = '100%';
-        liquid.style.backgroundColor = toRgb(rgb);
-        liquid.style.boxShadow = toGlow(rgb);
-
-        if (actor === 'alice') aliceColor = rgb;
-        if (actor === 'bob') bobColor = rgb;
-
-        if (aliceColor && bobColor) {
-            btn.disabled = false;
-            btn.innerText = "Mix with Public Base";
-            btn.style.background = "#f59e0b";
-            btn.style.boxShadow = "0 4px 15px rgba(245,158,11,0.3)";
-            statusBox.innerHTML = "<strong>Phase 2:</strong> Secrets chosen! Now, let's mix the Private Secrets with the Public Base color. (The resulting mixtures are mathematically impossible to un-mix).";
-        }
+      // Draw number
+      const isCur = hist.length>0 && hist[hist.length-1].r === n;
+      ctx.font = `${isCur?'700':'400'} ${isCur?'13':'11'}px 'JetBrains Mono', monospace`;
+      ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+      ctx.fillStyle = isCur ? '#9b9ff7' : visited.has(n) ? 'rgba(124,127,239,0.8)' : 'rgba(166,172,205,0.4)';
+      ctx.fillText(n, lx, ly);
     }
 
-    document.querySelectorAll('.alice-swatch').forEach(el => el.addEventListener('click', function() { handleColorSelect('alice', this.dataset.color, this); }));
-    document.querySelectorAll('.bob-swatch').forEach(el => el.addEventListener('click', function() { handleColorSelect('bob', this.dataset.color, this); }));
+    // Draw the jump trail
+    for(let i=0; i<hist.length; i++){
+      const from = i===0 ? 1 : hist[i-1].r;
+      const to = hist[i].r;
+      const isLast = i===hist.length-1;
+      const alpha = isLast && t!==null ? null : (0.1 + 0.6*((i+1)/hist.length));
+      const [fx, fy] = pt(from, R-10);
+      const [tx2, ty2] = pt(to, R-10);
 
-    btn.addEventListener('click', () => {
+      if(!isLast || t===null){
+        ctx.beginPath(); ctx.moveTo(fx,fy); ctx.lineTo(tx2,ty2);
+        ctx.strokeStyle = `rgba(99,102,241,${isLast ? 0.9 : alpha})`;
+        ctx.lineWidth = isLast ? 2.5 : 1.5; ctx.stroke();
+        if(isLast) drawDot(tx2, ty2, '#6366f1', 8, true);
+      }
+    }
+
+    // Draw active animating line
+    if(dotX !== null){
+      const [fx, fy] = pt(hist.length>=2 ? hist[hist.length-2].r : 1, R-10);
+      ctx.beginPath(); ctx.moveTo(fx,fy); ctx.lineTo(dotX,dotY);
+      ctx.strokeStyle = 'rgba(99,102,241,0.9)'; ctx.lineWidth = 2.5; ctx.stroke();
+      drawDot(dotX, dotY, '#6366f1', 8, true);
+    }
+
+    // Draw start node marker (always starts at 1)
+    if(!hist.length && p > 1){
+      const [sx, sy] = pt(1, R-10);
+      ctx.beginPath(); ctx.arc(sx,sy,7,0,2*Math.PI);
+      ctx.strokeStyle='#6366f1'; ctx.lineWidth=2; ctx.stroke();
+      ctx.fillStyle='rgba(99,102,241,0.2)'; ctx.fill();
+    }
+
+    // Center Label
+    ctx.textAlign='center'; ctx.textBaseline='middle';
+    ctx.font='400 11px Inter,sans-serif'; ctx.fillStyle='rgba(166,172,205,0.3)';
+    ctx.fillText('clock modulus', CX, CY-14);
+    ctx.font='700 26px Inter,sans-serif'; ctx.fillStyle='rgba(99,102,241,0.6)';
+    ctx.fillText(`p = ${p||'?' }`, CX, CY+12);
+  }
+
+  function drawDot(x, y, col, r, glow){
+    if(glow){ ctx.beginPath(); ctx.arc(x,y,r+6,0,2*Math.PI); ctx.fillStyle='rgba(99,102,241,0.2)'; ctx.fill(); }
+    ctx.beginPath(); ctx.arc(x,y,r,0,2*Math.PI); ctx.fillStyle=col; ctx.fill();
+    ctx.beginPath(); ctx.arc(x,y,r-3,0,2*Math.PI); ctx.fillStyle='rgba(255,255,255,0.9)'; ctx.fill();
+  }
+
+  // Promise-based jump animation
+  function animateJump(from, to) {
+    return new Promise(resolve => {
+      anim = { from, to, t0: null };
+      function loop(ts) {
+        if (!anim) { resolve(); return; }
+        if (!anim.t0) anim.t0 = ts;
+        // Animation speed fixed to a comfortable tracing speed
+        const t = Math.min((ts - anim.t0) / 600, 1); 
+        const et = ez(t);
+        const [fx, fy] = pt(anim.from, R-10);
+        const [tx, ty] = pt(anim.to, R-10);
+        draw(fx + (tx - fx) * et, fy + (ty - fy) * et, et);
         
-        if (state === 0) { // Moving to Phase 2
-            updateStepUI(2);
-            document.getElementById('aliceSwatches').classList.add('disabled');
-            document.getElementById('bobSwatches').classList.add('disabled');
-
-            aliceMixColor = mixColors(pubColor, aliceColor);
-            bobMixColor = mixColors(pubColor, bobColor);
-
-            aliceMixWrap.style.opacity = '1'; bobMixWrap.style.opacity = '1';
-            
-            setTimeout(() => {
-                aliceMixLiq.style.height = '100%';
-                aliceMixLiq.style.backgroundColor = toRgb(aliceMixColor);
-                aliceMixLiq.style.boxShadow = toGlow(aliceMixColor);
-                
-                bobMixLiq.style.height = '100%';
-                bobMixLiq.style.backgroundColor = toRgb(bobMixColor);
-                bobMixLiq.style.boxShadow = toGlow(bobMixColor);
-            }, 100);
-
-            btn.innerText = "Send Over Network";
-            btn.style.background = "#f43f5e";
-            btn.style.boxShadow = "0 4px 15px rgba(244,63,94,0.3)";
-            statusBox.innerHTML = "<strong>Phase 3:</strong> Mixtures created. Now, send the mixtures across the internet. Eve the hacker will see them, but she can't un-mix the paint to find your secrets!";
-            state = 1;
-        }
-        else if (state === 1) { // Moving to Phase 3
-            updateStepUI(3);
-            const dist = bobMixWrap.getBoundingClientRect().left - aliceMixWrap.getBoundingClientRect().left;
-
-            aliceMixWrap.style.transform = `translateX(${dist}px)`;
-            bobMixWrap.style.transform = `translateX(-${dist}px)`;
-
-            document.getElementById('aliceMixLabel').innerText = "Received from Bob";
-            document.getElementById('bobMixLabel').innerText = "Received from Alice";
-
-            btn.innerText = "Add Private Secrets";
-            btn.style.background = "#10b981";
-            btn.style.boxShadow = "0 4px 15px rgba(16,185,129,0.3)";
-            statusBox.innerHTML = "<strong>Phase 4:</strong> Exchange complete! Now, Alice adds her Private Secret to Bob's mixture. Bob adds his Private Secret to Alice's mixture.";
-            state = 2;
-        }
-        else if (state === 2) { // Moving to Phase 4
-            updateStepUI(4);
-            
-            // Generate exact 3-way match
-            const finalColor = mixFinal(aliceColor, bobColor, pubColor);
-
-            // Animate liquid mixing
-            aliceMixLiq.style.height = '50%'; bobMixLiq.style.height = '50%';
-            
-            setTimeout(() => {
-                aliceMixLiq.style.backgroundColor = toRgb(finalColor);
-                aliceMixLiq.style.boxShadow = toGlow(finalColor);
-                bobMixLiq.style.backgroundColor = toRgb(finalColor);
-                bobMixLiq.style.boxShadow = toGlow(finalColor);
-                
-                aliceMixLiq.style.height = '100%'; bobMixLiq.style.height = '100%';
-            }, 600);
-
-            document.getElementById('aliceMixLabel').innerHTML = "Shared AES Key<br><span style='color:#10b981;'>Matches perfectly!</span>";
-            document.getElementById('bobMixLabel').innerHTML = "Shared AES Key<br><span style='color:#10b981;'>Matches perfectly!</span>";
-
-            btn.innerText = "Reset Simulator";
-            btn.style.background = "#6366f1";
-            btn.style.boxShadow = "0 4px 15px rgba(99,102,241,0.3)";
-            statusBox.innerHTML = "<strong>Success!</strong> Because mixing is mathematically commutative, both sides have generated the <em>exact same color</em>. They now share an AES Key, and Eve is completely locked out!";
-            state = 3;
-        }
-        else if (state === 3) { // Reset
-            updateStepUI(1);
-            aliceColor = null; bobColor = null;
-            aliceMixColor = null; bobMixColor = null;
-
-            document.getElementById('aliceSecretLiquid').style.height = '0%';
-            document.getElementById('bobSecretLiquid').style.height = '0%';
-            document.getElementById('aliceSwatches').classList.remove('disabled');
-            document.getElementById('bobSwatches').classList.remove('disabled');
-            document.querySelectorAll('.swatch').forEach(el => el.classList.remove('selected'));
-
-            aliceMixWrap.style.opacity = '0'; bobMixWrap.style.opacity = '0';
-            aliceMixWrap.style.transform = `translateX(0)`; bobMixWrap.style.transform = `translateX(0)`;
-            aliceMixLiq.style.height = '0%'; bobMixLiq.style.height = '0%';
-
-            document.getElementById('aliceMixLabel').innerText = "Alice's Mixture";
-            document.getElementById('bobMixLabel').innerText = "Bob's Mixture";
-
-            btn.disabled = true;
-            btn.innerText = "Waiting for Secrets...";
-            btn.style.background = "#6366f1";
-            btn.style.boxShadow = "0 4px 15px rgba(99,102,241,0.3)";
-            statusBox.innerHTML = "<strong>Phase 1:</strong> Select a private secret color for both Alice and Bob by clicking the paint drops above.";
-            state = 0;
-        }
+        if (t < 1) requestAnimationFrame(loop);
+        else { anim = null; draw(null, null, null); resolve(); }
+      }
+      requestAnimationFrame(loop);
     });
+  }
+
+  // Run a single calculation phase visually
+  async function runPhase(title, base, maxExp, mod, outElemId, isFinal) {
+    document.getElementById('act-title').innerHTML = title;
+    document.getElementById('act-base').innerText = base;
+    document.getElementById('act-mod').innerText = mod;
+    document.getElementById('act-res').innerText = '?';
+    document.getElementById('act-exp').innerText = '1';
+    
+    // Remove highlight classes
+    document.querySelectorAll('.data-val').forEach(el => el.classList.remove('highlight'));
+
+    hist = [];
+    draw(null, null, null); 
+    await new Promise(res => setTimeout(res, 400)); 
+
+    for (let e = 1; e <= maxExp; e++) {
+      const r = mpow(base, e, mod);
+      const prev = hist.length ? hist[hist.length - 1].r : 1; 
+      
+      document.getElementById('act-exp').innerText = e;
+      document.getElementById('act-res').innerText = r;
+      document.getElementById('act-hint').innerHTML = `Step ${e}: Multiply previous result by base (${base}) and wrap around the clock.`;
+
+      hist.push({e, r});
+      await animateJump(prev, r);
+      await new Promise(res => setTimeout(res, 200)); 
+    }
+
+    const finalRes = hist[hist.length-1].r;
+    const targetEl = document.getElementById(outElemId);
+    targetEl.innerText = finalRes;
+    
+    if(isFinal) {
+        targetEl.classList.add('highlight');
+    } else {
+        targetEl.style.color = '#fff';
+    }
+
+    await new Promise(res => setTimeout(res, 1200)); 
+  }
+
+  // Main Controller
+  window.runDH = async function() {
+    if(isRunning) return;
+    
+    // Gather and validate inputs
+    p = parseInt(document.getElementById('val-p').value);
+    g = parseInt(document.getElementById('val-g').value);
+    x = parseInt(document.getElementById('val-x').value);
+    y = parseInt(document.getElementById('val-y').value);
+
+    if(isNaN(p) || p < 3) { alert("P must be a prime number > 2."); return; }
+    if(p > 97) { alert("Please keep P under 100 so the clock is readable."); return; }
+    
+    isRunning = true;
+    document.getElementById('btn-run').disabled = true;
+    document.querySelectorAll('input').forEach(i => i.disabled = true);
+
+    // Initial setup
+    document.getElementById('out-x').innerText = x;
+    document.getElementById('out-y').innerText = y;
+    document.getElementById('out-a').innerText = '?';
+    document.getElementById('out-b').innerText = '?';
+    document.getElementById('out-ka').innerText = '?';
+    document.getElementById('out-kb').innerText = '?';
+    document.getElementById('out-ka').classList.remove('highlight');
+    document.getElementById('out-kb').classList.remove('highlight');
+
+    // Mathematical Pre-compute
+    A = mpow(g, x, p);
+    B = mpow(g, y, p);
+
+    // Sequence Execution
+    document.getElementById('act-hint').innerText = "Starting Alice's Public Key calculation...";
+    
+    // Phase 1: Alice A
+    await runPhase("<span style='color:#f43f5e'>Phase 1: Generating Alice's Public Key (A)</span>", g, x, p, 'out-a', false);
+    
+    // Phase 2: Bob B
+    await runPhase("<span style='color:#3b82f6'>Phase 2: Generating Bob's Public Key (B)</span>", g, y, p, 'out-b', false);
+
+    // Phase 3: Alice Shared
+    document.getElementById('act-hint').innerHTML = `<strong>Exchange!</strong> Alice receives Bob's Public Key (${B}) and uses it as her new base.`;
+    await new Promise(res => setTimeout(res, 1500));
+    await runPhase("<span style='color:#f43f5e'>Phase 3: Alice Calculates Shared Secret</span>", B, x, p, 'out-ka', true);
+
+    // Phase 4: Bob Shared
+    document.getElementById('act-hint').innerHTML = `<strong>Exchange!</strong> Bob receives Alice's Public Key (${A}) and uses it as his new base.`;
+    await new Promise(res => setTimeout(res, 1500));
+    await runPhase("<span style='color:#3b82f6'>Phase 4: Bob Calculates Shared Secret</span>", A, y, p, 'out-kb', true);
+
+    // Done
+    document.getElementById('act-title').innerHTML = "<span style='color:#10b981; font-size: 16px;'>SUCCESS: Keys Match!</span>";
+    document.getElementById('act-hint').innerHTML = "Both parties arrived at the exact same number. They now share a secure AES key!";
+    
+    document.getElementById('btn-run').disabled = false;
+    document.getElementById('btn-run').innerText = "▶ Re-run Exchange";
+    document.querySelectorAll('input').forEach(i => i.disabled = false);
+    isRunning = false;
+  };
+
+  window.resetUI = function() {
+    if(isRunning) return;
+    p = parseInt(document.getElementById('val-p').value) || 7;
+    hist = [];
+    draw(null, null, null);
+
+    document.getElementById('out-x').innerText = '?';
+    document.getElementById('out-y').innerText = '?';
+    document.getElementById('out-a').innerText = '?';
+    document.getElementById('out-b').innerText = '?';
+    document.getElementById('out-ka').innerText = '?';
+    document.getElementById('out-kb').innerText = '?';
+    
+    document.getElementById('out-ka').classList.remove('highlight');
+    document.getElementById('out-kb').classList.remove('highlight');
+
+    document.getElementById('act-title').innerText = "System Ready";
+    document.getElementById('act-base').innerText = 'g';
+    document.getElementById('act-mod').innerText = 'p';
+    document.getElementById('act-exp').innerText = 'power';
+    document.getElementById('act-res').innerText = 'result';
+    document.getElementById('act-hint').innerHTML = 'Enter your parameters above and click <strong>Run Exchange</strong> to visualize the mathematics.';
+    
+    document.getElementById('btn-run').innerText = "▶ Run Exchange Sequence";
+  };
+
+  // Init blank canvas based on default p input
+  setTimeout(() => {
+      p = parseInt(document.getElementById('val-p').value) || 7;
+      draw(null, null, null);
+  }, 100);
+
 })();
 </script>
 {% endblock %}
