@@ -2,31 +2,26 @@ from flask import Flask, render_template, request, redirect, url_for, flash
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user, login_required
 from werkzeug.security import check_password_hash
 from werkzeug.security import generate_password_hash    
-import sqlite3
 from bson.objectid import ObjectId
 from pymongo import MongoClient
 import os
 from werkzeug.utils import secure_filename
+from dotenv import load_dotenv
 
 app = Flask(__name__)
 # IMPORTANT: In a real app, this should be a random string hidden in a .env file
 app.secret_key = 'super_secret_thesis_key_change_this_later' 
 
-#MONGO
-client = MongoClient('mongodb://localhost:27017/')
-db = client['thesis_db']
+load_dotenv()
 
+#MONGO
+client = MongoClient(os.getenv("MONGO_URI"))
+db = client['fatvdb']
 
 # --- Setup Flask-Login ---
 login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = 'login' # Tells Flask where to send users who aren't logged in
-
-# Helper function to connect to the DB
-def get_db_connection():
-    conn = sqlite3.connect('database.db')
-    conn.row_factory = sqlite3.Row # Lets us access columns by name
-    return conn
 
 # Create a User class that Flask-Login can understand
 class User(UserMixin):
@@ -34,9 +29,6 @@ class User(UserMixin):
         self.id = str(id)
         self.username = username
         self.role = role
-
-
-
 
 # This tells Flask how to find a user in the DB based on their session ID
 @login_manager.user_loader
@@ -46,6 +38,22 @@ def load_user(user_id):
     if user_data:
         return User(id=user_data['_id'], username=user_data['username'], role=user_data['role'])
     return None
+
+"""
+@app.route('/create_admin')
+def create_admin():
+    admin_user = {
+        "username": "admin",
+        "email": "admin@example.com",
+        "password_hash": generate_password_hash("admin"),
+        "role": "admin"
+    }
+
+    result = db.users.insert_one(admin_user)
+    print(result.inserted_id)
+
+    return "Admin created"
+"""
 
 #----------LOGIN----------------------------------------------
 @app.route('/register', methods=['GET', 'POST'])
