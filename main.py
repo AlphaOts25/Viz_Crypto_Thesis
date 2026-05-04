@@ -272,6 +272,8 @@ def delete_test(test_id):
     if current_user.role != 'admin':
         return redirect(url_for('home'))
 
+    from bson.objectid import ObjectId
+
     db.tests.delete_one({"_id": ObjectId(test_id)})
     db.questions.delete_many({"test_id": ObjectId(test_id)})
 
@@ -303,16 +305,27 @@ def get_test(test_type):
 
     return questions
 
+@app.route('/test/<test_type>')
+@login_required
+def take_test(test_type):
+    questions = get_test(test_type)
+    return render_template('test.html', questions=questions, type=test_type)
+
 #---------------------------------------TEMPLATES--------------------------------------------
 
 @app.route('/')
 def home():
-    # If the user is NOT logged in, kick them straight to the registration page!
     if not current_user.is_authenticated:
         return redirect(url_for('register'))
-    
-    # If they are logged in, show them the homepage
-    return render_template('index.html')
+
+    pre_test_exists = db.tests.find_one({"type": "pre"}) is not None
+    post_test_exists = db.tests.find_one({"type": "post"}) is not None
+
+    return render_template(
+        'index.html',
+        pre_test_exists=pre_test_exists,
+        post_test_exists=post_test_exists
+    )
 
 @app.route('/module/<int:module_num>/lesson/<int:lesson_num>')
 def view_lesson(module_num, lesson_num):

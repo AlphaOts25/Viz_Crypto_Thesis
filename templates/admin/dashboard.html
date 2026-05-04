@@ -303,11 +303,24 @@
                             Edit
                         </a>
                         
-                        <form method="POST" action="{{ url_for('delete_lesson', lesson_code=module.lesson_code) }}" onsubmit="return confirm('Are you sure you want to delete this lesson? This cannot be undone.');" style="margin: 0;">
-                            <button type="submit" style="background: #fee2e2; color: #b91c1c; border: none; padding: 8px 12px; border-radius: 6px; font-size: 13px; font-weight: bold; cursor: pointer; transition: 0.2s;">
-                                Delete
-                            </button>
-                        </form>
+                        {% if module.type == "lesson" %}
+                    <form method="POST"
+                        action="{{ url_for('delete_lesson', lesson_code=module.lesson_code) }}"
+                        onsubmit="return confirm('Delete this lesson?');"
+                        style="margin:0;">
+                    {% else %}
+                    <form method="POST"
+                        action="{{ url_for('delete_test', test_id=module._id) }}"
+                        onsubmit="return confirm('Delete this test?');"
+                        style="margin:0;">
+                    {% endif %}
+
+                        <button type="submit"
+                            style="background:#fee2e2; color:#b91c1c; border:none; padding:8px 12px; border-radius:6px; font-size:13px; font-weight:bold; cursor:pointer;">
+                            Delete
+                        </button>
+
+                    </form>
 
                     </td>
                 </tr>

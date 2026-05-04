@@ -18,7 +18,23 @@
         <div class="section-header">
             <h2>Featured Modules</h2>
         </div>
-        <!-- Pre test here-->
+        {% if pre_test_exists %}
+        <div class="course-card">
+            <div class="card-top bg-indigo">
+                <p class="course-subtitle">Assessment</p>
+                <h3 class="course-title">Pre-Test</h3>
+            </div>
+            <div class="card-bottom">
+                <div class="card-stats">
+                    <div class="stat">
+                        <span class="stat-number">—</span>
+                        <span class="stat-label">Questions</span>
+                    </div>
+                </div>
+                <a href="{{ url_for('take_test', test_type='pre') }}" class="play-btn">▶</a>
+            </div>
+        </div>
+        {% endif %}
         <div class="card-container">
             <div class="course-card">
                 <div class="card-top bg-purple">
@@ -39,7 +55,6 @@
                     <a href="{{ url_for('module_intro', module_num=1) }}" class="play-btn">▶</a>
                 </div>
             </div>
-
             <div class="course-card">
                 <div class="card-top bg-green">
                     <p class="course-subtitle">Module 2</p>
@@ -59,28 +74,23 @@
                     <a href="{{ url_for('module_intro', module_num=2) }}" class="play-btn">▶</a>
                 </div>
             </div>
-            <!--
+            {% if post_test_exists %}
             <div class="course-card">
                 <div class="card-top bg-orange">
-                    <p class="course-subtitle">Module 3</p>
-                    <h3 class="course-title">Key Exchange Problem</h3>
+                    <p class="course-subtitle">Assessment</p>
+                    <h3 class="course-title">Post-Test</h3>
                 </div>
                 <div class="card-bottom">
                     <div class="card-stats">
                         <div class="stat">
-                            <span class="stat-number">4</span>
-                            <span class="stat-label">Concepts</span>
-                        </div>
-                        <div class="stat">
-                            <span class="stat-number">1</span>
-                            <span class="stat-label">Interactive</span>
+                            <span class="stat-number">—</span>
+                            <span class="stat-label">Questions</span>
                         </div>
                     </div>
-                    <a href="#" class="play-btn">▶</a>
+                    <a href="{{ url_for('take_test', test_type='post') }}" class="play-btn">▶</a>
                 </div>
             </div>
-            -->
-            <!-- Post test -->
+            {% endif %}
         </div>
     </section>
 </div>
