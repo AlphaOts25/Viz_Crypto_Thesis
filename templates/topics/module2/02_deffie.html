@@ -113,9 +113,9 @@
     <!-- ── HEADER ── -->
     <div class="lesson-header" style="margin-bottom: 40px;">
         <p style="color: #6366f1; font-weight: bold; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 1px;">Topic 3</p>
-        <h1 style="font-size: 36px; margin-top: 0; margin-bottom: 15px;">The Key Exchange Problem</h1>
+        <h1 style="font-size: 36px; margin-top: 0; margin-bottom: 15px;">Diffie–Hellman Key Exchange</h1>
         <p style="font-size: 18px; color: #555; line-height: 1.6;">
-            AES is unbreakable, but it has a fatal flaw: Symmetric encryption requires both the sender and receiver to have the <em>exact same secret key</em>. How do you send that key across the internet without a hacker stealing it?
+            Diffie–Hellman is a key exchange method that solves the problem of securely sharing a secret key over an insecure network. It allows two parties to create the same shared key without ever sending that key directly, making it safe even if someone is listening.
         </p>
     </div>
 
@@ -124,6 +124,7 @@
         <h2 style="margin-top: 0; color: #333; border-bottom: 2px solid #e5e7eb; padding-bottom: 10px;">Enter Diffie-Hellman</h2>
         <p style="color: #555; line-height: 1.6; font-size: 16px;">
             In 1976, Whitfield Diffie and Martin Hellman solved this problem with pure mathematics. They invented a protocol that allows two people who have never met to generate a shared secret password in broad daylight, even if a hacker is listening to every single word they say.
+            In this process, both sides exchange public values and use their own private values to compute the same shared key. An attacker can see the public values but cannot derive the final key. This shared key is then used for symmetric encryption
         </p>
         <div style="background: #fdf2f8; border-left: 4px solid #f43f5e; padding: 15px; margin-top: 20px; border-radius: 0 6px 6px 0;">
             <p style="margin: 0; color: #9f1239; font-size: 15px;">
@@ -210,14 +211,7 @@
                 </div>
             </div>
         </div>
-
     </div>
-    <div style="margin-top: 50px; text-align: right;">
-        <a href="#" style="background: #10b981; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold; font-size: 16px; transition: background 0.2s;">
-            Next | Module 2: Symmetric Encryption →
-        </a>
-    </div>
-
         <!-- Controls (Stacked and Centered) -->
         <div class="control-panel">
             <div class="dh-status" id="dhStatus">
@@ -225,6 +219,11 @@
             </div>
             <button id="dhActionBtn" class="dh-btn" disabled>Waiting for Secrets...</button>
         </div>
+    </div>
+    <div style="margin-top: -30px; text-align: right;">
+        <a href="#" style="background: #10b981; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold; font-size: 16px; transition: background 0.2s;">
+            Next | Module 2: Symmetric Encryption →
+        </a>
     </div>
 </div>
 

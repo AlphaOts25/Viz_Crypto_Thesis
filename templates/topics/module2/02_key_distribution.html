@@ -5,15 +5,16 @@
 <div class="lesson-container" style="max-width: 850px; margin: 0 auto; padding-bottom: 60px;">
 
     <div class="lesson-header" style="margin-bottom: 40px;">
-        <p style="color: #6366f1; font-weight: bold; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 1px;">Topic 3</p>
+        <p style="color: #6366f1; font-weight: bold; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 1px;">Topic 2</p>
         <h1 style="font-size: 36px; margin-top: 0; margin-bottom: 15px;">The Key Distribution Problem</h1>
         <p style="font-size: 18px; color: #555; line-height: 1.6;">
-            Symmetric algorithms like AES are mathematically unbreakable. But they all share one fatal flaw: how do you safely give the secret key to the receiver without a hacker stealing it first?
+            The Key Distribution Problem is the challenge of securely sharing a secret key between two parties before using symmetric encryption. Since both sides must have the same key, sending it over an insecure network risks it being intercepted.
+            The Key Distribution Problem is the challenge of securely sharing a secret key between two parties before using symmetric encryption. In early cryptography, this was a major limitation because the key had to be physically delivered or sent through a secure channel. If intercepted, the entire communication would be compromised.
         </p>
     </div>
 
     <div class="study-section" style="background: #fff; border-radius: 12px; padding: 30px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); margin-bottom: 40px;">
-        <h2 style="margin-top: 0; color: #333; border-bottom: 2px solid #e5e7eb; padding-bottom: 10px;">The Catch-22 of Cryptography</h2>
+        <h2 style="margin-top: 0; color: #333; border-bottom: 2px solid #e5e7eb; padding-bottom: 10px;">Sharing Keys through Unsecured Channels</h2>
         
         <p style="color: #555; line-height: 1.6; font-size: 16px;">
             Imagine Alice wants to send her credit card number to Bob (a server like Amazon). She encrypts it with AES. The ciphertext is secure. But for Bob to read it, Alice must also send him the key. 

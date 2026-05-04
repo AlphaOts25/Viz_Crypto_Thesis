@@ -119,265 +119,107 @@
     <h2>Shared Key Concept</h2>
     {% include "video_player.html" %}
 
-    <!-- ── INTERACTIVE VIGENERE SIMULATOR ── -->
-    <div class="interactive-test vigenere-sim" style="background: #1e1e2e; border-radius: 12px; padding: 25px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); color: white; margin-top: 40px; font-family: sans-serif;">
-        <h2 style="margin-top: 0; color: #fff; font-size: 20px; margin-bottom: 20px;">Try It: Vigenère Cipher Simulator</h2>
-        
-        <!-- STEP 1 -->
-        <div class="step">
-          <div class="step-header">
-            <div class="step-badge badge-green">1</div>
-            <div>
-              <p class="step-title">👩 Alice sets up her message</p>
-              <p class="step-desc">Type a plaintext message and choose a secret keyword to encrypt it with.</p>
-            </div>
-          </div>
-          <div class="field-group">
-            <div class="field" style="flex: 2;">
-              <label class="label-green">Plaintext message</label>
-              <input type="text" id="alicePlain" class="input-green" value="ATTACKATDAWN" autocomplete="off">
-            </div>
-            <div class="field">
-              <label class="label-amber">Alice's secret keyword</label>
-              <input type="text" id="aliceKey" class="input-amber" value="LEMON" autocomplete="off">
-            </div>
-          </div>
+ <div class="interactive-test" style="background: #1e1e2e; border-radius: 12px; padding: 30px; color: white;">
+    <h2>Alice → Bob (Key Required)</h2>
+
+    <div style="display: flex; gap: 20px;">
+
+        <!-- Alice -->
+        <div style="flex: 1; background: #292d3e; padding: 15px; border-radius: 8px;">
+            <h3>Alice</h3>
+
+            <input id="plaintextInput" placeholder="Enter message"
+                style="width: 100%; padding: 8px; margin-bottom: 10px;" />
+
+            <button id="encryptBtn">Encrypt</button>
+
+            <p style="margin-top: 10px;">Encrypted:</p>
+            <div id="cipherBox" style="background: #1a1a24; padding: 8px;">---</div>
+
+            <p style="margin-top: 10px;">Key:</p>
+            <div id="aliceKeyBox" style="background: #f59e0b; padding: 8px;">---</div>
         </div>
 
-        <div class="connector"><div class="connector-line"></div></div>
+        <!-- User Input -->
+        <div style="flex: 1; text-align: center;">
+            <h3>Enter Key</h3>
 
-        <!-- STEP 2 -->
-        <div class="step">
-          <div class="step-header">
-            <div class="step-badge badge-amber">2</div>
-            <div>
-              <p class="step-title">🔗 See the letter pairing</p>
-              <p class="step-desc">Each plaintext letter is paired with one keyword letter.</p>
-            </div>
-          </div>
-          <div id="pairingArea"><p class="placeholder-text">Start typing above to see the pairing...</p></div>
+            <input id="userKeyInput" placeholder="Enter key"
+                style="padding: 8px; margin-bottom: 10px;" />
+
+            <br>
+
+            <button id="decryptBtn">Decrypt</button>
+
+            <p id="statusMsg"></p>
         </div>
 
-        <div class="connector"><div class="connector-line"></div></div>
+        <!-- Bob -->
+        <div style="flex: 1; background: #292d3e; padding: 15px; border-radius: 8px;">
+            <h3>Bob</h3>
 
-        <!-- STEP 3 -->
-        <div class="step">
-          <div class="step-header">
-            <div class="step-badge badge-amber">3</div>
-            <div>
-              <p class="step-title">🔢 The Vigenère formula</p>
-              <p class="step-desc">C = (P + K) mod 26</p>
-            </div>
-          </div>
-          <div style="overflow-x: auto;">
-            <div id="mathArea"><p class="placeholder-text">Table will appear here...</p></div>
-          </div>
-        </div>
-
-        <div class="connector"><div class="connector-line"></div></div>
-
-        <!-- STEP 4 -->
-        <div class="step">
-          <div class="step-header">
-            <div class="step-badge badge-red">4</div>
-            <div>
-              <p class="step-title">⚡ Encrypt &amp; send</p>
-            </div>
-          </div>
-          <button id="encryptBtn" onclick="triggerEncrypt()">Encrypt Message</button>
-          <div style="margin-top: 12px;">
-            <div class="transit-box">
-              <div style="font-size: 10px; color: #666a8a; text-transform: uppercase; margin-bottom: 5px;">🌐 Encrypted data on network</div>
-              <p id="transitCipher">—</p>
-            </div>
-          </div>
-        </div>
-
-        <div class="connector"><div class="connector-line"></div></div>
-
-        <!-- STEP 5 -->
-        <div class="step">
-          <div class="step-header">
-            <div class="step-badge badge-indigo">5</div>
-            <div>
-              <p class="step-title">👨 Bob tries to decrypt</p>
-              <p class="step-desc">Try typing the wrong keyword, then the right one.</p>
-            </div>
-          </div>
-          <div class="field-group">
-            <div class="field">
-              <label class="label-amber">Bob's keyword guess</label>
-              <input type="text" id="bobKey" class="input-amber" placeholder="Guess keyword..." oninput="bobDecrypt()">
-            </div>
-            <div class="field" style="flex: 2;">
-              <label class="label-indigo">Decrypted output</label>
-              <input type="text" id="bobOutput" readonly placeholder="Output will appear here...">
-            </div>
-          </div>
-          <div id="resultBanner"></div>
-        </div>
-        
-        <!-- STEP 6 (Hidden until correct) -->
-        <div class="step" id="decryptMathStep" style="display:none; margin-top:10px;">
-          <div class="step-header">
-            <div class="step-badge badge-indigo">6</div>
-            <div>
-              <p class="step-title">🔓 The decryption formula</p>
-              <p class="step-desc">P = (C − K + 26) mod 26</p>
-            </div>
-          </div>
-          <div style="overflow-x: auto;">
-            <div id="decryptMathArea"></div>
-          </div>
+            <p>Decrypted:</p>
+            <div id="bobMessage" style="background: #1a1a24; padding: 8px;">Locked</div>
         </div>
 
     </div>
 </div>
 
+</div>
+
 <script>
-(function() {
-    const ALPHA = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-    function clean(s)  { return s.toUpperCase().replace(/[^A-Z]/g, ''); }
-    function letterOf(c) { return ALPHA.indexOf(c); }
+const encryptBtn = document.getElementById('encryptBtn');
+const decryptBtn = document.getElementById('decryptBtn');
 
-    function vigenereEncrypt(plain, key) {
-        let out = '', ki = 0;
-        for (let c of plain) {
-            if (ALPHA.includes(c)) {
-                out += ALPHA[(letterOf(c) + letterOf(key[ki % key.length])) % 26];
-                ki++;
-            } else { out += c; }
+const plaintextInput = document.getElementById('plaintextInput');
+const cipherBox = document.getElementById('cipherBox');
+const aliceKeyBox = document.getElementById('aliceKeyBox');
+
+const userKeyInput = document.getElementById('userKeyInput');
+const bobMessage = document.getElementById('bobMessage');
+const statusMsg = document.getElementById('statusMsg');
+
+let currentKey = null;
+let currentCipher = "";
+let originalText = "";
+
+// Caesar Encrypt
+function caesarEncrypt(text, key) {
+    return text.split("").map(char => {
+        if (char.match(/[a-z]/i)) {
+            const base = char === char.toUpperCase() ? 65 : 97;
+            return String.fromCharCode((char.charCodeAt(0) - base + key) % 26 + base);
         }
-        return out;
+        return char;
+    }).join("");
+}
+
+encryptBtn.addEventListener('click', () => {
+    const text = plaintextInput.value;
+    if (!text) return;
+
+    originalText = text;
+    currentKey = Math.floor(Math.random() * 25) + 1;
+
+    currentCipher = caesarEncrypt(text, currentKey);
+
+    cipherBox.innerText = currentCipher;
+    aliceKeyBox.innerText = currentKey;
+});
+
+decryptBtn.addEventListener('click', () => {
+    const inputKey = parseInt(userKeyInput.value);
+
+    if (inputKey === currentKey) {
+        bobMessage.innerText = originalText;
+        bobMessage.style.color = "#10b981";
+        statusMsg.innerText = "Success";
+        statusMsg.style.color = "#10b981";
+    } else {
+        bobMessage.innerText = "Locked";
+        statusMsg.innerText = "Error: Wrong key";
+        statusMsg.style.color = "#f43f5e";
     }
-
-    function vigenereDecrypt(cipher, key) {
-        let out = '', ki = 0;
-        for (let c of cipher) {
-            if (ALPHA.includes(c)) {
-                out += ALPHA[((letterOf(c) - letterOf(key[ki % key.length])) + 26) % 26];
-                ki++;
-            } else { out += c; }
-        }
-        return out;
-    }
-
-    function buildPairingGrid(plain, key) {
-        const cleanP = plain.toUpperCase();
-        if (!clean(cleanP) || !clean(key)) return '<p class="placeholder-text">Enter plaintext and keyword above...</p>';
-        const grid = document.createElement('div');
-        grid.className = 'pairing-grid';
-        let ki = 0;
-        for (let c of cleanP) {
-            const cell = document.createElement('div');
-            const isLetter = ALPHA.includes(c);
-            cell.className = 'pair-cell' + (isLetter ? '' : ' space-cell');
-            const kc = isLetter ? clean(key)[ki % clean(key).length] : '·';
-            cell.innerHTML = `
-              <span class="pair-plain">${isLetter ? c : '·'}</span>
-              <div class="pair-divider"></div>
-              <span class="pair-key">${kc}</span>
-              <span class="pair-index">${isLetter ? (letterOf(c)+','+letterOf(kc)) : ''}</span>
-            `;
-            grid.appendChild(cell);
-            if (isLetter) ki++;
-        }
-        return grid.outerHTML;
-    }
-
-    function buildMathTable(plain, key, mode) {
-        const cleanP = clean(plain);
-        const cleanK = clean(key);
-        if (!cleanP || !cleanK) return '';
-
-        const headers = mode === 'decrypt'
-            ? ['Cipher (C)', 'Key (K)', 'C val', 'K val', 'C−K+26', 'mod 26', 'Plain (P)']
-            : ['Plain (P)', 'Key (K)',  'P val', 'K val', 'P+K',    'mod 26', 'Cipher (C)'];
-
-        let rows = '';
-        const src = mode === 'decrypt' ? cleanP : cleanP;
-
-        for (let i = 0; i < src.length; i++) {
-            const p = src[i];
-            const k = cleanK[i % cleanK.length];
-            const pv = letterOf(p);
-            const kv = letterOf(k);
-            let raw, mod, result;
-            
-            if (mode === 'decrypt') {
-                raw = `${pv}−${kv}+26`; mod = ((pv - kv + 26) % 26); result = ALPHA[mod];
-            } else {
-                raw = `${pv}+${kv}`; mod = (pv + kv) % 26; result = ALPHA[mod];
-            }
-            
-            const resClass = mode === 'decrypt' ? 'col-p' : 'col-c';
-            const srcClass = mode === 'decrypt' ? 'col-c' : 'col-p';
-            rows += `<tr>
-              <td class="${srcClass}">${p}</td><td class="col-k">${k}</td>
-              <td class="col-op">${pv}</td><td class="col-op">${kv}</td>
-              <td class="col-op">${raw}</td><td class="col-op">${mod}</td>
-              <td class="${resClass}">${result}</td>
-            </tr>`;
-        }
-        return `<table class="math-table"><thead><tr>${headers.map(h=>`<th>${h}</th>`).join('')}</tr></thead><tbody>${rows}</tbody></table>`;
-    }
-
-    let encryptedCipher = '';
-
-    window.updatePairingAndMath = function() {
-        const p = document.getElementById('alicePlain').value;
-        const k = clean(document.getElementById('aliceKey').value);
-        document.getElementById('pairingArea').innerHTML = buildPairingGrid(p, k);
-        document.getElementById('mathArea').innerHTML = buildMathTable(p, k, 'encrypt');
-    };
-
-    window.triggerEncrypt = function() {
-        const p = clean(document.getElementById('alicePlain').value);
-        const k = clean(document.getElementById('aliceKey').value);
-        if (!p || !k) {
-            document.getElementById('transitCipher').textContent = '⚠ Enter message and keyword.';
-            return;
-        }
-        encryptedCipher = vigenereEncrypt(document.getElementById('alicePlain').value.toUpperCase(), k);
-        document.getElementById('transitCipher').textContent = encryptedCipher;
-        
-        document.getElementById('bobOutput').value = '';
-        document.getElementById('bobOutput').className = '';
-        document.getElementById('resultBanner').style.display = 'none';
-        document.getElementById('decryptMathStep').style.display = 'none';
-        document.getElementById('bobKey').value = '';
-        document.getElementById('bobKey').focus();
-    };
-
-    window.bobDecrypt = function() {
-        const guess = clean(document.getElementById('bobKey').value);
-        const alice = clean(document.getElementById('aliceKey').value);
-        const banner = document.getElementById('resultBanner');
-        const output = document.getElementById('bobOutput');
-
-        if (!encryptedCipher || !guess) {
-            output.value = ''; output.className = ''; banner.style.display = 'none';
-            document.getElementById('decryptMathStep').style.display = 'none';
-            return;
-        }
-
-        output.value = vigenereDecrypt(encryptedCipher, guess);
-
-        if (guess === alice) {
-            output.className = 'correct'; banner.className = 'correct';
-            banner.textContent = '✓ Correct! The keyword matched perfectly.';
-            document.getElementById('decryptMathStep').style.display = 'block';
-            document.getElementById('decryptMathArea').innerHTML = buildMathTable(clean(encryptedCipher), guess, 'decrypt');
-        } else {
-            output.className = 'wrong'; banner.className = 'wrong';
-            banner.textContent = '✗ Wrong keyword — output is gibberish.';
-            document.getElementById('decryptMathStep').style.display = 'none';
-        }
-    };
-
-    document.getElementById('alicePlain').addEventListener('input', updatePairingAndMath);
-    document.getElementById('aliceKey').addEventListener('input', updatePairingAndMath);
-    updatePairingAndMath();
-})();
+});
 </script>
 {% endblock %}
