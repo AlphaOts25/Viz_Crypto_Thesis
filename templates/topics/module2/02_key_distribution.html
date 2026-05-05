@@ -3,10 +3,10 @@
 
 {% block content %}
 <style>
-    /* ── MINIMALIST HYBRID SIMULATOR CSS ── */
-    #hybridSim * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', 'Segoe UI', sans-serif; }
-    #hybridSim {
-        background: #11141e; /* Darker, sleek background matching the image */
+    /* ── MINIMALIST VULNERABILITY SIMULATOR CSS ── */
+    #symSim * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', 'Segoe UI', sans-serif; }
+    #symSim {
+        background: #11141e; 
         border-radius: 16px;
         padding: 40px;
         box-shadow: 0 10px 30px rgba(0,0,0,0.4);
@@ -29,7 +29,7 @@
         gap: 0px;
         margin-bottom: 30px;
         position: relative;
-        min-height: 450px;
+        min-height: 480px;
         background: #151822;
         border-radius: 12px;
         border: 1px solid rgba(255,255,255,0.03);
@@ -46,7 +46,7 @@
     }
     
     /* Column Dividers */
-    .eve-col { background: rgba(244,63,94,0.02); border-left: 1px solid rgba(255,255,255,0.03); border-right: 1px solid rgba(255,255,255,0.03); }
+    .eve-col { background: rgba(244,63,94,0.04); border-left: 1px dashed rgba(244,63,94,0.3); border-right: 1px dashed rgba(244,63,94,0.3); }
 
     /* Pill Headers */
     .pill-header {
@@ -57,11 +57,11 @@
         font-weight: 700;
         text-transform: uppercase;
         letter-spacing: 1px;
-        margin-bottom: 30px;
+        margin-bottom: 25px;
         background: transparent;
     }
     .pill-blue { border-color: #60a5fa; color: #fff; }
-    .pill-red { border-color: #f43f5e; color: #fff; }
+    .pill-red { border-color: #f43f5e; color: #fff; background: rgba(244,63,94,0.1); }
     .pill-green { border-color: #10b981; color: #fff; }
 
     /* Icons */
@@ -75,9 +75,8 @@
     .icon-red { color: #fb7185; }
     .icon-green { color: #34d399; }
     .icon-yellow { color: #fbbf24; }
-    .icon-purple { color: #c084fc; }
 
-    /* Data Pills (Inputs and Displays) */
+    /* Data Pills */
     .data-pill {
         border: 1.5px solid rgba(255,255,255,0.2);
         border-radius: 20px;
@@ -87,42 +86,42 @@
         color: #fff;
         background: transparent;
         text-align: center;
-        margin-bottom: 15px;
+        margin-bottom: 12px;
         display: flex;
         align-items: center;
         gap: 8px;
-        transition: all 0.3s ease;
-        max-width: 90%;
+        transition: all 0.4s ease;
+        width: 90%;
+        justify-content: center;
         word-break: break-all;
     }
     input.data-pill {
-        background: rgba(0,0,0,0.2); outline: none; cursor: text; border-color: rgba(255,255,255,0.4);
+        background: rgba(0,0,0,0.2); outline: none; cursor: text; border-color: rgba(255,255,255,0.4); font-family: 'JetBrains Mono', monospace;
     }
     input.data-pill:focus { border-color: #6366f1; box-shadow: 0 0 10px rgba(99,102,241,0.3); }
     
-    .pill-highlight { border-color: #10b981; box-shadow: 0 0 15px rgba(16,185,129,0.2); }
-    .pill-error { border-color: #f43f5e; box-shadow: 0 0 15px rgba(244,63,94,0.2); color: #f43f5e; }
-    .pill-locked { border-color: #c084fc; box-shadow: 0 0 15px rgba(192,132,252,0.2); }
-    .pill-public { border-color: #fbbf24; }
-
-    /* Decryption Flow specifically for Bob */
-    .decrypt-flow {
-        display: flex; flex-direction: column; align-items: center; width: 100%;
-        margin-top: 10px; background: rgba(0,0,0,0.2); padding: 15px 10px; border-radius: 12px;
-        border: 1px dashed rgba(16,185,129,0.3); opacity: 0; transition: opacity 0.5s;
-    }
-    .flow-arrow { color: #34d399; font-size: 16px; margin: 4px 0; }
-    .flow-row { display: flex; gap: 10px; align-items: center; justify-content: center; width: 100%; }
+    .pill-highlight { border-color: #10b981; box-shadow: 0 0 15px rgba(16,185,129,0.2); color: #10b981; }
+    .pill-error { border-color: #f43f5e; box-shadow: 0 0 20px rgba(244,63,94,0.4); color: #f43f5e; background: rgba(244,63,94,0.1); }
+    .pill-locked { border-color: #c084fc; color: #c084fc; }
 
     /* Animated Flying Packet */
     #flying-packet {
         position: absolute; top: 180px; left: 16%; 
-        background: #11141e; border: 1.5px solid #fff; color: #fff;
-        padding: 8px 16px; border-radius: 20px; font-weight: 700; font-size: 12px;
-        box-shadow: 0 5px 15px rgba(0,0,0,0.5); z-index: 100;
-        opacity: 0; transition: left 1.5s cubic-bezier(0.4, 0, 0.2, 1), top 1.5s, opacity 0.3s;
+        background: #11141e; border: 1.5px solid #f43f5e; color: #fff;
+        padding: 8px 16px; border-radius: 20px; font-weight: 700; font-size: 12px; font-family: 'JetBrains Mono', monospace;
+        box-shadow: 0 5px 15px rgba(244,63,94,0.4); z-index: 100;
+        opacity: 0; transition: left 1.5s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s;
         pointer-events: none; display: flex; align-items: center; gap: 8px;
     }
+
+    /* Decryption Flow UI */
+    .decrypt-flow {
+        display: flex; flex-direction: column; align-items: center; width: 100%;
+        margin-top: 10px; background: rgba(0,0,0,0.2); padding: 15px 10px; border-radius: 12px;
+        border: 1px dashed rgba(255,255,255,0.2); opacity: 0; transition: opacity 0.5s;
+    }
+    .flow-arrow { color: #8b92b2; font-size: 16px; margin: 4px 0; }
+    .flow-row { display: flex; gap: 8px; align-items: center; justify-content: center; width: 100%; }
 
     /* Terminal Log */
     .log-container {
@@ -152,39 +151,28 @@
 
 <div class="lesson-container" style="max-width: 950px; margin: 0 auto; padding-bottom: 60px;">
 
-    <!-- HEADER / INTRO (Kept from your original) -->
+    <!-- HEADER -->
     <div class="lesson-header" style="margin-bottom: 40px;">
         <p style="color: #6366f1; font-weight: bold; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 1px;">Topic 3</p>
-        <h1 style="font-size: 36px; margin-top: 0; margin-bottom: 15px;">The Key Distribution Problem</h1>
+        <h1 style="font-size: 36px; margin-top: 0; margin-bottom: 15px;">The Key Distribution Vulnerability</h1>
         <p style="font-size: 18px; color: #555; line-height: 1.6;">
-            Symmetric algorithms like AES are mathematically unbreakable. But they all share one fatal flaw: how do you safely give the secret key to the receiver without a hacker stealing it first?
+            Symmetric algorithms like AES are mathematically unbreakable. But they all share one fatal flaw: to use a symmetric key, you must share it. If you send the key across the internet, the entire system breaks.
         </p>
     </div>
 
-    <div class="study-section" style="background: #fff; border-radius: 12px; padding: 30px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); margin-bottom: 40px;">
-        <h2 style="margin-top: 0; color: #333; border-bottom: 2px solid #e5e7eb; padding-bottom: 10px;">Enter Diffie-Hellman</h2>
-        <p style="color: #555; line-height: 1.6; font-size: 16px;">
-            In 1976, Whitfield Diffie and Martin Hellman solved this problem with pure mathematics. They invented a protocol that allows two people who have never met to generate a shared secret password in broad daylight, even if a hacker is listening to every single word they say.
-        </p>
-        <div style="background: #fdf2f8; border-left: 4px solid #f43f5e; padding: 15px; margin-top: 20px; border-radius: 0 6px 6px 0;">
-            <p style="margin: 0; color: #9f1239; font-size: 15px;">
-                <strong>Important:</strong> Diffie-Hellman is purely a <strong>Key Exchange Protocol</strong> used to safely establish the password that AES will use later!
-            </p>
-        </div>
-    </div>
-
-    <h2>Key Distribution Problem</h2>
+    <h1>Key Distribution Problem</h1>
+        
     {% include "video_player.html" %}
 
-    <!-- ── INTERACTIVE HYBRID ENCRYPTION SIMULATOR ── -->
-    <div id="hybridSim">
+    <!-- ── INTERACTIVE SIMULATOR ── -->
+    <div id="symSim">
         <div class="sim-header">
-            <h2>The "Lockbox" Protocol</h2>
-            <p>Type a message and a fast Symmetric Key below. Watch how Public Key Cryptography acts as a mathematical lockbox to transport the key safely past Eve.</p>
+            <h2>Interactive: The Interception Flaw</h2>
+            <p>Type a message and a Symmetric Key below. Watch what happens when Alice tries to send the locked ciphertext to Bob, but is also forced to send the key so Bob can read it.</p>
         </div>
 
         <!-- Flying Animation Packet -->
-        <div id="flying-packet">📦 Data</div>
+        <div id="flying-packet">📦 CIPH + 🔑 KEY</div>
 
         <div class="sim-stage" id="stage-area">
             
@@ -192,22 +180,16 @@
             <div class="sim-col alice-col" id="col-alice">
                 <div class="pill-header pill-blue">ALICE (SENDER)</div>
                 
-                <!-- SVG Document -->
-                <svg class="sim-icon icon-blue" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
-                <input type="text" id="inMsg" class="data-pill pill-highlight" value="TOP SECRET" style="width: 150px; justify-content: center;">
+                <div style="font-size: 10px; color: #8b92b2; margin-bottom: 4px;">Plaintext Message</div>
+                <input type="text" id="inMsg" class="data-pill" value="CREDIT CARD DATA">
                 
-                <!-- SVG User -->
-                <svg class="sim-icon icon-blue" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
-                
-                <!-- SVG Box -->
-                <svg class="sim-icon icon-purple" viewBox="0 0 24 24" style="margin-top: 5px;"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>
-                <input type="text" id="inKey" class="data-pill" value="SYM KEY: 9944" style="width: 150px; justify-content: center;">
+                <div style="font-size: 10px; color: #8b92b2; margin-bottom: 4px;">Secret Key</div>
+                <input type="text" id="inKey" class="data-pill" value="9944">
 
-                <!-- Dynamic Processing Area -->
-                <div id="aliceProcess" style="display: flex; flex-direction: column; align-items: center; width: 100%; margin-top: 15px;">
-                    <div id="aPub" class="data-pill pill-public" style="display: none; font-size: 10px;">🔓 PUB KEY</div>
-                    <div id="aBox" class="data-pill pill-locked" style="display: none; font-size: 10px;">📦 BOX [🔒]</div>
-                    <div id="aCiph" class="data-pill" style="display: none; font-size: 10px; border-color: rgba(255,255,255,0.4);">📄 CIPHERTEXT</div>
+                <div id="aliceProcess" style="display: flex; flex-direction: column; align-items: center; width: 100%; margin-top: 20px; opacity: 0; transition: opacity 0.5s;">
+                    <div style="font-size: 10px; color: #60a5fa; margin-bottom: 8px;">Encrypting Message...</div>
+                    <div id="aCiph" class="data-pill pill-locked">📦 CIPHERTEXT</div>
+                    <div style="font-size: 10px; color: #f43f5e; margin-bottom: 8px; text-align: center;">Must also send the key<br>so Bob can read it!</div>
                 </div>
             </div>
 
@@ -215,15 +197,21 @@
             <div class="sim-col eve-col" id="col-eve">
                 <div class="pill-header pill-red">NETWORK (EVE)</div>
                 
-                <!-- SVG Hacker / Shield -->
-                <svg class="sim-icon icon-red" viewBox="0 0 24 24" style="margin-top: 40px; width: 48px; height: 48px;"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+                <svg class="sim-icon icon-red" viewBox="0 0 24 24" style="margin-top: 10px; width: 48px; height: 48px;"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+                <div style="font-size: 10px; color: #f43f5e; text-align: center; margin-bottom: 10px;">Eve listens to all traffic</div>
                 
-                <div id="eveProcess" style="display: flex; flex-direction: column; align-items: center; width: 100%; margin-top: 20px;">
-                    <div id="eBox" class="data-pill pill-locked" style="display: none; font-size: 10px;">📦 BOX [🔒]</div>
-                    <div id="eErrBox" class="data-pill pill-error" style="display: none; font-size: 10px;">❌ NEED PRIV KEY</div>
+                <div id="eveProcess" class="decrypt-flow" style="border-color: rgba(244,63,94,0.4); background: rgba(244,63,94,0.05);">
+                    <div style="font-size: 10px; color: #f43f5e; font-weight: bold; margin-bottom: 8px;">EVE INTERCEPTS BOTH!</div>
                     
-                    <div id="eCiph" class="data-pill" style="display: none; font-size: 10px; margin-top: 15px;">📄 CIPHERTEXT</div>
-                    <div id="eErrCiph" class="data-pill pill-error" style="display: none; font-size: 10px;">❌ NEED SYM KEY</div>
+                    <div class="flow-row">
+                        <div class="data-pill pill-locked" style="margin:0; padding:6px; font-size:10px;" id="eCiph">📦 CIPH</div>
+                        <div style="color: #fff; font-size: 12px;">+</div>
+                        <div class="data-pill" style="margin:0; padding:6px; font-size:10px; border-color:#fbbf24; color:#fbbf24" id="eKey">🔑 KEY</div>
+                    </div>
+                    
+                    <div class="flow-arrow">↓</div>
+                    
+                    <div class="data-pill pill-error" style="margin:0; width: 100%; box-shadow: 0 0 20px rgba(244,63,94,0.6);" id="eDec">📄 ?</div>
                 </div>
             </div>
 
@@ -231,45 +219,21 @@
             <div class="sim-col bob-col" id="col-bob">
                 <div class="pill-header pill-green">BOB (RECEIVER)</div>
                 
-                <!-- SVG User -->
-                <svg class="sim-icon icon-green" viewBox="0 0 24 24" style="margin-top: 40px;"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                <svg class="sim-icon icon-green" viewBox="0 0 24 24" style="margin-top: 10px;"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
                 
-                <div style="display: flex; gap: 10px; margin-top: 20px;">
-                    <div style="display: flex; flex-direction: column; align-items: center;">
-                        <svg class="sim-icon icon-yellow" viewBox="0 0 24 24" style="width: 24px; height: 24px;"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
-                        <div class="data-pill pill-public" style="font-size: 10px; padding: 6px 10px;">PUBLIC KEY</div>
-                    </div>
-                    <div style="display: flex; flex-direction: column; align-items: center;">
-                        <svg class="sim-icon icon-green" viewBox="0 0 24 24" style="width: 24px; height: 24px;"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"></path></svg>
-                        <div class="data-pill pill-highlight" style="font-size: 10px; padding: 6px 10px;">PRIVATE KEY</div>
-                    </div>
-                </div>
-
-                <!-- Explicit Decryption Flow Area -->
-                <div id="decryptFlow" class="decrypt-flow">
-                    <div style="font-size: 10px; color: #34d399; font-weight: bold; margin-bottom: 8px; text-transform: uppercase;">Decryption Process</div>
+                <div id="bobProcess" class="decrypt-flow" style="border-color: rgba(16,185,129,0.4); margin-top: auto;">
+                    <div style="font-size: 10px; color: #34d399; font-weight: bold; margin-bottom: 8px;">BOB RECEIVES DATA</div>
                     
-                    <!-- Extracting Key -->
-                    <div class="flow-row" id="flowStep1" style="display: none;">
-                        <div class="data-pill pill-locked" style="margin:0; padding:4px 8px; font-size:9px;">📦 BOX</div>
+                    <div class="flow-row">
+                        <div class="data-pill pill-locked" style="margin:0; padding:6px; font-size:10px;" id="bCiph">📦 CIPH</div>
                         <div style="color: #fff; font-size: 12px;">+</div>
-                        <div class="data-pill pill-highlight" style="margin:0; padding:4px 8px; font-size:9px;">🗝️ PRIV</div>
-                        <div style="color: #fff; font-size: 12px;">=</div>
-                        <div class="data-pill" style="margin:0; padding:4px 8px; font-size:9px; border-color: #fff;" id="flowExtractedKey">🔑 ?</div>
+                        <div class="data-pill" style="margin:0; padding:6px; font-size:10px; border-color:#fbbf24; color:#fbbf24" id="bKey">🔑 KEY</div>
                     </div>
                     
-                    <div class="flow-arrow" id="flowArrow" style="display: none;">↓</div>
+                    <div class="flow-arrow">↓</div>
                     
-                    <!-- Decrypting Message -->
-                    <div class="flow-row" id="flowStep2" style="display: none;">
-                        <div class="data-pill" style="margin:0; padding:4px 8px; font-size:9px; border-color:rgba(255,255,255,0.4);" id="flowCiph">📄 CIPH</div>
-                        <div style="color: #fff; font-size: 12px;">+</div>
-                        <div class="data-pill" style="margin:0; padding:4px 8px; font-size:9px; border-color: #fff;" id="flowUsedKey">🔑 ?</div>
-                        <div style="color: #fff; font-size: 12px;">=</div>
-                        <div class="data-pill pill-highlight" style="margin:0; padding:4px 8px; font-size:9px; box-shadow: 0 0 10px rgba(16,185,129,0.5);" id="flowResult">📄 ?</div>
-                    </div>
+                    <div class="data-pill pill-highlight" style="margin:0; width: 100%;" id="bDec">📄 ?</div>
                 </div>
-
             </div>
 
         </div>
@@ -279,7 +243,15 @@
             <div class="log-line"><span class="log-time">[00:00:00]</span> <span class="log-info">SYSTEM:</span> Waiting for user to initiate sequence...</div>
         </div>
 
-        <button id="btnRunHybrid" class="btn-run" onclick="runSequence()">▶ Start Transmission Sequence</button>
+        <button id="btnRunSym" class="btn-run" onclick="runSequence()">▶ Transmit Message & Key</button>
+        <button id="btnReset" class="btn-run" onclick="resetUI()" style="background: #1e212b; color: #a6accd; box-shadow: none; display: none;">Reset Simulator</button>
+    </div>
+
+    <div style="margin-top: 50px; text-align: right;">
+        <p style="color: #888; font-size: 14px; margin-bottom: 10px;">How do we solve this impossible problem?</p>
+        <a href="{{ url_for('view_lesson', module_num=2, lesson_num=3) }}" style="background: #6366f1; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold; font-size: 16px; box-shadow: 0 4px 6px rgba(99, 102, 241, 0.2);">
+            Start Module 3: Public Key Cryptography →
+        </a>
     </div>
 </div>
 
@@ -303,7 +275,7 @@
     }
 
     // Animation Function
-    function animatePacket(startColId, endColId, label, color, yOffset = 180) {
+    function animatePacket(startColId, endColId) {
         return new Promise(resolve => {
             const packet = document.getElementById('flying-packet');
             const startPct = startColId === 'col-bob' ? 80 : (startColId === 'col-alice' ? 16 : 50);
@@ -311,10 +283,6 @@
 
             packet.style.transition = 'none';
             packet.style.left = startPct + '%';
-            packet.style.top = yOffset + 'px';
-            packet.style.borderColor = color;
-            packet.style.boxShadow = `0 5px 15px rgba(${color === '#fbbf24' ? '251,191,36' : '192,132,252'},0.4)`;
-            packet.innerHTML = label;
             
             void packet.offsetWidth; // Force reflow
 
@@ -330,117 +298,75 @@
     }
 
     function resetUI() {
-        // Hide processing pills
-        ['aPub', 'aBox', 'aCiph', 'eBox', 'eErrBox', 'eCiph', 'eErrCiph'].forEach(id => {
-            document.getElementById(id).style.display = 'none';
-        });
+        document.getElementById('aliceProcess').style.opacity = '0';
+        document.getElementById('eveProcess').style.opacity = '0';
+        document.getElementById('bobProcess').style.opacity = '0';
         
-        // Hide Decryption Flow
-        const dFlow = document.getElementById('decryptFlow');
-        dFlow.style.opacity = '0';
-        ['flowStep1', 'flowArrow', 'flowStep2'].forEach(id => {
-            document.getElementById(id).style.display = 'none';
+        ['eDec', 'bDec'].forEach(id => {
+            document.getElementById(id).innerHTML = '📄 ?';
         });
 
         document.getElementById('sysLog').innerHTML = '';
+        
+        document.getElementById('inMsg').disabled = false;
+        document.getElementById('inKey').disabled = false;
+        document.getElementById('btnRunSym').style.display = 'block';
+        document.getElementById('btnReset').style.display = 'none';
     }
 
     async function runSequence() {
-        const btn = document.getElementById('btnRunHybrid');
-        let msgRaw = document.getElementById('inMsg').value || "TOP SECRET";
-        let symKeyRaw = document.getElementById('inKey').value || "9944";
-        
-        // Strip "SYM KEY:" if user left it in
-        const symKey = symKeyRaw.replace('SYM KEY:', '').trim();
-        const msg = msgRaw.trim();
+        const btn = document.getElementById('btnRunSym');
+        let msg = document.getElementById('inMsg').value || "CREDIT CARD";
+        let symKey = document.getElementById('inKey').value || "9944";
         const cipherText = generateCipher(msg);
         
-        btn.disabled = true;
+        btn.style.display = 'none';
         document.getElementById('inMsg').disabled = true;
         document.getElementById('inKey').disabled = true;
-        resetUI();
-
+        
         addLog("SYSTEM: Transmission sequence initiated.", "info");
 
-        // STEP 1: Request Public Key
-        addLog("ALICE: Requesting Bob's Public Key...", "info");
-        await sleep(800);
-        await animatePacket('col-bob', 'col-alice', '🔓 PUB KEY', '#fbbf24', 280);
-        
-        document.getElementById('aPub').style.display = "flex";
-        addLog("ALICE: Received Bob's Public Key.", "success");
+        // ALICE ENCRYPTS
+        addLog("ALICE: Encrypting message...", "info");
+        document.getElementById('aliceProcess').style.opacity = '1';
+        document.getElementById('aCiph').innerHTML = `📦 ${cipherText}`;
+        await sleep(1500);
+
+        // TRANSMIT
+        addLog("ALICE: Sending Ciphertext AND Secret Key across the open network so Bob can read it...", "warn");
         await sleep(1000);
+        await animatePacket('col-alice', 'col-eve');
 
-        // STEP 2: Encrypt Data
-        addLog("ALICE: Encrypting message with Symmetric Key...", "warn");
-        await sleep(800);
-        document.getElementById('aCiph').innerHTML = `📄 ${cipherText}`;
-        document.getElementById('aCiph').style.display = "flex";
-
-        addLog(`ALICE: Locking Symmetric Key [${symKey}] with Bob's Public Padlock...`, "warn");
-        await sleep(1000);
-        document.getElementById('aBox').innerHTML = `📦 [🔒 ${symKey}]`;
-        document.getElementById('aBox').style.display = "flex";
-
-        // STEP 3: Transmit & Intercept
-        addLog("ALICE: Transmitting Ciphertext and Locked Box over network...", "info");
-        await sleep(500);
-        await animatePacket('col-alice', 'col-eve', '📦+📄 DATA', '#c084fc', 350);
-
-        // EVE'S TURN
-        addLog("EVE: Intercepted packet passing through network!", "error");
-        document.getElementById('eBox').innerHTML = `📦 [🔒 ${symKey}]`;
-        document.getElementById('eBox').style.display = "flex";
-        document.getElementById('eCiph').innerHTML = `📄 ${cipherText}`;
-        document.getElementById('eCiph').style.display = "flex";
-        await sleep(1200);
-
-        addLog("EVE: Attempting to unlock the Box...", "error");
-        await sleep(800);
-        document.getElementById('eErrBox').style.display = "flex";
-        addLog("EVE ERROR: Missing Bob's Private Key. Cannot extract Symmetric Key.", "error");
+        // EVE INTERCEPTS
+        addLog("EVE: Intercepted the packet!", "error");
+        document.getElementById('eveProcess').style.opacity = '1';
+        document.getElementById('eCiph').innerHTML = `📦 ${cipherText}`;
+        document.getElementById('eKey').innerHTML = `🔑 ${symKey}`;
         await sleep(1500);
 
-        addLog("EVE: Attempting to decrypt the Ciphertext directly...", "error");
-        await sleep(800);
-        document.getElementById('eErrCiph').style.display = "flex";
-        addLog("EVE ERROR: Missing Symmetric Key. Message unreadable.", "error");
+        addLog("EVE: Found the Symmetric Key! Decrypting the message...", "error");
         await sleep(1500);
-
-        // STEP 4: Delivery to Bob
-        addLog("NETWORK: Forwarding packet to destination...", "info");
-        await animatePacket('col-eve', 'col-bob', '📦+📄 DATA', '#c084fc', 350);
-        addLog("BOB: Received encrypted packet.", "success");
-        await sleep(1000);
-
-        // STEP 5: Bob Decrypts (Explicit Flow)
-        const dFlow = document.getElementById('decryptFlow');
-        dFlow.style.opacity = '1';
-        
-        addLog("BOB: Unlocking Box using Private Key...", "warn");
-        document.getElementById('flowStep1').style.display = "flex";
-        await sleep(1500);
-        
-        document.getElementById('flowExtractedKey').innerHTML = `🔑 ${symKey}`;
-        document.getElementById('flowExtractedKey').classList.add('pill-highlight');
-        addLog("BOB: Success! Extracted Symmetric Key.", "success");
-        await sleep(1500);
-
-        addLog(`BOB: Decrypting Ciphertext using Symmetric Key [${symKey}]...`, "warn");
-        document.getElementById('flowArrow').style.display = "block";
-        document.getElementById('flowStep2').style.display = "flex";
-        document.getElementById('flowCiph').innerHTML = `📄 ${cipherText}`;
-        document.getElementById('flowUsedKey').innerHTML = `🔑 ${symKey}`;
+        document.getElementById('eDec').innerHTML = `📄 ${msg}`;
+        addLog(`EVE SUCCESS: Message compromised! Eve read: "${msg}"`, "error");
         await sleep(2000);
 
-        document.getElementById('flowResult').innerHTML = `📄 ${msg}`;
-        addLog("BOB: Success! Message recovered perfectly.", "success");
-        addLog("SYSTEM: Sequence Complete. Eve was locked out.", "success");
+        // FORWARD TO BOB
+        addLog("NETWORK: Forwarding the packet to Bob...", "info");
+        await animatePacket('col-eve', 'col-bob');
+        
+        document.getElementById('bobProcess').style.opacity = '1';
+        document.getElementById('bCiph').innerHTML = `📦 ${cipherText}`;
+        document.getElementById('bKey').innerHTML = `🔑 ${symKey}`;
+        await sleep(1500);
 
-        btn.disabled = false;
-        btn.innerText = "▶ Re-run Sequence";
-        document.getElementById('inMsg').disabled = false;
-        document.getElementById('inKey').disabled = false;
+        addLog("BOB: Received data and key. Decrypting...", "success");
+        await sleep(1500);
+        document.getElementById('bDec').innerHTML = `📄 ${msg}`;
+        
+        await sleep(1000);
+        addLog("SYSTEM FAILURE: Bob successfully read the message, but Eve read it too! This is the Key Distribution Problem.", "error");
+
+        document.getElementById('btnReset').style.display = 'block';
     }
 </script>
 {% endblock %}

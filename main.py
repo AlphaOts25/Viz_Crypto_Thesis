@@ -159,7 +159,8 @@ def admin_dashboard():
         'admin/dashboard.html',
         modules=curriculum,
         module_count=module_count,
-        student_count=student_count
+        student_count=student_count,
+        show_sidebar=False
     )
 
 
@@ -264,6 +265,36 @@ def add_test():
 
     return redirect(url_for('admin_dashboard'))
 
+@app.route('/submit_test', methods=['POST'])
+@login_required
+def submit_test():
+    test_type = request.form.get('test_type')
+    test = db.tests.find_one({"type": test_type})
+    
+    if not test:
+        return redirect(url_for('home'))
+    
+    # Calculate score
+    score = 0
+    questions = list(db.questions.find({"test_id": test["_id"]}))
+    
+    for idx, question in enumerate(questions):
+        user_answer = request.form.get(f'question_{idx}')
+        if user_answer == question['correct_answer']:
+            score += 1
+    
+    # Store result
+    db.results.insert_one({
+        "user_id": ObjectId(current_user.id),
+        "test_type": test_type,
+        "score": score,
+        "total": len(questions),
+        "timestamp": datetime.utcnow()
+    })
+    
+    flash(f'Test submitted! Your score: {score}/{len(questions)}')
+    return redirect(url_for('home'))
+
 
 @app.route('/delete_test/<test_id>', methods=['POST'])
 @login_required
@@ -309,7 +340,7 @@ def get_test(test_type):
 @login_required
 def take_test(test_type):
     questions = get_test(test_type)
-    return render_template('test.html', questions=questions, type=test_type)
+    return render_template('test.html', questions=questions, type=test_type, show_sidebar=True)
 
 #---------------------------------------TEMPLATES--------------------------------------------
 
@@ -324,7 +355,8 @@ def home():
     return render_template(
         'index.html',
         pre_test_exists=pre_test_exists,
-        post_test_exists=post_test_exists
+        post_test_exists=post_test_exists,
+        show_sidebar=True
     )
 
 @app.route('/module/<int:module_num>/lesson/<int:lesson_num>')
@@ -347,7 +379,7 @@ def view_lesson(module_num, lesson_num):
     filename = file_map.get(target_code)
     template_path = f"topics/module{module_num}/{filename}"
     
-    return render_template(template_path, lesson_data=current_lesson)
+    return render_template(template_path, lesson_data=current_lesson, show_sidebar=True)
     
 @app.route('/module/<int:module_num>/intro')
 def module_intro(module_num):
@@ -361,7 +393,7 @@ def module_intro(module_num):
     if not filename:
         return "Module not found", 404
 
-    return render_template(f'topics/module{module_num}/{filename}')
+    return render_template(f'topics/module{module_num}/{filename}', show_sidebar=True)
 
 #-----------------------MAIN------------------------------------
 UPLOAD_FOLDER = 'static/uploads/videos'
