@@ -32,6 +32,15 @@
         <aside class="sidebar">
             <h3 class="sidebar-title">Curriculum</h3>
 
+            <!-- Pre-Test at the Top -->
+            {% if pre_test_exists %}
+            <a href="{{ url_for('take_test', test_type='pre') }}" class="sidebar-link assessment-link">
+                <span class="assessment-badge">Assessment</span>
+                Pre-Test
+            </a>
+            {% endif %}
+
+            <!-- Module 1 -->
             <button class="dropdown-btn">1. Encryption/Decryption 
                 <span class="arrow">▼</span>
             </button>
@@ -41,6 +50,7 @@
                 <a href="{{ url_for('view_lesson', module_num=1, lesson_num=2) }}">Classical Cryptography</a>
             </div>
 
+            <!-- Module 2 -->
             <button class="dropdown-btn">2. Symmetric Encryption 
                 <span class="arrow">▼</span>
             </button>
@@ -48,8 +58,16 @@
                 <a href="{{ url_for('module_intro', module_num=2) }}" style="font-weight: bold; color: #6366f1;">Introduction</a>
                 <a href="{{ url_for('view_lesson', module_num=2, lesson_num=1) }}">Shared Key Concept</a>
                 <a href="{{ url_for('view_lesson', module_num=2, lesson_num=2) }}">Key Distribution Problem</a>
-                <a href="{{ url_for('view_lesson', module_num=2, lesson_num=3)  }}">Diffie-Hellman Exchange</a>
+                <a href="{{ url_for('view_lesson', module_num=2, lesson_num=3) }}">Diffie-Hellman Exchange</a>
             </div>
+
+            <!-- Post-Test at the Bottom -->
+            {% if post_test_exists %}
+            <a href="{{ url_for('take_test', test_type='post') }}" class="sidebar-link assessment-link">
+                <span class="assessment-badge">Assessment</span>
+                Post-Test
+            </a>
+            {% endif %}
         </aside>
         {% endif %}
 

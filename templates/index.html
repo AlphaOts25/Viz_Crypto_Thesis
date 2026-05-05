@@ -1,84 +1,28 @@
-{% extends "base.html" %}
+    {% extends "base.html" %}
 
-{% block content %}
-<style>
-    .content-area {
-        max-width: 1400px !important; /* Expands the squashed middle */
-        padding: 40px 60px !important; /* Adds nice breathing room on the sides */
-    }
-</style>
+    {% block content %}
+    <style>
+        .content-area {
+            max-width: 1400px !important; /* Expands the squashed middle */
+            padding: 40px 60px !important; /* Adds nice breathing room on the sides */
+        }
+    </style>
 
-<div class="main-container">
-    <header class="page-header">
-        <p class="welcome-text">Welcome to</p>
-        <h1>ITN108 Visualizer</h1>
-    </header>
+    <div class="main-container">
+        <header class="page-header">
+            <p class="welcome-text">Welcome to</p>
+            <h1>ITN108 Visualizer</h1>
+        </header>
 
-    <section class="featured-section">
-        <div class="section-header">
-            <h2>Featured Modules</h2>
-        </div>
-        {% if pre_test_exists %}
-        <div class="course-card">
-            <div class="card-top bg-indigo">
-                <p class="course-subtitle">Assessment</p>
-                <h3 class="course-title">Pre-Test</h3>
+        <section class="featured-section">
+            <div class="section-header">
+                <h2>Featured Modules</h2>
             </div>
-            <div class="card-bottom">
-                <div class="card-stats">
-                    <div class="stat">
-                        <span class="stat-number">—</span>
-                        <span class="stat-label">Questions</span>
-                    </div>
-                </div>
-                <a href="{{ url_for('take_test', test_type='pre') }}" class="play-btn">▶</a>
-            </div>
-        </div>
-        {% endif %}
-        <div class="card-container">
+            {% if pre_test_exists %}
             <div class="course-card">
-                <div class="card-top bg-purple">
-                    <p class="course-subtitle">Module 1</p>
-                    <h3 class="course-title">Encryption & Decryption</h3>
-                </div>
-                <div class="card-bottom">
-                    <div class="card-stats">
-                        <div class="stat">
-                            <span class="stat-number">2</span>
-                            <span class="stat-label">Concepts</span>
-                        </div>
-                        <div class="stat">
-                            <span class="stat-number">1</span>
-                            <span class="stat-label">Interactive</span>
-                        </div>
-                    </div>
-                    <a href="{{ url_for('module_intro', module_num=1) }}" class="play-btn">▶</a>
-                </div>
-            </div>
-            <div class="course-card">
-                <div class="card-top bg-green">
-                    <p class="course-subtitle">Module 2</p>
-                    <h3 class="course-title">Symmetric Encryption</h3>
-                </div>
-                <div class="card-bottom">
-                    <div class="card-stats">
-                        <div class="stat">
-                            <span class="stat-number">3</span>
-                            <span class="stat-label">Concepts</span>
-                        </div>
-                        <div class="stat">
-                            <span class="stat-number">2</span>
-                            <span class="stat-label">Interactive</span>
-                        </div>
-                    </div>
-                    <a href="{{ url_for('module_intro', module_num=2) }}" class="play-btn">▶</a>
-                </div>
-            </div>
-            {% if post_test_exists %}
-            <div class="course-card">
-                <div class="card-top bg-orange">
+                <div class="card-top bg-indigo">
                     <p class="course-subtitle">Assessment</p>
-                    <h3 class="course-title">Post-Test</h3>
+                    <h3 class="course-title">Pre-Test</h3>
                 </div>
                 <div class="card-bottom">
                     <div class="card-stats">
@@ -87,11 +31,67 @@
                             <span class="stat-label">Questions</span>
                         </div>
                     </div>
-                    <a href="{{ url_for('take_test', test_type='post') }}" class="play-btn">▶</a>
+                    <a href="{{ url_for('take_test', test_type='pre') }}" class="play-btn">▶</a>
                 </div>
             </div>
             {% endif %}
-        </div>
-    </section>
-</div>
-{% endblock %}
+            <div class="card-container">
+                <div class="course-card">
+                    <div class="card-top bg-purple">
+                        <p class="course-subtitle">Module 1</p>
+                        <h3 class="course-title">Encryption & Decryption</h3>
+                    </div>
+                    <div class="card-bottom">
+                        <div class="card-stats">
+                            <div class="stat">
+                                <span class="stat-number">2</span>
+                                <span class="stat-label">Concepts</span>
+                            </div>
+                            <div class="stat">
+                                <span class="stat-number">1</span>
+                                <span class="stat-label">Interactive</span>
+                            </div>
+                        </div>
+                        <a href="{{ url_for('module_intro', module_num=1) }}" class="play-btn">▶</a>
+                    </div>
+                </div>
+                <div class="course-card">
+                    <div class="card-top bg-green">
+                        <p class="course-subtitle">Module 2</p>
+                        <h3 class="course-title">Symmetric Encryption</h3>
+                    </div>
+                    <div class="card-bottom">
+                        <div class="card-stats">
+                            <div class="stat">
+                                <span class="stat-number">3</span>
+                                <span class="stat-label">Concepts</span>
+                            </div>
+                            <div class="stat">
+                                <span class="stat-number">2</span>
+                                <span class="stat-label">Interactive</span>
+                            </div>
+                        </div>
+                        <a href="{{ url_for('module_intro', module_num=2) }}" class="play-btn">▶</a>
+                    </div>
+                </div>
+                {% if post_test_exists %}
+                <div class="course-card">
+                    <div class="card-top bg-orange">
+                        <p class="course-subtitle">Assessment</p>
+                        <h3 class="course-title">Post-Test</h3>
+                    </div>
+                    <div class="card-bottom">
+                        <div class="card-stats">
+                            <div class="stat">
+                                <span class="stat-number">—</span>
+                                <span class="stat-label">Questions</span>
+                            </div>
+                        </div>
+                        <a href="{{ url_for('take_test', test_type='post') }}" class="play-btn">▶</a>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </section>
+    </div>
+    {% endblock %}
