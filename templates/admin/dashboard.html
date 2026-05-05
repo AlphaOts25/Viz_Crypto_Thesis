@@ -15,13 +15,14 @@
 /* Modal box */
 .modal-content {
     background: white;
-    width: 600px;
-    max-width: 90%;
+    width: 900px;
+    max-width: 95%;
     margin: 80px auto;
     padding: 25px;
     border-radius: 12px;
     box-shadow: 0 10px 30px rgba(0,0,0,0.15);
     animation: fadeIn 0.2s ease;
+    overflow: hidden;
 }
 
 /* Header */
@@ -62,14 +63,16 @@
 }
 .modal-grid {
     display: grid;
-    grid-template-columns: 1fr 1.3fr;
+    grid-template-columns: 1fr 1fr;
     gap: 20px;
+    min-width: 0;
 }
 
 /* LEFT SIDE */
 .modal-left {
     display: flex;
     flex-direction: column;
+    min-width: 0;
 }
 
 /* RIGHT SIDE PANEL */
@@ -80,6 +83,7 @@
     border: 1px solid #eee;
     display: flex;
     flex-direction: column;
+    min-width: 0;
 }
 
 /* SCROLL AREA */
@@ -111,6 +115,7 @@
     border-radius: 6px;
     font-size: 14px;
     margin-bottom: 10px;
+    box-sizing: border-box;
 }
 
 /* Make choices uniform */
@@ -124,6 +129,7 @@
     margin-top: 6px;
     border: 1px solid #ccc;
     border-radius: 6px;
+    box-sizing: border-box;
 }
 
 /* Buttons */
@@ -229,36 +235,37 @@
         </form>
     </div>
     <div id="testModal">
-        <div class="modal-content modal-grid">
+        <div class="modal-content">
+            <form method="POST" action="{{ url_for('add_test') }}">
+                <div class="modal-grid">
 
-            <!-- LEFT SIDE -->
-            <div class="modal-left">
-                <div class="modal-header">
-                    <h2>Create Test</h2>
-                    <button class="modal-close" onclick="closeTestModal()">✕</button>
-                </div>
+                    <!-- LEFT -->
+                    <div class="modal-left">
+                        <div class="modal-header">
+                            <h2>Create Test</h2>
+                            <button type="button" class="modal-close" onclick="closeTestModal()">✕</button>
+                        </div>
 
-                <form method="POST" action="{{ url_for('add_test') }}">
+                        <label>Test Type</label>
+                        <select name="type" required>
+                            <option value="pre">Pre-test</option>
+                            <option value="post">Post-test</option>
+                        </select>
 
-                    <label>Test Type</label>
-                    <select name="type" required>
-                        <option value="pre">Pre-test</option>
-                        <option value="post">Post-test</option>
-                    </select>
-
-                    <div class="modal-actions">
-                        <button type="button" class="btn-add" onclick="addQuestion()">+ Add Question</button>
-                        <button type="submit" class="btn-save">Save</button>
+                        <div class="modal-actions">
+                            <button type="button" class="btn-add" onclick="addQuestion()">+ Add Question</button>
+                            <button type="submit" class="btn-save">Save</button>
+                        </div>
                     </div>
-                </form>
-            </div>
 
-            <!-- RIGHT SIDE (SCROLLABLE) -->
-            <div class="modal-right">
-                <h3>Questions</h3>
-                <div id="questions-container" class="questions-scroll"></div>
-            </div>
+                    <!-- RIGHT -->
+                    <div class="modal-right">
+                        <h3>Questions</h3>
+                        <div id="questions-container" class="questions-scroll"></div>
+                    </div>
 
+                </div>
+            </form>
         </div>
     </div>
     

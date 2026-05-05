@@ -33,25 +33,32 @@ body {
 
 /* --- Card Container (Flexbox) --- */
 .card-container {
-    display: flex;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
     gap: 20px;
-    flex-wrap: wrap; /* Allows cards to wrap to the next line on small screens */
 }
 
 /* --- The Course Card --- */
 .course-card {
     background: #fff;
     border-radius: 12px;
-    width: 280px;
+    width: 100%;
     box-shadow: 0 4px 12px rgba(0,0,0,0.05);
     overflow: hidden; /* Keeps the top background inside the rounded corners */
     position: relative;
     transition: transform 0.2s ease, box-shadow 0.2s ease;
+    gap: 20px;
 }
 
 .course-card:hover {
     transform: translateY(-5px);
     box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+}
+
+@media (max-width: 600px) {
+    .card-container {
+        grid-template-columns: 1fr;
+    }
 }
 
 /* --- Card Top (The Colored Part) --- */
@@ -75,9 +82,10 @@ body {
 }
 
 /* --- The Gradients --- */
+.bg-orange {background: linear-gradient(135deg, #6366f1, #4f46e5);}
 .bg-purple { background: linear-gradient(135deg, #8b5cf6, #6366f1); }
 .bg-green { background: linear-gradient(135deg, #10b981, #059669); }
-.bg-orange { background: linear-gradient(135deg, #fb923c, #f43f5e); }
+.bg-mustard { background: linear-gradient(135deg, #fb923c, #f43f5e); }
 
 /* --- Card Bottom (The Stats Part) --- */
 .card-bottom {
