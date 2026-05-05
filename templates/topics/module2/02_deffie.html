@@ -3,427 +3,469 @@
 
 {% block content %}
 <style>
-    /* ── GENERAL LAYOUT ── */
-    #dhSim * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', 'Segoe UI', sans-serif; }
-    #dhSim {
-        background: #0c0d14; 
-        border-radius: 16px; 
-        padding: 40px 50px; 
-        box-shadow: 0 10px 30px rgba(0,0,0,0.3); 
-        color: #fff;
-        margin-top: 40px;
-        border: 1px solid rgba(255,255,255,0.05);
-    }
-    
-    /* ── CLOCK SIMULATOR CSS ── */
-    .ms-wrap { font-family: var(--font-sans, 'Inter', sans-serif); padding: 4px 0 16px; }
-    .ms-ctrl-row { display: flex; gap: 12px; align-items: flex-end; margin-bottom: 24px; flex-wrap: wrap; background: rgba(255,255,255,0.02); padding: 16px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05); }
-    .ms-ctrl { display: flex; flex-direction: column; gap: 5px; flex: 1; min-width: 100px; }
-    .ms-ctrl label { font-size: 11px; color: var(--color-text-secondary, #a6accd); text-transform: uppercase; letter-spacing: 1px; font-weight: 600; }
-    .ms-ctrl input[type=number], .ms-ctrl input[type=range] { 
-        background: var(--color-background-secondary, #1a1a24); 
-        border: 1px solid rgba(255,255,255,0.15); 
-        color: #fff; 
-        padding: 10px 12px; border-radius: 8px; font-size: 14px; font-weight: 600; font-family: 'JetBrains Mono', monospace; 
-    }
-    .ms-ctrl input[type=number]:focus { outline: none; border-color: #6366f1; box-shadow: 0 0 0 2px rgba(99,102,241,0.3); }
-    
-    .ms-body { display: flex; gap: 24px; align-items: flex-start; flex-wrap: wrap; }
-    .ms-right { flex: 1; min-width: 250px; display: flex; flex-direction: column; gap: 14px; }
-    .ms-card { 
-        background: var(--color-background-secondary, #1a1a24); 
-        border-radius: 12px; padding: 18px; 
-        border: 1px solid rgba(255,255,255,0.07); 
-    }
-    .ms-card-lbl { font-size: 11px; color: var(--color-text-tertiary, #55558a); text-transform: uppercase; letter-spacing: 1px; font-weight: 700; margin-bottom: 12px; }
-    .ms-formula { font-size: 24px; font-family: var(--font-mono, 'JetBrains Mono', 'Courier New', monospace); line-height: 1.5; margin-bottom: 10px; background: rgba(0,0,0,0.2); padding: 12px; border-radius: 8px; text-align: center; border: 1px solid rgba(255,255,255,0.03); }
-    
-    /* Syntax Highlighting */
-    .f-g { color: #7c7fef; }
-    .f-x { color: #f59e0b; }
-    .f-m { color: var(--color-text-tertiary, #55558a); font-size: 15px; }
-    .f-p { color: var(--color-text-secondary, #a6accd); }
-    .f-eq { color: var(--color-text-tertiary, #55558a); }
-    .f-r { color: #10b981; font-weight: 700; }
-    
-    .ms-hint { font-size: 13px; color: #a6accd; margin-top: 8px; line-height: 1.6; text-align: center; }
-    
-    /* Actor Dashboard */
-    .dh-actor-cards { display: flex; gap: 12px; margin-bottom: 6px; }
-    .actor-col { flex: 1; background: rgba(255,255,255,0.02); border-radius: 12px; padding: 16px; border-top: 3px solid transparent; }
-    .actor-col.alice { border-top-color: #f43f5e; }
-    .actor-col.bob { border-top-color: #3b82f6; }
-    .actor-name { font-size: 14px; font-weight: 700; text-transform: uppercase; margin-bottom: 12px; letter-spacing: 1px; }
-    .actor-col.alice .actor-name { color: #f43f5e; }
-    .actor-col.bob .actor-name { color: #3b82f6; }
-    
-    .data-row { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 13px; color: #8b92b2; }
-    .data-val { font-family: 'JetBrains Mono', monospace; font-weight: 600; color: #fff; }
-    .data-val.highlight { color: #10b981; font-size: 15px; text-shadow: 0 0 10px rgba(16,185,129,0.4); }
-    
-    /* Buttons */
-    .ms-btns { display: flex; gap: 12px; margin-top: 10px; }
-    .ms-btn { flex: 1; padding: 14px 24px; border: none; border-radius: 8px; font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; cursor: pointer; transition: all .2s; font-family: inherit; }
-    .ms-pri { background: #6366f1; color: #fff; box-shadow: 0 4px 15px rgba(99,102,241,0.3); }
-    .ms-pri:hover:not(:disabled) { background: #4f46e5; transform: translateY(-2px); box-shadow: 0 6px 20px rgba(99,102,241,0.4); }
-    .ms-pri:disabled { background: #252537; color: #55558a; cursor: not-allowed; box-shadow: none; transform: none; }
-    .ms-rst { background: rgba(244,63,94,0.1); color: #f43f5e; border: 1px solid rgba(244,63,94,0.2); flex: 0.3; }
-    .ms-rst:hover:not(:disabled) { background: rgba(244,63,94,0.2); }
+  /* ── DIFFIE-HELLMAN STEP-BY-STEP SIMULATOR CSS ── */
+  * { box-sizing:border-box; }
+  
+  .dh-wrapper {
+      font-family: 'Inter', 'Segoe UI', sans-serif;
+      background: #f5f5f0;
+      color: #1a1a1a;
+      padding: 2rem;
+      border-radius: 16px;
+      margin-top: 2rem;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+  }
+  .dh-wrapper h1 { font-size:24px; font-weight:600; margin-bottom:6px; margin-top:0; color:#1a1a1a; }
+  .dh-wrapper .subtitle { font-size:14px; color:#888; margin-bottom:1.5rem; line-height: 1.5; }
+
+  /* INPUT PANEL */
+  .dh-wrapper .input-panel { background:#fff; border:0.5px solid #ddd; border-radius:12px; padding:1.25rem 1.5rem; margin-bottom:1.5rem; }
+  .dh-wrapper .input-panel h2 { font-size:13px; font-weight:600; text-transform:uppercase; letter-spacing:0.5px; color:#888; margin-bottom:1rem; margin-top:0; }
+  .dh-wrapper .inputs-row { display:flex; gap:12px; flex-wrap:wrap; align-items:flex-end; }
+  .dh-wrapper .inp-group { display:flex; flex-direction:column; gap:5px; flex: 1 1 120px; }
+  .dh-wrapper .inp-group label { font-size:12px; color:#666; font-weight:500; }
+  .dh-wrapper .inp-group input { padding:8px 10px; border:0.5px solid #ccc; border-radius:8px; font-size:14px; font-family:'Courier New',monospace; font-weight:600; background:#fafafa; color:#1a1a1a; width:100%; }
+  .dh-wrapper .inp-group input:focus { outline:none; border-color:#378ADD; box-shadow:0 0 0 2px rgba(55,138,221,0.15); }
+  .dh-wrapper .inp-group input.alice-inp { border-color:#B5D4F4; }
+  .dh-wrapper .inp-group input.bob-inp { border-color:#C0DD97; }
+  .dh-wrapper .inp-error { font-size:11px; color:#D85A30; margin-top:4px; display:none; }
+  .dh-wrapper .btn-start { padding:9px 22px; background:#1a1a1a; color:#fff; border:none; border-radius:8px; font-size:13px; font-weight:500; cursor:pointer; white-space:nowrap; transition: background 0.2s; }
+  .dh-wrapper .btn-start:hover { background:#333; }
+
+  /* SCROLL-FREE STAGE (Responsive) */
+  .dh-wrapper .stage { 
+      display: flex;
+      justify-content: space-between;
+      align-items: stretch; /* Forces equal height */
+      gap: 10px; 
+      margin-bottom: 50px; /* EXTRA SPACE FOR BUTTONS */
+  }
+  
+  .dh-wrapper .actor { 
+      background: #fff; 
+      border: 0.5px solid #ddd; 
+      border-radius: 12px; 
+      padding: 1.25rem 0.75rem; 
+      display: flex; 
+      flex-direction: column; 
+      flex: 1;
+      min-width: 0; /* CRITICAL: Allows flex items to shrink and text to wrap */
+  }
+  
+  .dh-wrapper .wire { 
+      display: flex; 
+      flex-direction: column; 
+      align-items: center; 
+      justify-content: flex-start; 
+      padding-top: 52px; 
+      width: 60px;
+      flex-shrink: 0;
+  }
+  
+  .dh-wrapper .wire-seg { width:2px; background:#ddd; flex:1; min-height: 20px; }
+  .dh-wrapper .actor-icon { width:40px; height:40px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:17px; font-weight:600; margin-bottom:8px; margin-left: auto; margin-right: auto;}
+  .dh-wrapper .alice-icon { background:#E6F1FB; color:#185FA5; }
+  .dh-wrapper .bob-icon { background:#EAF3DE; color:#3B6D11; }
+  .dh-wrapper .eve-icon { background:#FAECE7; color:#993C1D; border:2px dashed #D85A30; }
+  .dh-wrapper .actor-name { font-size:14px; font-weight:600; margin-bottom:12px; text-align: center;}
+  .dh-wrapper .divider { height:0.5px; background:#eee; margin:10px 0; width: 100%; }
+  
+  .dh-wrapper .kv { display:flex; flex-direction:column; gap:8px; margin-top: auto; width: 100%; }
+  .dh-wrapper .kv-row { display:flex; justify-content:space-between; align-items:center; flex-wrap: wrap; gap:4px; font-size:12px; }
+  .dh-wrapper .kv-label { color:#888; display: flex; align-items: center; flex-wrap: wrap; }
+  .dh-wrapper .kv-val { 
+      font-family:'Courier New',monospace; font-size:12px; font-weight:600; background:#f5f5f0; 
+      padding:3px 7px; border-radius:4px; color:#1a1a1a; transition:all 0.3s; text-align: right;
+      word-break: break-all; /* Prevents long numbers from breaking the layout */
+  }
+  .dh-wrapper .kv-val.secret { background:#E6F1FB; color:#185FA5; }
+  .dh-wrapper .kv-val.pub-val { background:#f5f5f0; color:#1a1a1a; }
+  .dh-wrapper .kv-val.shared { background:#EAF3DE; color:#3B6D11; font-size:13px; }
+  .dh-wrapper .kv-val.unknown { background:none; color:#aaa; font-style:italic; font-weight:400; font-family:inherit; }
+  .dh-wrapper .kv-val.dash { background:none; color:#ccc; font-family:inherit; font-weight:400; }
+  
+  .dh-wrapper .tag { display:inline-block; font-size:9px; padding:2px 5px; border-radius:4px; margin-left:5px; font-weight:700; letter-spacing:0.3px; }
+  .dh-wrapper .tag-prv { background:#FAEEDA; color:#854F0B; }
+  .dh-wrapper .tag-pub { background:#E6F1FB; color:#185FA5; }
+
+  /* PACKETS ON WIRE */
+  .dh-wrapper .wire-packets { display:flex; flex-direction:column; align-items:center; gap:4px; margin:4px 0; }
+  .dh-wrapper .packet { display:none; flex-direction:column; align-items:center; gap:2px; }
+  .dh-wrapper .packet.visible { display:flex; }
+  .dh-wrapper .pill { font-size:11px; padding:4px 6px; border-radius:10px; font-family:'Courier New',monospace; font-weight:600; text-align:center; word-break: break-all; border:0.5px solid; max-width: 55px;}
+  .dh-wrapper .pill-a { background:#E6F1FB; color:#185FA5; border-color:#B5D4F4; }
+  .dh-wrapper .pill-b { background:#EAF3DE; color:#3B6D11; border-color:#C0DD97; }
+  .dh-wrapper .pill-arr { font-size:11px; color:#aaa; }
+
+  /* STEP INFO */
+  .dh-wrapper .step-info { background:#fff; border:0.5px solid #ddd; border-radius:12px; padding:1.25rem; margin-bottom:1.5rem; border-left:4px solid #ddd; transition:border-color 0.3s; }
+  .dh-wrapper .step-info.setup { border-left-color:#888; }
+  .dh-wrapper .step-info.alice { border-left-color:#378ADD; }
+  .dh-wrapper .step-info.bob { border-left-color:#639922; }
+  .dh-wrapper .step-info.eve { border-left-color:#D85A30; }
+  .dh-wrapper .step-info.done { border-left-color:#1D9E75; }
+  .dh-wrapper .step-counter { font-size:11px; text-transform:uppercase; letter-spacing:0.5px; color:#aaa; margin-bottom:4px; font-weight:600; }
+  .dh-wrapper .step-title { font-size:16px; font-weight:600; color:#1a1a1a; margin-bottom:8px; }
+  .dh-wrapper .step-body { font-size:14px; color:#555; line-height:1.6; }
+  .dh-wrapper .step-body strong { font-weight:600; color:#1a1a1a; }
+  .dh-wrapper .step-body code { font-family:'Courier New',monospace; background:#f0f0f0; padding:2px 6px; border-radius:4px; font-size:13px; color: #1a1a1a; font-weight: 600; }
+
+  /* CONTROLS */
+  .dh-wrapper .controls { display:flex; align-items:center; gap:12px; flex-wrap:wrap; margin-top:1.5rem; }
+  .dh-wrapper .btn-next { padding:12px 26px; background:#1a1a1a; color:#fff; border:none; border-radius:8px; font-size:14px; font-weight:600; cursor:pointer; transition:background 0.15s; }
+  .dh-wrapper .btn-next:hover:not(:disabled) { background:#333; }
+  .dh-wrapper .btn-next:disabled { background:#ddd; color:#aaa; cursor:not-allowed; }
+  .dh-wrapper .btn-reset { padding:12px 20px; border-radius:8px; border:0.5px solid #ccc; background:#fff; font-size:14px; cursor:pointer; color:#666; font-weight: 500; transition:background 0.15s;}
+  .dh-wrapper .btn-reset:hover { background:#f5f5f0; }
+  .dh-wrapper .progress { display:flex; gap:6px; align-items:center; margin-left: 10px; }
+  .dh-wrapper .dot { width:8px; height:8px; border-radius:50%; background:#ddd; transition:background 0.2s; }
+  .dh-wrapper .dot.done-dot { background:#5DCAA5; }
+  .dh-wrapper .dot.active-dot { background:#378ADD; }
+
+  /* CONCLUSION */
+  .dh-wrapper .conclusion { display:none; background:#EAF3DE; border:0.5px solid #C0DD97; border-radius:12px; padding:1.25rem; margin-top:1rem; }
+  .dh-wrapper .conclusion.visible { display:block; }
+  .dh-wrapper .conc-title { font-size:15px; font-weight:600; color:#3B6D11; margin-bottom:6px; }
+  .dh-wrapper .conc-body { font-size:14px; color:#3B6D11; line-height:1.6; }
+  .dh-wrapper .conc-body strong { font-weight:700; }
+
+  /* RESPONSIVE SCALING */
+  @media(max-width:850px) {
+    .dh-wrapper .stage { gap: 4px; }
+    .dh-wrapper .wire { width: 44px; }
+    .dh-wrapper .actor { padding: 0.75rem 0.5rem; }
+    .dh-wrapper .actor-name { font-size: 12px; }
+    .dh-wrapper .kv-row { flex-direction: column; align-items: center; justify-content: center; text-align: center; margin-bottom: 6px; }
+    .dh-wrapper .kv-label { width: 100%; justify-content: center; font-size: 10px; }
+    .dh-wrapper .kv-val { width: 100%; text-align: center; font-size: 11px; padding: 4px; }
+    .dh-wrapper .tag { display: none; } /* Hide tags to save space on mobile */
+    .dh-wrapper .pill { font-size: 9px; padding: 2px 4px; max-width: 40px; }
+  }
 </style>
 
-<div class="lesson-container" style="max-width: 900px; margin: 0 auto; padding-bottom: 60px;">
+<div class="lesson-container" style="max-width: 950px; margin: 0 auto; padding-bottom: 60px;">
 
-    <!-- ── HEADER ── -->
-    <div class="lesson-header" style="margin-bottom: 40px;">
-        <p style="color: #6366f1; font-weight: bold; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 1px;">Topic 3</p>
-        <h1 style="font-size: 36px; margin-top: 0; margin-bottom: 15px;">The Key Exchange Problem</h1>
-        <p style="font-size: 18px; color: #555; line-height: 1.6;">
-            AES is unbreakable, but it has a fatal flaw: Symmetric encryption requires both the sender and receiver to have the <em>exact same secret key</em>. How do you send that key across the internet without a hacker stealing it?
-        </p>
-    </div>
+  <!-- HEADER / INTRO -->
+  <div class="lesson-header" style="margin-bottom: 40px;">
+      <p style="color: #6366f1; font-weight: bold; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 1px;">Topic 3</p>
+      <h1 style="font-size: 36px; margin-top: 0; margin-bottom: 15px;">The Key Exchange Problem</h1>
+      <p style="font-size: 18px; color: #555; line-height: 1.6;">
+          AES is mathematically unbreakable. But it has a fatal flaw: Symmetric encryption requires both the sender and receiver to have the <em>exact same secret key</em>. How do you send that key across the internet without a hacker stealing it?
+      </p>
+  </div>
 
-    <!-- ── EXPLANATION ── -->
-    <div class="study-section" style="background: #fff; border-radius: 12px; padding: 30px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); margin-bottom: 40px;">
-        <h2 style="margin-top: 0; color: #333; border-bottom: 2px solid #e5e7eb; padding-bottom: 10px;">Enter Diffie-Hellman</h2>
-        <p style="color: #555; line-height: 1.6; font-size: 16px;">
-            In 1976, Whitfield Diffie and Martin Hellman solved this problem with pure mathematics. They invented a protocol that allows two people who have never met to generate a shared secret password in broad daylight, even if a hacker is listening to every single word they say.
-        </p>
-        <div style="background: #fdf2f8; border-left: 4px solid #f43f5e; padding: 15px; margin-top: 20px; border-radius: 0 6px 6px 0;">
-            <p style="margin: 0; color: #9f1239; font-size: 15px;">
-                <strong>Important:</strong> Diffie-Hellman is purely a <strong>Key Exchange Protocol</strong> used to safely establish the password that AES will use later!
-            </p>
+  <div class="study-section" style="background: #fff; border-radius: 12px; padding: 30px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); margin-bottom: 40px;">
+      <h2 style="margin-top: 0; color: #333; border-bottom: 2px solid #e5e7eb; padding-bottom: 10px;">Enter Diffie-Hellman</h2>
+      <p style="color: #555; line-height: 1.6; font-size: 16px;">
+          In 1976, Whitfield Diffie and Martin Hellman solved this problem with pure mathematics. They invented a protocol that allows two people who have never met to generate a shared secret password in broad daylight, even if a hacker is listening to every single word they say.
+      </p>
+  </div>
+
+  <h2>Diffie-Hellman Explained</h2>
+  {% include "video_player.html" %}
+
+  <!-- ── INTERACTIVE DIFFIE-HELLMAN SIMULATOR ── -->
+  <div class="dh-wrapper">
+    <h1>Diffie-Hellman Key Exchange</h1>
+    <p class="subtitle">Enter your own values and step through the protocol — see exactly what the hacker Eve can and cannot see.</p>
+
+    <!-- INPUT PANEL -->
+    <div class="input-panel">
+      <h2>Parameters</h2>
+      <div class="inputs-row">
+        <div class="inp-group">
+          <label>Prime modulus (p)</label>
+          <input type="number" id="inp-p" value="23" min="3">
+          <div class="inp-error" id="err-p">Must be a prime number</div>
         </div>
+        <div class="inp-group">
+          <label>Generator (g)</label>
+          <input type="number" id="inp-g" value="5" min="2">
+          <div class="inp-error" id="err-g">Must be 2 or more</div>
+        </div>
+        <div class="inp-group">
+          <label>Alice's private (x) <span class="tag tag-prv">secret</span></label>
+          <input type="number" id="inp-x" value="6" min="1" class="alice-inp">
+          <div class="inp-error" id="err-x">Must be 1 or more</div>
+        </div>
+        <div class="inp-group">
+          <label>Bob's private (y) <span class="tag tag-prv">secret</span></label>
+          <input type="number" id="inp-y" value="15" min="1" class="bob-inp">
+          <div class="inp-error" id="err-y">Must be 1 or more</div>
+        </div>
+        <button class="btn-start" onclick="initDH()">Apply &amp; Restart</button>
+      </div>
     </div>
 
-    <h2>Diffie-Hellman</h2>
-    {% include "video_player.html" %}
+    <!-- STEP INFO BANNER -->
+    <div class="step-info setup" id="step-banner">
+      <div class="step-counter" id="step-counter">Step 0 of 6</div>
+      <div class="step-title" id="step-title">The scene: a hacker is watching</div>
+      <div class="step-body" id="step-body">Alice wants to message Bob securely. <strong>Eve</strong> is a hacker who can record everything sent over the network — but she cannot stop or modify packets, only read them. Alice and Bob need to agree on a secret key without Eve learning it.</div>
+    </div>
 
-    <!-- ── INTERACTIVE MODULAR MATH SIMULATOR ── -->
-    <div id="dhSim">
-        <h2 style="font-size:24px; font-weight:600; color:#fff; margin-top:0; margin-bottom: 10px;">Interactive: The Mathematical Reality</h2>
-        <p style="color:#a6accd; font-size:15px; margin-bottom:30px; line-height: 1.6;">
-            Watch how computers use <strong>Modular Exponentiation</strong>. By wrapping numbers around a clock (the prime modulus <span style="font-family:monospace">p</span>), the results jump chaotically. <br><br>
-            <em>Note: The inputs below are pre-filled with the exact values from <strong>image_64aaad.png</strong>. Change them to test your own numbers!</em>
-        </p>
+    <!-- STAGE -->
+    <div class="stage">
 
-        <div class="ms-wrap">
-          <!-- INPUT CONTROLS -->
-          <div class="ms-ctrl-row">
-            <div class="ms-ctrl" title="The clock size. Must be a prime number.">
-              <label>Prime Modulus (p)</label>
-              <input type="number" id="val-p" value="7" min="3" max="47">
-            </div>
-            <div class="ms-ctrl" title="The base number.">
-              <label>Generator (g)</label>
-              <input type="number" id="val-g" value="5" min="2">
-            </div>
-            <div style="width: 1px; background: rgba(255,255,255,0.1); margin: 0 10px;"></div>
-            <div class="ms-ctrl" title="Alice's secret exponent">
-              <label style="color:#f43f5e">Alice Private (x)</label>
-              <input type="number" id="val-x" value="2" min="1">
-            </div>
-            <div class="ms-ctrl" title="Bob's secret exponent">
-              <label style="color:#3b82f6">Bob Private (y)</label>
-              <input type="number" id="val-y" value="3" min="1">
-            </div>
+      <!-- ALICE -->
+      <div class="actor">
+        <div class="actor-icon alice-icon">A</div>
+        <div class="actor-name" style="color:#185FA5">Alice</div>
+        <div class="kv">
+          <div class="kv-row"><span class="kv-label">p <span class="tag tag-pub">pub</span></span><span class="kv-val dash" id="a-p">—</span></div>
+          <div class="kv-row"><span class="kv-label">g <span class="tag tag-pub">pub</span></span><span class="kv-val dash" id="a-g">—</span></div>
+          <div class="divider"></div>
+          <div class="kv-row"><span class="kv-label">private x <span class="tag tag-prv">sec</span></span><span class="kv-val dash" id="a-x">—</span></div>
+          <div class="kv-row"><span class="kv-label">public A <span class="tag tag-pub">sent</span></span><span class="kv-val dash" id="a-A">—</span></div>
+          <div class="divider"></div>
+          <div class="kv-row"><span class="kv-label">shared key</span><span class="kv-val dash" id="a-key">—</span></div>
+        </div>
+      </div>
+
+      <!-- WIRE LEFT -->
+      <div class="wire">
+        <div class="wire-seg"></div>
+        <div class="wire-packets">
+          <div class="packet" id="pkt-A-left">
+            <span class="pill-arr">→</span>
+            <span class="pill pill-a" id="lbl-A-left">A=?</span>
           </div>
-
-          <div class="ms-body">
-            <!-- CANVAS CLOCK -->
-            <canvas id="ms-cv" width="340" height="340" style="border-radius:12px;flex-shrink:0; background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.05);"></canvas>
-            
-            <div class="ms-right">
-              
-              <!-- ACTOR DASHBOARD -->
-              <div class="dh-actor-cards">
-                <div class="actor-col alice">
-                  <div class="actor-name">👩 Alice</div>
-                  <div class="data-row"><span>Private (x):</span> <span class="data-val" id="out-x">?</span></div>
-                  <div class="data-row"><span>Public (A):</span> <span class="data-val" id="out-a">?</span></div>
-                  <div class="data-row" style="margin-top: 10px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 10px;">
-                    <span>Shared Key:</span> <span class="data-val" id="out-ka">?</span>
-                  </div>
-                </div>
-                
-                <div class="actor-col bob">
-                  <div class="actor-name">👨 Bob</div>
-                  <div class="data-row"><span>Private (y):</span> <span class="data-val" id="out-y">?</span></div>
-                  <div class="data-row"><span>Public (B):</span> <span class="data-val" id="out-b">?</span></div>
-                  <div class="data-row" style="margin-top: 10px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 10px;">
-                    <span>Shared Key:</span> <span class="data-val" id="out-kb">?</span>
-                  </div>
-                </div>
-              </div>
-
-              <!-- LIVE COMPUTATION TRACKER -->
-              <div class="ms-card" style="margin-top: auto;">
-                <div class="ms-card-lbl" id="act-title" style="color:#6366f1; font-size: 12px;">System Ready</div>
-                <div class="ms-formula">
-                  <span class="f-g" id="act-base">g</span><sup><span class="f-x" id="act-exp">power</span></sup>
-                  <span class="f-m"> mod </span><span class="f-p" id="act-mod">p</span>
-                  <span class="f-eq"> = </span><span id="act-res" class="f-r">result</span>
-                </div>
-                <div class="ms-hint" id="act-hint">Enter your parameters above and click <strong>Run Exchange</strong> to visualize the mathematics.</div>
-              </div>
-
-              <div class="ms-btns">
-                <button class="ms-btn ms-pri" id="btn-run" onclick="runDH()">▶ Run Exchange Sequence</button>
-                <button class="ms-btn ms-rst" id="btn-rst" onclick="resetUI()">Reset</button>
-              </div>
-            </div>
+          <div class="packet" id="pkt-B-left">
+            <span class="pill-arr">←</span>
+            <span class="pill pill-b" id="lbl-B-left">B=?</span>
           </div>
         </div>
+        <div class="wire-seg"></div>
+      </div>
+
+      <!-- EVE -->
+      <div class="actor">
+        <div class="actor-icon eve-icon">E</div>
+        <div class="actor-name" style="color:#D85A30">Eve <span style="font-size:11px;color:#D85A30;font-weight:400">(hacker)</span></div>
+        <div class="kv">
+          <div class="kv-row"><span class="kv-label">sees p</span><span class="kv-val dash" id="e-p">—</span></div>
+          <div class="kv-row"><span class="kv-label">sees g</span><span class="kv-val dash" id="e-g">—</span></div>
+          <div class="kv-row"><span class="kv-label">intercepts A</span><span class="kv-val dash" id="e-A">—</span></div>
+          <div class="kv-row"><span class="kv-label">intercepts B</span><span class="kv-val dash" id="e-B">—</span></div>
+          <div class="divider"></div>
+          <br>
+          <div class="kv-row"><span class="kv-label">shared key?</span><span class="kv-val unknown" id="e-key">cannot compute</span></div>
+        </div>
+      </div>
+
+      <!-- WIRE RIGHT -->
+      <div class="wire">
+        <div class="wire-seg"></div>
+        <div class="wire-packets">
+          <div class="packet" id="pkt-B-right">
+            <span class="pill-arr">←</span>
+            <span class="pill pill-b" id="lbl-B-right">B=?</span>
+          </div>
+          <div class="packet" id="pkt-A-right">
+            <span class="pill-arr">→</span>
+            <span class="pill pill-a" id="lbl-A-right">A=?</span>
+          </div>
+        </div>
+        <div class="wire-seg"></div>
+      </div>
+
+      <!-- BOB -->
+      <div class="actor">
+        <div class="actor-icon bob-icon">B</div>
+        <div class="actor-name" style="color:#3B6D11">Bob</div>
+        <div class="kv">
+          <div class="kv-row"><span class="kv-label">p <span class="tag tag-pub">pub</span></span><span class="kv-val dash" id="b-p">—</span></div>
+          <div class="kv-row"><span class="kv-label">g <span class="tag tag-pub">pub</span></span><span class="kv-val dash" id="b-g">—</span></div>
+          <div class="divider"></div>
+          <div class="kv-row"><span class="kv-label">private y <span class="tag tag-prv">sec</span></span><span class="kv-val dash" id="b-y">—</span></div>
+          <div class="kv-row"><span class="kv-label">public B <span class="tag tag-pub">sent</span></span><span class="kv-val dash" id="b-B">—</span></div>
+          <div class="divider"></div>
+          <div class="kv-row"><span class="kv-label">shared key</span><span class="kv-val dash" id="b-key">—</span></div>
+        </div>
+      </div>
+
+    </div><!-- /stage -->
+
+    <!-- CONCLUSION -->
+    <div class="conclusion" id="conclusion">
+      <div class="conc-title" id="conc-title">Both arrived at the same key — without ever sending it.</div>
+      <div class="conc-body" id="conc-body"></div>
     </div>
+
+    <!-- CONTROLS -->
+    <div class="controls">
+      <button class="btn-next" id="btn-next" onclick="advance()">Next step →</button>
+      <button class="btn-reset" onclick="softReset()">Start over</button>
+      <div class="progress" id="progress"></div>
+    </div>
+
+  </div>
 </div>
 
 <script>
-(function(){
-  const cv=document.getElementById('ms-cv'), ctx=cv.getContext('2d');
-  const W=340, H=340, CX=170, CY=170, R=120;
-  let anim=null, isRunning=false;
-  
-  // Variables
-  let p, g, x, y, A, B, Ka, Kb;
-  let hist = [];
+  function isPrime(n){if(n<2)return false;for(let i=2;i<=Math.sqrt(n);i++)if(n%i===0)return false;return true;}
+  function mpow(b,e,m){let r=1n;b=BigInt(b);e=BigInt(e);m=BigInt(m);b=b%m;while(e>0n){if(e%2n===1n)r=r*b%m;e=e/2n;b=b*b%m;}return Number(r);}
 
-  function ang(n){ return (n/p)*2*Math.PI - Math.PI/2; }
-  function pt(n, r){ const a=ang(n), rad=r??R; return [CX+rad*Math.cos(a), CY+rad*Math.sin(a)]; }
-  function mpow(b, e, m){ let res=1; for(let i=0; i<e; i++) res=(res*b)%m; return res; }
-  function ez(t){ return t<.5 ? 4*t*t*t : 1-Math.pow(-2*t+2, 3)/2; }
+  let p,g,x,y,A,B,Ka,Kb,cur=0,steps=[];
 
-  // Draw the clock
-  function draw(dotX, dotY, t) {
-    ctx.clearRect(0,0,W,H);
-
-    // Rings
-    ctx.beginPath(); ctx.arc(CX,CY,R+25,0,2*Math.PI); ctx.strokeStyle='rgba(99,102,241,0.05)'; ctx.lineWidth=1; ctx.stroke();
-    ctx.beginPath(); ctx.arc(CX,CY,R,0,2*Math.PI); ctx.strokeStyle='rgba(255,255,255,0.05)'; ctx.lineWidth=1; ctx.stroke();
-
-    const visited = new Set(hist.map(h=>h.r));
-
-    // Numbers & Ticks
-    for(let n=0; n<p; n++){
-      const a = ang(n);
-      const [lx, ly] = pt(n, R+22);
-      
-      // Tick marks
-      ctx.beginPath(); ctx.moveTo(CX+(R+4)*Math.cos(a), CY+(R+4)*Math.sin(a)); ctx.lineTo(CX+R*Math.cos(a), CY+R*Math.sin(a));
-      ctx.strokeStyle='rgba(255,255,255,0.1)'; ctx.lineWidth=1; ctx.stroke();
-
-      // Highlight visited nodes
-      if(visited.has(n)){
-        ctx.beginPath(); ctx.arc(...pt(n, R-10), 11, 0, 2*Math.PI); ctx.fillStyle='rgba(99,102,241,0.15)'; ctx.fill();
+  function buildSteps(){
+    return [
+      {
+        color:'setup',n:'Step 0 of 6',
+        title:'The scene: a hacker is watching',
+        body:'Alice wants to message Bob securely. <strong>Eve</strong> is a hacker who can record everything sent over the network — but she cannot stop or modify packets, only read them. Alice and Bob need to agree on a secret key without Eve learning it.',
+        apply:()=>{}
+      },
+      {
+        color:'setup',n:'Step 1 of 6',
+        title:'Alice and Bob agree on two public numbers',
+        body:`They publicly agree on a <strong>prime modulus p = ${p}</strong> (the "clock size" — numbers wrap back around when they exceed p) and a <strong>generator g = ${g}</strong> (the base for calculations). These are not secret — Eve can see them too.`,
+        apply:()=>{
+          setDH('a-p',p,'pub-val');setDH('a-g',g,'pub-val');
+          setDH('b-p',p,'pub-val');setDH('b-g',g,'pub-val');
+          setDH('e-p',p,'pub-val');setDH('e-g',g,'pub-val');
+        }
+      },
+      {
+        color:'alice',n:'Step 2 of 6',
+        title:"Alice picks a private number and computes her public key",
+        body:`Alice secretly picks <strong>x = ${x}</strong> — she never shares this with anyone. She then computes her public key: <code>A = g<sup>x</sup> mod p = ${g}<sup>${x}</sup> mod ${p} = ${A}</code>. The mod (clock) operation scrambles the result, making it impossible for Eve to work backwards and find x.`,
+        apply:()=>{
+          setDH('a-x',x,'secret');
+          setDH('a-A',A,'pub-val');
+        }
+      },
+      {
+        color:'bob',n:'Step 3 of 6',
+        title:"Bob does the same — his own private number",
+        body:`Bob secretly picks <strong>y = ${y}</strong>. He computes his public key: <code>B = g<sup>y</sup> mod p = ${g}<sup>${y}</sup> mod ${p} = ${B}</code>. Same process as Alice, different private number.`,
+        apply:()=>{
+          setDH('b-y',y,'secret');
+          setDH('b-B',B,'pub-val');
+        }
+      },
+      {
+        color:'eve',n:'Step 4 of 6',
+        title:"They exchange public keys — Eve intercepts both",
+        body:`Alice sends <strong>A = ${A}</strong> to Bob. Bob sends <strong>B = ${B}</strong> to Alice. Eve intercepts both values! She now has p, g, A, and B. But she still cannot find x or y — reversing modular exponentiation (the <em>discrete logarithm problem</em>) is computationally infeasible for large numbers.`,
+        apply:()=>{
+          show('pkt-A-left');show('pkt-A-right');
+          show('pkt-B-left');show('pkt-B-right');
+          setDH('e-A',A,'pub-val');setDH('e-B',B,'pub-val');
+        }
+      },
+      {
+        color:'done',n:'Step 5 of 6',
+        title:"Both independently compute the exact same shared secret",
+        body:`<strong>Alice</strong> uses Bob's public key B with her private x: <code>B<sup>x</sup> mod p = ${B}<sup>${x}</sup> mod ${p} = ${Ka}</code><br><br><strong>Bob</strong> uses Alice's public key A with his private y: <code>A<sup>y</sup> mod p = ${A}<sup>${y}</sup> mod ${p} = ${Kb}</code><br><br>They both get <strong>${Ka}</strong>. This works because of the mathematics of modular exponentiation.`,
+        apply:()=>{
+          setDH('a-key',Ka,'shared');
+          setDH('b-key',Kb,'shared');
+        }
+      },
+      {
+        color:'done',n:'Step 6 of 6',
+        title:"Shared key established — Eve is locked out",
+        body:`Alice and Bob share the secret <strong>${Ka}</strong> without it ever crossing the wire. Eve has p=${p}, g=${g}, A=${A}, B=${B} — every number that was transmitted — and still cannot derive the key. This shared number now becomes the password for AES to encrypt their actual messages.`,
+        apply:()=>{
+          document.getElementById('conclusion').classList.add('visible');
+          document.getElementById('conc-body').innerHTML=`Eve recorded every public value: <strong>p=${p}, g=${g}, A=${A}, B=${B}</strong>. But the shared key <strong>${Ka}</strong> was never transmitted — it was independently computed by both sides using their own private numbers. That is the entire trick. This key is then handed to AES to encrypt the real message.`;
+          document.getElementById('btn-next').disabled=true;
+        }
       }
-
-      // Draw number
-      const isCur = hist.length>0 && hist[hist.length-1].r === n;
-      ctx.font = `${isCur?'700':'400'} ${isCur?'13':'11'}px 'JetBrains Mono', monospace`;
-      ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-      ctx.fillStyle = isCur ? '#9b9ff7' : visited.has(n) ? 'rgba(124,127,239,0.8)' : 'rgba(166,172,205,0.4)';
-      ctx.fillText(n, lx, ly);
-    }
-
-    // Draw the jump trail
-    for(let i=0; i<hist.length; i++){
-      const from = i===0 ? 1 : hist[i-1].r;
-      const to = hist[i].r;
-      const isLast = i===hist.length-1;
-      const alpha = isLast && t!==null ? null : (0.1 + 0.6*((i+1)/hist.length));
-      const [fx, fy] = pt(from, R-10);
-      const [tx2, ty2] = pt(to, R-10);
-
-      if(!isLast || t===null){
-        ctx.beginPath(); ctx.moveTo(fx,fy); ctx.lineTo(tx2,ty2);
-        ctx.strokeStyle = `rgba(99,102,241,${isLast ? 0.9 : alpha})`;
-        ctx.lineWidth = isLast ? 2.5 : 1.5; ctx.stroke();
-        if(isLast) drawDot(tx2, ty2, '#6366f1', 8, true);
-      }
-    }
-
-    // Draw active animating line
-    if(dotX !== null){
-      const [fx, fy] = pt(hist.length>=2 ? hist[hist.length-2].r : 1, R-10);
-      ctx.beginPath(); ctx.moveTo(fx,fy); ctx.lineTo(dotX,dotY);
-      ctx.strokeStyle = 'rgba(99,102,241,0.9)'; ctx.lineWidth = 2.5; ctx.stroke();
-      drawDot(dotX, dotY, '#6366f1', 8, true);
-    }
-
-    // Draw start node marker (always starts at 1)
-    if(!hist.length && p > 1){
-      const [sx, sy] = pt(1, R-10);
-      ctx.beginPath(); ctx.arc(sx,sy,7,0,2*Math.PI);
-      ctx.strokeStyle='#6366f1'; ctx.lineWidth=2; ctx.stroke();
-      ctx.fillStyle='rgba(99,102,241,0.2)'; ctx.fill();
-    }
-
-    // Center Label
-    ctx.textAlign='center'; ctx.textBaseline='middle';
-    ctx.font='400 11px Inter,sans-serif'; ctx.fillStyle='rgba(166,172,205,0.3)';
-    ctx.fillText('clock modulus', CX, CY-14);
-    ctx.font='700 26px Inter,sans-serif'; ctx.fillStyle='rgba(99,102,241,0.6)';
-    ctx.fillText(`p = ${p||'?' }`, CX, CY+12);
+    ];
   }
 
-  function drawDot(x, y, col, r, glow){
-    if(glow){ ctx.beginPath(); ctx.arc(x,y,r+6,0,2*Math.PI); ctx.fillStyle='rgba(99,102,241,0.2)'; ctx.fill(); }
-    ctx.beginPath(); ctx.arc(x,y,r,0,2*Math.PI); ctx.fillStyle=col; ctx.fill();
-    ctx.beginPath(); ctx.arc(x,y,r-3,0,2*Math.PI); ctx.fillStyle='rgba(255,255,255,0.9)'; ctx.fill();
+  function setDH(id,val,cls){
+    const el=document.getElementById(id);
+    if(!el)return;
+    el.textContent=val;
+    el.className='kv-val'+(cls?' '+cls:'');
   }
+  function show(id){const el=document.getElementById(id);if(el)el.classList.add('visible');}
+  function hide(id){const el=document.getElementById(id);if(el)el.classList.remove('visible');}
 
-  // Promise-based jump animation
-  function animateJump(from, to) {
-    return new Promise(resolve => {
-      anim = { from, to, t0: null };
-      function loop(ts) {
-        if (!anim) { resolve(); return; }
-        if (!anim.t0) anim.t0 = ts;
-        // Animation speed fixed to a comfortable tracing speed
-        const t = Math.min((ts - anim.t0) / 600, 1); 
-        const et = ez(t);
-        const [fx, fy] = pt(anim.from, R-10);
-        const [tx, ty] = pt(anim.to, R-10);
-        draw(fx + (tx - fx) * et, fy + (ty - fy) * et, et);
-        
-        if (t < 1) requestAnimationFrame(loop);
-        else { anim = null; draw(null, null, null); resolve(); }
-      }
-      requestAnimationFrame(loop);
-    });
-  }
-
-  // Run a single calculation phase visually
-  async function runPhase(title, base, maxExp, mod, outElemId, isFinal) {
-    document.getElementById('act-title').innerHTML = title;
-    document.getElementById('act-base').innerText = base;
-    document.getElementById('act-mod').innerText = mod;
-    document.getElementById('act-res').innerText = '?';
-    document.getElementById('act-exp').innerText = '1';
-    
-    // Remove highlight classes
-    document.querySelectorAll('.data-val').forEach(el => el.classList.remove('highlight'));
-
-    hist = [];
-    draw(null, null, null); 
-    await new Promise(res => setTimeout(res, 400)); 
-
-    for (let e = 1; e <= maxExp; e++) {
-      const r = mpow(base, e, mod);
-      const prev = hist.length ? hist[hist.length - 1].r : 1; 
-      
-      document.getElementById('act-exp').innerText = e;
-      document.getElementById('act-res').innerText = r;
-      document.getElementById('act-hint').innerHTML = `Step ${e}: Multiply previous result by base (${base}) and wrap around the clock.`;
-
-      hist.push({e, r});
-      await animateJump(prev, r);
-      await new Promise(res => setTimeout(res, 200)); 
+  function buildProgress(){
+    const pr=document.getElementById('progress');
+    pr.innerHTML='';
+    for(let i=0;i<steps.length;i++){
+      const d=document.createElement('div');
+      d.className='dot'+(i<cur?' done-dot':i===cur?' active-dot':'');
+      pr.appendChild(d);
     }
-
-    const finalRes = hist[hist.length-1].r;
-    const targetEl = document.getElementById(outElemId);
-    targetEl.innerText = finalRes;
-    
-    if(isFinal) {
-        targetEl.classList.add('highlight');
-    } else {
-        targetEl.style.color = '#fff';
-    }
-
-    await new Promise(res => setTimeout(res, 1200)); 
   }
 
-  // Main Controller
-  window.runDH = async function() {
-    if(isRunning) return;
-    
-    // Gather and validate inputs
-    p = parseInt(document.getElementById('val-p').value);
-    g = parseInt(document.getElementById('val-g').value);
-    x = parseInt(document.getElementById('val-x').value);
-    y = parseInt(document.getElementById('val-y').value);
+  function applyStep(s){
+    document.getElementById('step-banner').className='step-info '+s.color;
+    document.getElementById('step-counter').textContent=s.n;
+    document.getElementById('step-title').textContent=s.title;
+    document.getElementById('step-body').innerHTML=s.body;
+    s.apply();
+    buildProgress();
+  }
 
-    if(isNaN(p) || p < 3) { alert("P must be a prime number > 2."); return; }
-    if(p > 97) { alert("Please keep P under 100 so the clock is readable."); return; }
-    
-    isRunning = true;
-    document.getElementById('btn-run').disabled = true;
-    document.querySelectorAll('input').forEach(i => i.disabled = true);
+  function advance(){
+    if(cur>=steps.length-1)return;
+    cur++;
+    applyStep(steps[cur]);
+  }
 
-    // Initial setup
-    document.getElementById('out-x').innerText = x;
-    document.getElementById('out-y').innerText = y;
-    document.getElementById('out-a').innerText = '?';
-    document.getElementById('out-b').innerText = '?';
-    document.getElementById('out-ka').innerText = '?';
-    document.getElementById('out-kb').innerText = '?';
-    document.getElementById('out-ka').classList.remove('highlight');
-    document.getElementById('out-kb').classList.remove('highlight');
+  function softReset(){
+    cur=0;
+    ['a-p','a-g','a-x','a-A','a-key','b-p','b-g','b-y','b-B','b-key','e-p','e-g','e-A','e-B'].forEach(id=>setDH(id,'—','dash'));
+    setDH('e-key','cannot compute','unknown');
+    ['pkt-A-left','pkt-A-right','pkt-B-left','pkt-B-right'].forEach(hide);
+    document.getElementById('conclusion').classList.remove('visible');
+    document.getElementById('btn-next').disabled=false;
+    applyStep(steps[0]);
+  }
 
-    // Mathematical Pre-compute
-    A = mpow(g, x, p);
-    B = mpow(g, y, p);
+  function showError(id,msg,shouldShow){
+    const el=document.getElementById(id);
+    el.textContent=msg;
+    el.style.display=shouldShow?'block':'none';
+  }
 
-    // Sequence Execution
-    document.getElementById('act-hint').innerText = "Starting Alice's Public Key calculation...";
-    
-    // Phase 1: Alice A
-    await runPhase("<span style='color:#f43f5e'>Phase 1: Generating Alice's Public Key (A)</span>", g, x, p, 'out-a', false);
-    
-    // Phase 2: Bob B
-    await runPhase("<span style='color:#3b82f6'>Phase 2: Generating Bob's Public Key (B)</span>", g, y, p, 'out-b', false);
+  function initDH(){
+    const pv=parseInt(document.getElementById('inp-p').value);
+    const gv=parseInt(document.getElementById('inp-g').value);
+    const xv=parseInt(document.getElementById('inp-x').value);
+    const yv=parseInt(document.getElementById('inp-y').value);
 
-    // Phase 3: Alice Shared
-    document.getElementById('act-hint').innerHTML = `<strong>Exchange!</strong> Alice receives Bob's Public Key (${B}) and uses it as her new base.`;
-    await new Promise(res => setTimeout(res, 1500));
-    await runPhase("<span style='color:#f43f5e'>Phase 3: Alice Calculates Shared Secret</span>", B, x, p, 'out-ka', true);
+    let ok=true;
+    if(!isPrime(pv)||pv<3){showError('err-p','Must be a prime number (e.g. 7, 11, 23, 47)',true);ok=false;}
+    else showError('err-p','',false);
+    if(isNaN(gv)||gv<2){showError('err-g','Must be 2 or more',true);ok=false;}
+    else showError('err-g','',false);
+    if(isNaN(xv)||xv<1){showError('err-x','Must be 1 or more',true);ok=false;}
+    else showError('err-x','',false);
+    if(isNaN(yv)||yv<1){showError('err-y','Must be 1 or more',true);ok=false;}
+    else showError('err-y','',false);
+    if(!ok)return;
 
-    // Phase 4: Bob Shared
-    document.getElementById('act-hint').innerHTML = `<strong>Exchange!</strong> Bob receives Alice's Public Key (${A}) and uses it as his new base.`;
-    await new Promise(res => setTimeout(res, 1500));
-    await runPhase("<span style='color:#3b82f6'>Phase 4: Bob Calculates Shared Secret</span>", A, y, p, 'out-kb', true);
+    p=pv; g=gv; x=xv; y=yv;
+    A=mpow(g,x,p);
+    B=mpow(g,y,p);
+    Ka=mpow(B,x,p);
+    Kb=mpow(A,y,p);
 
-    // Done
-    document.getElementById('act-title').innerHTML = "<span style='color:#10b981; font-size: 16px;'>SUCCESS: Keys Match!</span>";
-    document.getElementById('act-hint').innerHTML = "Both parties arrived at the exact same number. They now share a secure AES key!";
-    
-    document.getElementById('btn-run').disabled = false;
-    document.getElementById('btn-run').innerText = "▶ Re-run Exchange";
-    document.querySelectorAll('input').forEach(i => i.disabled = false);
-    isRunning = false;
-  };
+    // Update pill labels
+    document.getElementById('lbl-A-left').textContent=`A=${A}`;
+    document.getElementById('lbl-A-right').textContent=`A=${A}`;
+    document.getElementById('lbl-B-left').textContent=`B=${B}`;
+    document.getElementById('lbl-B-right').textContent=`B=${B}`;
 
-  window.resetUI = function() {
-    if(isRunning) return;
-    p = parseInt(document.getElementById('val-p').value) || 7;
-    hist = [];
-    draw(null, null, null);
+    steps=buildSteps();
+    cur=0;
+    ['a-p','a-g','a-x','a-A','a-key','b-p','b-g','b-y','b-B','b-key','e-p','e-g','e-A','e-B'].forEach(id=>setDH(id,'—','dash'));
+    setDH('e-key','cannot compute','unknown');
+    ['pkt-A-left','pkt-A-right','pkt-B-left','pkt-B-right'].forEach(hide);
+    document.getElementById('conclusion').classList.remove('visible');
+    document.getElementById('btn-next').disabled=false;
+    applyStep(steps[0]);
+  }
 
-    document.getElementById('out-x').innerText = '?';
-    document.getElementById('out-y').innerText = '?';
-    document.getElementById('out-a').innerText = '?';
-    document.getElementById('out-b').innerText = '?';
-    document.getElementById('out-ka').innerText = '?';
-    document.getElementById('out-kb').innerText = '?';
-    
-    document.getElementById('out-ka').classList.remove('highlight');
-    document.getElementById('out-kb').classList.remove('highlight');
-
-    document.getElementById('act-title').innerText = "System Ready";
-    document.getElementById('act-base').innerText = 'g';
-    document.getElementById('act-mod').innerText = 'p';
-    document.getElementById('act-exp').innerText = 'power';
-    document.getElementById('act-res').innerText = 'result';
-    document.getElementById('act-hint').innerHTML = 'Enter your parameters above and click <strong>Run Exchange</strong> to visualize the mathematics.';
-    
-    document.getElementById('btn-run').innerText = "▶ Run Exchange Sequence";
-  };
-
-  // Init blank canvas based on default p input
-  setTimeout(() => {
-      p = parseInt(document.getElementById('val-p').value) || 7;
-      draw(null, null, null);
-  }, 100);
-
-})();
+  // Boot
+  initDH();
 </script>
 {% endblock %}
