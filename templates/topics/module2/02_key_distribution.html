@@ -181,10 +181,10 @@
                 <div class="pill-header pill-blue">ALICE (SENDER)</div>
                 
                 <div style="font-size: 10px; color: #8b92b2; margin-bottom: 4px;">Plaintext Message</div>
-                <input type="text" id="inMsg" class="data-pill" value="CREDIT CARD DATA">
+                <input type="text" id="inMsg" class="data-pill" value="Enter a message">
                 
                 <div style="font-size: 10px; color: #8b92b2; margin-bottom: 4px;">Secret Key</div>
-                <input type="text" id="inKey" class="data-pill" value="9944">
+                <div id="generatedKey" class="data-pill">AUTO-GENERATED</div>
 
                 <div id="aliceProcess" style="display: flex; flex-direction: column; align-items: center; width: 100%; margin-top: 20px; opacity: 0; transition: opacity 0.5s;">
                     <div style="font-size: 10px; color: #60a5fa; margin-bottom: 8px;">Encrypting Message...</div>
@@ -309,20 +309,30 @@
         document.getElementById('sysLog').innerHTML = '';
         
         document.getElementById('inMsg').disabled = false;
-        document.getElementById('inKey').disabled = false;
         document.getElementById('btnRunSym').style.display = 'block';
         document.getElementById('btnReset').style.display = 'none';
+    }
+
+    function generateKey(length = 4) {
+        const chars = "0123456789ABCDEF";
+        let key = "";
+
+        for (let i = 0; i < length; i++) {
+            key += chars[Math.floor(Math.random() * chars.length)];
+        }
+
+        return key;
     }
 
     async function runSequence() {
         const btn = document.getElementById('btnRunSym');
         let msg = document.getElementById('inMsg').value || "CREDIT CARD";
-        let symKey = document.getElementById('inKey').value || "9944";
+        let symKey = generateKey();
+        document.getElementById('generatedKey').innerHTML = `🔑 ${symKey}`;
         const cipherText = generateCipher(msg);
         
         btn.style.display = 'none';
         document.getElementById('inMsg').disabled = true;
-        document.getElementById('inKey').disabled = true;
         
         addLog("SYSTEM: Transmission sequence initiated.", "info");
 

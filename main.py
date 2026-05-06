@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for, flash
+from flask import Flask, render_template, request, redirect, url_for, flash, session
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user, login_required
 from werkzeug.security import check_password_hash
 from werkzeug.security import generate_password_hash    
@@ -10,6 +10,7 @@ from dotenv import load_dotenv
 import random
 from collections import defaultdict
 from datetime import datetime
+from flask_mail import Mail, Message
 
 app = Flask(__name__)
 # IMPORTANT: In a real app, this should be a random string hidden in a .env file
@@ -20,6 +21,14 @@ load_dotenv()
 #MONGO
 client = MongoClient(os.getenv("MONGO_URI"))
 db = client['fatvdb']
+
+app.config['MAIL_SERVER'] = 'smtp.gmail.com'
+app.config['MAIL_PORT'] = 587
+app.config['MAIL_USE_TLS'] = True
+app.config['MAIL_USERNAME'] = os.getenv('MAIL_USERNAME')
+app.config['MAIL_PASSWORD'] = os.getenv('MAIL_PASSWORD')
+
+mail = Mail(app)
 
 # --- Setup Flask-Login ---
 login_manager = LoginManager()
@@ -42,23 +51,41 @@ def load_user(user_id):
         return User(id=user_data['_id'], username=user_data['username'], role=user_data['role'])
     return None
 
-"""
-@app.route('/create_admin')
-def create_admin():
-    admin_user = {
-        "username": "admin",
-        "email": "admin@example.com",
-        "password_hash": generate_password_hash("admin"),
-        "role": "admin"
-    }
+#----------OTP---------------------------------------------
 
-    result = db.users.insert_one(admin_user)
-    print(result.inserted_id)
+@app.route('/verifyOTP', methods=['GET', 'POST'])
+def verifyOTP():
+    if request.method == 'POST':
 
-    return "Admin created"
-"""
+        entered_otp = request.form.get('otp')
 
-#----------LOGIN----------------------------------------------
+        print("Entered:", entered_otp)
+        print("Stored:", session.get('otp'))
+
+        if entered_otp == session.get('otp'):
+
+            pending = session.get('pending_user')
+
+            db.users.insert_one({
+                "username": pending["username"],
+                "email": pending["email"],
+                "password_hash": generate_password_hash(pending["password"]),
+                "role": "student",
+                "quiz_scores": defaultdict(int),
+                "total_score": 0,
+                "professor_id": ObjectId(pending["professor_id"])
+            })
+
+            session.pop('otp', None)
+            session.pop('pending_user', None)
+
+            flash('Account created successfully!')
+            return redirect(url_for('login'))
+
+        else:
+            flash('Invalid OTP')
+
+    return render_template('auth/verifyOTP.html')
 # ---------- LOGIN ----------------------------------------------
 @app.route('/register', methods=['GET', 'POST'])
 def register():
@@ -81,19 +108,28 @@ def register():
             flash('Username or Email already exists.')
             return redirect(url_for('register'))
 
-        new_student = {
+        otp = str(random.randint(100000, 999999))
+
+        session['otp'] = otp
+
+        session['pending_user'] = {
             "username": username,
             "email": email,
-            "password_hash": generate_password_hash(password),
-            "role": "student",
-            "quiz_scores": defaultdict(int),
-            "total_score": 0,
-            "professor_id": ObjectId(professor_id) 
+            "password": password,
+            "professor_id": professor_id
         }
 
-        db.users.insert_one(new_student)
-        flash('Account created successfully!')
-        return redirect(url_for('login'))
+        msg = Message(
+            'Your OTP Code',
+            sender=app.config['MAIL_USERNAME'],
+            recipients=[email]
+        )
+
+        msg.body = f'Your OTP is: {otp}'
+
+        mail.send(msg)
+
+        return redirect(url_for('verifyOTP'))
 
     admins = list(db.users.find({"role": "admin"}))
     return render_template('auth/register.html', admins=admins)

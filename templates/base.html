@@ -5,70 +5,19 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cryptography Visualizer</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/sidebar.css') }}">
 </head>
 <body>
 
-    <nav class="navbar">
-        <div class="nav-brand">
-            {% if current_user.is_authenticated %}
-                <a href="{{ url_for('home') }}"><strong>Cryptography</strong> Visualizer</a>
-            {% else %}
-                <a href="#"><strong>Cryptography</strong> Visualizer</a>
-            {% endif %}
-        </div>
-        <div class="nav-actions">
-            {% if current_user.is_authenticated %}
-                <span style="margin-right: 15px; color: #555; font-weight: 500;">Hi, {{ current_user.username }}!</span>
-                <a href="{{ url_for('logout') }}" class="btn-login">Logout</a> 
-            {% else %}
-                <a href="{{ url_for('login') }}" class="btn-login">Admin Login</a> 
-            {% endif %}
-        </div>
-    </nav>
+    {% include 'partials/navbar.html' %}
 
     <div class="page-wrapper">
         
         {% if show_sidebar %}
-        <aside class="sidebar">
-            <h3 class="sidebar-title">Curriculum</h3>
-
-            <!-- Pre-Test at the Top -->
-            {% if pre_test_exists %}
-            <a href="{{ url_for('take_test', test_type='pre') }}" class="sidebar-link assessment-link">
-                <span class="assessment-badge">Assessment</span>
-                Pre-Test
-            </a>
-            {% endif %}
-
-            <!-- Module 1 -->
-            <button class="dropdown-btn">Module 1:Encryption/Decryption 
-                <span class="arrow">▼</span>
-            </button>
-            <div class="dropdown-container">
-                <a href="{{ url_for('module_intro', module_num=1) }}" style="font-weight: bold; color: #6366f1;">Introduction</a>
-                <a href="{{ url_for('view_lesson', module_num=1, lesson_num=1) }}">Plaintext vs Ciphertext</a>
-                <a href="{{ url_for('view_lesson', module_num=1, lesson_num=2) }}">Classical Cryptography</a>
-            </div>
-
-            <!-- Module 2 -->
-            <button class="dropdown-btn">Module 2: Symmetric Encryption 
-                <span class="arrow">▼</span>
-            </button>
-            <div class="dropdown-container">
-                <a href="{{ url_for('module_intro', module_num=2) }}" style="font-weight: bold; color: #6366f1;">Introduction</a>
-                <a href="{{ url_for('view_lesson', module_num=2, lesson_num=1) }}">Shared Key Concept</a>
-                <a href="{{ url_for('view_lesson', module_num=2, lesson_num=2) }}">Key Distribution Problem</a>
-                <a href="{{ url_for('view_lesson', module_num=2, lesson_num=3) }}">Diffie-Hellman Exchange</a>
-            </div>
-
-            <!-- Post-Test at the Bottom -->
-            {% if post_test_exists %}
-            <a href="{{ url_for('take_test', test_type='post') }}" class="sidebar-link assessment-link">
-                <span class="assessment-badge">Assessment</span>
-                Post-Test
-            </a>
-            {% endif %}
-        </aside>
+            {% include 'partials/sidebar.html' %}
         {% endif %}
 
         <main class="content-area">

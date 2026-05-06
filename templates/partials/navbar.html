@@ -1,0 +1,25 @@
+<nav class="navbar">
+    <div class="nav-brand">
+        {% if current_user.is_authenticated %}
+            <a href="{{ url_for('home') }}">
+                <strong>Cryptography</strong> Visualizer
+            </a>
+        {% else %}
+            <a href="#">
+                <strong>Cryptography</strong> Visualizer
+            </a>
+        {% endif %}
+    </div>
+
+    <div class="nav-actions">
+        {% if current_user.is_authenticated %}
+            <span style="margin-right: 15px; color: #555; font-weight: 500;">
+                Hi, {{ current_user.username }}!
+            </span>
+
+            <a href="{{ url_for('logout') }}" class="btn-login">
+                Logout
+            </a>
+        {% endif %}
+    </div>
+</nav>

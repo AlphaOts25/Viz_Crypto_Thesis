@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="auth-container">
+
+    <div class="auth-card">
+
+        <h2>OTP Verification</h2>
+
+        <form method="POST">
+
+            <div class="form-group">
+                <label>Enter OTP</label>
+
+                <input 
+                    type="text"
+                    name="otp"
+                    required
+                >
+            </div>
+
+            <button type="submit" class="btn-primary">
+                Verify OTP
+            </button>
+
+        </form>
+
+    </div>
+
+</div>
+
+{% endblock %}

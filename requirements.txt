@@ -4,3 +4,4 @@ Flask-Login==0.6.3
 pymongo==4.17.0
 python-dotenv==1.2.2
 gunicorn
+flask-mail==0.10.0
