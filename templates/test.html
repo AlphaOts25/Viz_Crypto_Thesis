@@ -255,6 +255,8 @@
             </div>
 
             {% for question in questions %}
+            {% set q_index = loop.index0 %}
+
             <div class="question-block">
                 <span class="question-number">Question {{ loop.index }} of {{ questions|length }}</span>
                 <p class="question-text">{{ question.question_text }}</p>
@@ -264,12 +266,12 @@
                     <div class="choice">
                         <input 
                             type="radio" 
-                            id="q{{ loop.index0 }}_{{ choice_key }}" 
-                            name="question_{{ loop.index0 }}" 
+                            id="q{{ q_index }}_{{ choice_key }}" 
+                            name="question_{{ q_index }}" 
                             value="{{ choice_key }}"
-                            data-question="{{ loop.index0 }}"
+                            data-question="{{ q_index }}"
                         >
-                        <label for="q{{ loop.index0 }}_{{ choice_key }}">{{ choice_value }}</label>
+                        <label for="q{{ q_index }}_{{ choice_key }}">{{ choice_value }}</label>
                     </div>
                     {% endfor %}
                 </div>

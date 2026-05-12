@@ -253,7 +253,36 @@ def delete_lesson(lesson_code):
 
     return redirect(url_for('admin_dashboard'))
 
+@app.route('/admin/users')
+@login_required
+def admin_users():
+    if current_user.role != 'admin':
+        return redirect(url_for('home'))
 
+    students = list(db.users.find({"role": "student"}))
+
+    for student in students:
+        pre_result = db.results.find_one(
+            {"user_id": student["_id"], "test_type": "pre"},
+            sort=[("timestamp", -1)]
+        )
+
+        post_result = db.results.find_one(
+            {"user_id": student["_id"], "test_type": "post"},
+            sort=[("timestamp", -1)]
+        )
+
+        student["pre_score"] = pre_result["score"] if pre_result else "Not taken"
+        student["pre_total"] = pre_result["total"] if pre_result else ""
+
+        student["post_score"] = post_result["score"] if post_result else "Not taken"
+        student["post_total"] = post_result["total"] if post_result else ""
+
+    return render_template(
+        "admin/users.html",
+        students=students,
+        show_sidebar=False
+    )
 # ------------------------------ TESTS ------------------------------
 
 def create_test(test_type):
@@ -354,21 +383,6 @@ def get_test(test_type):
 
     questions = list(db.questions.find({"test_id": test["_id"]}))
     random.shuffle(questions)
-
-    for q in questions:
-        items = list(q["choices"].items())
-        random.shuffle(items)
-
-        new_choices = {}
-        correct = q["correct_answer"]
-
-        for i, (k, v) in enumerate(items):
-            new_key = ["a","b","c","d"][i]
-            new_choices[new_key] = v
-            if k == correct:
-                q["correct_answer"] = new_key
-
-        q["choices"] = new_choices
 
     return questions
 

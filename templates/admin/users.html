@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="main-container">
+
+    <a href="{{ url_for('admin_dashboard') }}"
+        style="display:inline-block; background:#f3f4f6; color:#374151; padding:10px 16px; border-radius:6px; font-weight:bold; text-decoration:none; margin-bottom:20px;">
+        ← Back to Dashboard
+    </a>
+
+    <h1 style="margin-bottom: 5px;">User Scores</h1>
+    <p style="color:#666; margin-bottom: 25px;">
+        View student pre-test and post-test scores.
+    </p>
+
+    <div style="background:white; border-radius:12px; box-shadow:0 4px 12px rgba(0,0,0,0.05); overflow:hidden;">
+        <table style="width:100%; border-collapse:collapse; text-align:left;">
+            <thead>
+                <tr style="background:#f9fafb; border-bottom:2px solid #e5e7eb; color:#6b7280; font-size:13px; text-transform:uppercase;">
+                    <th style="padding:15px 20px;">Username</th>
+                    <th style="padding:15px 20px;">Pre-test Score</th>
+                    <th style="padding:15px 20px;">Post-test Score</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for student in students %}
+                <tr style="border-bottom:1px solid #f3f4f6;">
+                    <td style="padding:15px 20px; font-weight:bold;">
+                        {{ student.username }}
+                    </td>
+
+                    <td style="padding:15px 20px;">
+                        {% if student.pre_score == "Not taken" %}
+                            <span style="color:#b91c1c; font-weight:bold;">Not taken</span>
+                        {% else %}
+                            <span style="color:#4f46e5; font-weight:bold;">
+                                {{ student.pre_score }}/{{ student.pre_total }}
+                            </span>
+                        {% endif %}
+                    </td>
+
+                    <td style="padding:15px 20px;">
+                        {% if student.post_score == "Not taken" %}
+                            <span style="color:#b91c1c; font-weight:bold;">Not taken</span>
+                        {% else %}
+                            <span style="color:#10b981; font-weight:bold;">
+                                {{ student.post_score }}/{{ student.post_total }}
+                            </span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="4" style="padding:40px; text-align:center; color:#888;">
+                        No students found.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+</div>
+{% endblock %}
