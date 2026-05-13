@@ -18,27 +18,35 @@
   .dh-wrapper h1 { font-size:24px; font-weight:600; margin-bottom:6px; margin-top:0; color:#1a1a1a; }
   .dh-wrapper .subtitle { font-size:14px; color:#888; margin-bottom:1.5rem; line-height: 1.5; }
 
-  /* INPUT PANEL */
+  /* ── UPDATED "CLICKY" INPUT PANEL ── */
   .dh-wrapper .input-panel { background:#fff; border:0.5px solid #ddd; border-radius:12px; padding:1.25rem 1.5rem; margin-bottom:1.5rem; }
-  .dh-wrapper .input-panel h2 { font-size:13px; font-weight:600; text-transform:uppercase; letter-spacing:0.5px; color:#888; margin-bottom:1rem; margin-top:0; }
-  .dh-wrapper .inputs-row { display:flex; gap:12px; flex-wrap:wrap; align-items:flex-end; }
-  .dh-wrapper .inp-group { display:flex; flex-direction:column; gap:5px; flex: 1 1 120px; }
-  .dh-wrapper .inp-group label { font-size:12px; color:#666; font-weight:500; }
-  .dh-wrapper .inp-group input { padding:8px 10px; border:0.5px solid #ccc; border-radius:8px; font-size:14px; font-family:'Courier New',monospace; font-weight:600; background:#fafafa; color:#1a1a1a; width:100%; }
-  .dh-wrapper .inp-group input:focus { outline:none; border-color:#378ADD; box-shadow:0 0 0 2px rgba(55,138,221,0.15); }
-  .dh-wrapper .inp-group input.alice-inp { border-color:#B5D4F4; }
-  .dh-wrapper .inp-group input.bob-inp { border-color:#C0DD97; }
-  .dh-wrapper .inp-error { font-size:11px; color:#D85A30; margin-top:4px; display:none; }
-  .dh-wrapper .btn-start { padding:9px 22px; background:#1a1a1a; color:#fff; border:none; border-radius:8px; font-size:13px; font-weight:500; cursor:pointer; white-space:nowrap; transition: background 0.2s; }
-  .dh-wrapper .btn-start:hover { background:#333; }
+  .dh-wrapper .input-panel h2 { font-size:13px; font-weight:600; text-transform:uppercase; letter-spacing:0.5px; color:#888; margin-bottom:10px; margin-top:0; }
+  
+  /* Preset Chips for p and g */
+  .dh-wrapper .preset-chips { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:1.5rem; }
+  .dh-wrapper .chip { padding:6px 14px; border-radius:20px; border:1px solid #ccc; background:#fff; font-size:13px; cursor:pointer; font-weight:500; transition:all 0.2s; color:#555;}
+  .dh-wrapper .chip:hover { background:#f5f5f0; }
+  .dh-wrapper .chip.active { background:#1a1a1a; color:#fff; border-color:#1a1a1a; }
+
+  /* Number Grids for x and y */
+  .dh-wrapper .grid-container { display:flex; gap:15px; flex-wrap:wrap; }
+  .dh-wrapper .grid-box { flex:1; min-width:200px; background:#fafafa; border:1px solid #ddd; border-radius:8px; padding:12px; }
+  .dh-wrapper .grid-box.alice-box { border-top:3px solid #378ADD; }
+  .dh-wrapper .grid-box.bob-box { border-top:3px solid #639922; }
+  .dh-wrapper .grid-title { font-size:12px; font-weight:600; margin-bottom:10px; }
+  .dh-wrapper .num-grid { display:flex; flex-wrap:wrap; gap:5px; }
+  .dh-wrapper .num-btn { width:32px; height:32px; border-radius:6px; border:1px solid #ccc; background:#fff; font-size:13px; cursor:pointer; font-family:'Courier New',monospace; font-weight:600; color:#555; transition:all 0.15s; }
+  .dh-wrapper .num-btn:hover { border-color:#888; color:#1a1a1a; }
+  .dh-wrapper .num-btn.sel-a { background:#E6F1FB; border-color:#378ADD; color:#185FA5; }
+  .dh-wrapper .num-btn.sel-b { background:#EAF3DE; border-color:#639922; color:#3B6D11; }
 
   /* SCROLL-FREE STAGE (Responsive) */
   .dh-wrapper .stage { 
       display: flex;
       justify-content: space-between;
-      align-items: stretch; /* Forces equal height */
+      align-items: stretch;
       gap: 10px; 
-      margin-bottom: 50px; /* EXTRA SPACE FOR BUTTONS */
+      margin-bottom: 50px; 
   }
   
   .dh-wrapper .actor { 
@@ -49,7 +57,7 @@
       display: flex; 
       flex-direction: column; 
       flex: 1;
-      min-width: 0; /* CRITICAL: Allows flex items to shrink and text to wrap */
+      min-width: 0; 
   }
   
   .dh-wrapper .wire { 
@@ -76,7 +84,7 @@
   .dh-wrapper .kv-val { 
       font-family:'Courier New',monospace; font-size:12px; font-weight:600; background:#f5f5f0; 
       padding:3px 7px; border-radius:4px; color:#1a1a1a; transition:all 0.3s; text-align: right;
-      word-break: break-all; /* Prevents long numbers from breaking the layout */
+      word-break: break-all;
   }
   .dh-wrapper .kv-val.secret { background:#E6F1FB; color:#185FA5; }
   .dh-wrapper .kv-val.pub-val { background:#f5f5f0; color:#1a1a1a; }
@@ -138,7 +146,7 @@
     .dh-wrapper .kv-row { flex-direction: column; align-items: center; justify-content: center; text-align: center; margin-bottom: 6px; }
     .dh-wrapper .kv-label { width: 100%; justify-content: center; font-size: 10px; }
     .dh-wrapper .kv-val { width: 100%; text-align: center; font-size: 11px; padding: 4px; }
-    .dh-wrapper .tag { display: none; } /* Hide tags to save space on mobile */
+    .dh-wrapper .tag { display: none; }
     .dh-wrapper .pill { font-size: 9px; padding: 2px 4px; max-width: 40px; }
   }
 </style>
@@ -167,33 +175,28 @@
   <!-- ── INTERACTIVE DIFFIE-HELLMAN SIMULATOR ── -->
   <div class="dh-wrapper">
     <h1>Diffie-Hellman Key Exchange</h1>
-    <p class="subtitle">Enter your own values and step through the protocol — see exactly what the hacker Eve can and cannot see.</p>
+    <p class="subtitle">Click the numbers below and step through the protocol — see exactly what the hacker Eve can and cannot see.</p>
 
-    <!-- INPUT PANEL -->
+    <!-- CLICKY INPUT PANEL -->
     <div class="input-panel">
-      <h2>Parameters</h2>
-      <div class="inputs-row">
-        <div class="inp-group">
-          <label>Prime modulus (p)</label>
-          <input type="number" id="inp-p" value="23" min="3">
-          <div class="inp-error" id="err-p">Must be a prime number</div>
+      <h2>1. Select Public Parameters (p, g)</h2>
+      <div class="preset-chips">
+        <button class="chip active" onclick="pickPreset(23, 5, this)">p=23, g=5</button>
+        <button class="chip" onclick="pickPreset(47, 10, this)">p=47, g=10</button>
+        <button class="chip" onclick="pickPreset(61, 7, this)">p=61, g=7</button>
+        <button class="chip" onclick="pickPreset(31, 3, this)">p=31, g=3</button>
+      </div>
+
+      <h2>2. Select Private Keys (Click a number)</h2>
+      <div class="grid-container">
+        <div class="grid-box alice-box">
+          <div class="grid-title" style="color:#185FA5;">Alice's Secret (x)</div>
+          <div class="num-grid" id="grid-x"></div>
         </div>
-        <div class="inp-group">
-          <label>Generator (g)</label>
-          <input type="number" id="inp-g" value="5" min="2">
-          <div class="inp-error" id="err-g">Must be 2 or more</div>
+        <div class="grid-box bob-box">
+          <div class="grid-title" style="color:#3B6D11;">Bob's Secret (y)</div>
+          <div class="num-grid" id="grid-y"></div>
         </div>
-        <div class="inp-group">
-          <label>Alice's private (x) <span class="tag tag-prv">secret</span></label>
-          <input type="number" id="inp-x" value="6" min="1" class="alice-inp">
-          <div class="inp-error" id="err-x">Must be 1 or more</div>
-        </div>
-        <div class="inp-group">
-          <label>Bob's private (y) <span class="tag tag-prv">secret</span></label>
-          <input type="number" id="inp-y" value="15" min="1" class="bob-inp">
-          <div class="inp-error" id="err-y">Must be 1 or more</div>
-        </div>
-        <button class="btn-start" onclick="initDH()">Apply &amp; Restart</button>
       </div>
     </div>
 
@@ -303,10 +306,11 @@
 </div>
 
 <script>
-  function isPrime(n){if(n<2)return false;for(let i=2;i<=Math.sqrt(n);i++)if(n%i===0)return false;return true;}
   function mpow(b,e,m){let r=1n;b=BigInt(b);e=BigInt(e);m=BigInt(m);b=b%m;while(e>0n){if(e%2n===1n)r=r*b%m;e=e/2n;b=b*b%m;}return Number(r);}
 
-  let p,g,x,y,A,B,Ka,Kb,cur=0,steps=[];
+  // INITIAL STATE
+  let p=23, g=5, x=6, y=15;
+  let A, B, Ka, Kb, cur=0, steps=[];
 
   function buildSteps(){
     return [
@@ -420,34 +424,46 @@
     applyStep(steps[0]);
   }
 
-  function showError(id,msg,shouldShow){
-    const el=document.getElementById(id);
-    el.textContent=msg;
-    el.style.display=shouldShow?'block':'none';
+  // --- NEW CLICKY LOGIC ---
+  
+  function pickPreset(newP, newG, btnElem) {
+    p = newP;
+    g = newG;
+    // Update chip styling
+    document.querySelectorAll('.preset-chips .chip').forEach(c => c.classList.remove('active'));
+    btnElem.classList.add('active');
+    initDH();
+  }
+
+  function buildGrids() {
+    const gridX = document.getElementById('grid-x');
+    const gridY = document.getElementById('grid-y');
+    gridX.innerHTML = '';
+    gridY.innerHTML = '';
+
+    for (let i = 1; i <= 20; i++) {
+      // Alice Button
+      const btnA = document.createElement('button');
+      btnA.className = 'num-btn' + (i === x ? ' sel-a' : '');
+      btnA.textContent = i;
+      btnA.onclick = () => { x = i; initDH(); };
+      gridX.appendChild(btnA);
+
+      // Bob Button
+      const btnB = document.createElement('button');
+      btnB.className = 'num-btn' + (i === y ? ' sel-b' : '');
+      btnB.textContent = i;
+      btnB.onclick = () => { y = i; initDH(); };
+      gridY.appendChild(btnB);
+    }
   }
 
   function initDH(){
-    const pv=parseInt(document.getElementById('inp-p').value);
-    const gv=parseInt(document.getElementById('inp-g').value);
-    const xv=parseInt(document.getElementById('inp-x').value);
-    const yv=parseInt(document.getElementById('inp-y').value);
-
-    let ok=true;
-    if(!isPrime(pv)||pv<3){showError('err-p','Must be a prime number (e.g. 7, 11, 23, 47)',true);ok=false;}
-    else showError('err-p','',false);
-    if(isNaN(gv)||gv<2){showError('err-g','Must be 2 or more',true);ok=false;}
-    else showError('err-g','',false);
-    if(isNaN(xv)||xv<1){showError('err-x','Must be 1 or more',true);ok=false;}
-    else showError('err-x','',false);
-    if(isNaN(yv)||yv<1){showError('err-y','Must be 1 or more',true);ok=false;}
-    else showError('err-y','',false);
-    if(!ok)return;
-
-    p=pv; g=gv; x=xv; y=yv;
-    A=mpow(g,x,p);
-    B=mpow(g,y,p);
-    Ka=mpow(B,x,p);
-    Kb=mpow(A,y,p);
+    // Math recalculations based on current clicked variables
+    A = mpow(g, x, p);
+    B = mpow(g, y, p);
+    Ka = mpow(B, x, p);
+    Kb = mpow(A, y, p);
 
     // Update pill labels
     document.getElementById('lbl-A-left').textContent=`A=${A}`;
@@ -455,8 +471,12 @@
     document.getElementById('lbl-B-left').textContent=`B=${B}`;
     document.getElementById('lbl-B-right').textContent=`B=${B}`;
 
-    steps=buildSteps();
-    cur=0;
+    steps = buildSteps();
+    cur = 0;
+    
+    buildGrids(); // Redraws the numbers so the clicked one gets highlighted
+
+    // Reset visually back to step 0
     ['a-p','a-g','a-x','a-A','a-key','b-p','b-g','b-y','b-B','b-key','e-p','e-g','e-A','e-B'].forEach(id=>setDH(id,'—','dash'));
     setDH('e-key','cannot compute','unknown');
     ['pkt-A-left','pkt-A-right','pkt-B-left','pkt-B-right'].forEach(hide);
@@ -465,7 +485,7 @@
     applyStep(steps[0]);
   }
 
-  // Boot
+  // Boot the simulator
   initDH();
 </script>
 {% endblock %}
