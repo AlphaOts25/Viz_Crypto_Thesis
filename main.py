@@ -139,7 +139,7 @@ def register():
 @login_required
 def logout():
     logout_user()
-    return redirect(url_for('home'))
+    return redirect(url_for('login'))
 
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -390,7 +390,7 @@ def get_test(test_type):
 @login_required
 def take_test(test_type):
     questions = get_test(test_type)
-    return render_template('test.html', questions=questions, type=test_type, show_sidebar=True)
+    return render_template('test.html', questions=questions, type=test_type, show_sidebar=False)
 
 #---------------------------------------TEMPLATES--------------------------------------------
 
@@ -403,10 +403,10 @@ def home():
     post_test_exists = db.tests.find_one({"type": "post"}) is not None
 
     return render_template(
-        'index.html',
+        'user/dashboard.html',
         pre_test_exists=pre_test_exists,
         post_test_exists=post_test_exists,
-        show_sidebar=True
+        show_sidebar=False
     )
 
 @app.route('/module/<int:module_num>/lesson/<int:lesson_num>')
@@ -429,7 +429,13 @@ def view_lesson(module_num, lesson_num):
     filename = file_map.get(target_code)
     template_path = f"topics/module{module_num}/{filename}"
     
-    return render_template(template_path, lesson_data=current_lesson, show_sidebar=True)
+    return render_template(
+        template_path,
+        lesson_data=current_lesson,
+        show_sidebar=True,
+        pre_test_exists=db.tests.find_one({"type": "pre"}) is not None,
+        post_test_exists=db.tests.find_one({"type": "post"}) is not None
+    )
     
 @app.route('/module/<int:module_num>/intro')
 def module_intro(module_num):
@@ -443,7 +449,12 @@ def module_intro(module_num):
     if not filename:
         return "Module not found", 404
 
-    return render_template(f'topics/module{module_num}/{filename}', show_sidebar=True)
+    return render_template(
+        f'topics/module{module_num}/{filename}',
+        show_sidebar=True,
+        pre_test_exists=db.tests.find_one({"type": "pre"}) is not None,
+        post_test_exists=db.tests.find_one({"type": "post"}) is not None
+    )
 
 #-----------------------MAIN------------------------------------
 UPLOAD_FOLDER = 'static/uploads/videos'
