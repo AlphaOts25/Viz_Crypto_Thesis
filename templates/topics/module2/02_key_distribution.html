@@ -3,150 +3,62 @@
 
 {% block content %}
 <style>
-    /* ── MINIMALIST VULNERABILITY SIMULATOR CSS ── */
-    #symSim * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', 'Segoe UI', sans-serif; }
-    #symSim {
-        background: #11141e; 
-        border-radius: 16px;
-        padding: 40px;
-        box-shadow: 0 10px 30px rgba(0,0,0,0.4);
-        color: #fff;
-        margin-top: 40px;
-        border: 1px solid rgba(255,255,255,0.05);
-        position: relative;
-        overflow: hidden;
-    }
-
-    .sim-header { margin-bottom: 30px; text-align: center; }
-    .sim-header h2 { margin: 0 0 10px 0; color: #fff; font-size: 24px; font-weight: 600; letter-spacing: -0.5px;}
-    .sim-header p { color: #8b92b2; font-size: 15px; margin: 0; line-height: 1.6; }
-
-    /* Layout */
-    .sim-stage {
-        display: flex;
-        justify-content: space-between;
-        align-items: stretch;
-        gap: 0px;
-        margin-bottom: 30px;
-        position: relative;
-        min-height: 480px;
-        background: #151822;
-        border-radius: 12px;
-        border: 1px solid rgba(255,255,255,0.03);
-    }
-
-    .sim-col {
-        flex: 1;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        padding: 25px 15px;
-        position: relative;
-        z-index: 2;
-    }
-    
-    /* Column Dividers */
-    .eve-col { background: rgba(244,63,94,0.04); border-left: 1px dashed rgba(244,63,94,0.3); border-right: 1px dashed rgba(244,63,94,0.3); }
-
-    /* Pill Headers */
-    .pill-header {
-        border: 1.5px solid #fff;
-        border-radius: 30px;
-        padding: 8px 20px;
-        font-size: 12px;
-        font-weight: 700;
-        text-transform: uppercase;
-        letter-spacing: 1px;
-        margin-bottom: 25px;
-        background: transparent;
-    }
-    .pill-blue { border-color: #60a5fa; color: #fff; }
-    .pill-red { border-color: #f43f5e; color: #fff; background: rgba(244,63,94,0.1); }
-    .pill-green { border-color: #10b981; color: #fff; }
-
-    /* Icons */
-    .sim-icon {
-        width: 36px; height: 36px;
-        fill: none; stroke: currentColor; stroke-width: 2;
-        stroke-linecap: round; stroke-linejoin: round;
-        margin-bottom: 10px;
-    }
-    .icon-blue { color: #818cf8; }
-    .icon-red { color: #fb7185; }
-    .icon-green { color: #34d399; }
-    .icon-yellow { color: #fbbf24; }
-
-    /* Data Pills */
-    .data-pill {
-        border: 1.5px solid rgba(255,255,255,0.2);
-        border-radius: 20px;
-        padding: 8px 16px;
-        font-size: 12px;
-        font-weight: 700;
-        color: #fff;
-        background: transparent;
-        text-align: center;
-        margin-bottom: 12px;
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        transition: all 0.4s ease;
-        width: 90%;
-        justify-content: center;
-        word-break: break-all;
-    }
-    input.data-pill {
-        background: rgba(0,0,0,0.2); outline: none; cursor: text; border-color: rgba(255,255,255,0.4); font-family: 'JetBrains Mono', monospace;
-    }
-    input.data-pill:focus { border-color: #6366f1; box-shadow: 0 0 10px rgba(99,102,241,0.3); }
-    
-    .pill-highlight { border-color: #10b981; box-shadow: 0 0 15px rgba(16,185,129,0.2); color: #10b981; }
-    .pill-error { border-color: #f43f5e; box-shadow: 0 0 20px rgba(244,63,94,0.4); color: #f43f5e; background: rgba(244,63,94,0.1); }
-    .pill-locked { border-color: #c084fc; color: #c084fc; }
-
-    /* Animated Flying Packet */
-    #flying-packet {
-        position: absolute; top: 180px; left: 16%; 
-        background: #11141e; border: 1.5px solid #f43f5e; color: #fff;
-        padding: 8px 16px; border-radius: 20px; font-weight: 700; font-size: 12px; font-family: 'JetBrains Mono', monospace;
-        box-shadow: 0 5px 15px rgba(244,63,94,0.4); z-index: 100;
-        opacity: 0; transition: left 1.5s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s;
-        pointer-events: none; display: flex; align-items: center; gap: 8px;
-    }
-
-    /* Decryption Flow UI */
-    .decrypt-flow {
-        display: flex; flex-direction: column; align-items: center; width: 100%;
-        margin-top: 10px; background: rgba(0,0,0,0.2); padding: 15px 10px; border-radius: 12px;
-        border: 1px dashed rgba(255,255,255,0.2); opacity: 0; transition: opacity 0.5s;
-    }
-    .flow-arrow { color: #8b92b2; font-size: 16px; margin: 4px 0; }
-    .flow-row { display: flex; gap: 8px; align-items: center; justify-content: center; width: 100%; }
-
-    /* Terminal Log */
-    .log-container {
-        background: #080a0f; border: 1px solid rgba(255,255,255,0.05); border-radius: 12px;
-        padding: 15px; height: 160px; overflow-y: auto;
-        font-family: 'JetBrains Mono', 'Courier New', monospace; font-size: 12px; line-height: 1.6;
-        margin-bottom: 20px; box-shadow: inset 0 0 20px rgba(0,0,0,0.5);
-    }
-    .log-container::-webkit-scrollbar { width: 6px; }
-    .log-container::-webkit-scrollbar-thumb { background: #333; border-radius: 3px; }
-    .log-line { margin-bottom: 4px; color: #8b92b2; }
-    .log-time { color: #4b5563; margin-right: 8px; }
-    .log-info { color: #60a5fa; }
-    .log-success { color: #34d399; }
-    .log-error { color: #fb7185; }
-    .log-warn { color: #fbbf24; }
-
-    /* Button */
-    .btn-run {
-        width: 100%; padding: 16px; background: #6366f1; border: none; border-radius: 8px;
-        color: #fff; font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px;
-        cursor: pointer; transition: all 0.2s; box-shadow: 0 4px 15px rgba(99,102,241,0.2);
-    }
-    .btn-run:hover:not(:disabled) { background: #4f46e5; transform: translateY(-2px); box-shadow: 0 6px 20px rgba(99,102,241,0.4); }
-    .btn-run:disabled { background: #1e212b; color: #4b5563; cursor: not-allowed; box-shadow: none; transform: none; }
+h2.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+#ks * {box-sizing:border-box;margin:0;padding:0}
+#ks{background:#11141e;border-radius:16px;padding:24px;color:#fff;font-family:system-ui,sans-serif;position:relative;border:1px solid rgba(255,255,255,.06);overflow:visible;user-select:none;-webkit-user-select:none;margin-top:40px;}
+#ks-hdr{text-align:center;margin-bottom:18px}
+#ks-hdr h3{font-size:18px;font-weight:600;margin-bottom:6px;color:#fff}
+#ks-hdr p{font-size:13px;color:#8b92b2;line-height:1.5}
+#statusbar{background:rgba(0,0,0,.35);border-radius:8px;padding:9px 14px;font-size:12px;font-family:'Courier New',monospace;color:#8b92b2;margin-bottom:14px;min-height:38px;transition:color .3s;line-height:1.5}
+.stage{display:grid;grid-template-columns:1fr 1fr 1fr;min-height:360px;border-radius:12px;overflow:hidden;border:1px solid rgba(255,255,255,.05);margin-bottom:14px;position:relative}
+.col{padding:18px 14px;display:flex;flex-direction:column;align-items:center;position:relative}
+#acol{background:#13161f;border-right:1px solid rgba(255,255,255,.05)}
+#ecol{background:#160e14;border-right:1px solid rgba(244,63,94,.25);transition:background .2s}
+#ecol.alert{background:rgba(244,63,94,.14)}
+#bcol{background:#0d1610}
+.col-lbl{font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:5px 14px;border-radius:20px;margin-bottom:14px;white-space:nowrap}
+.lbl-a{border:1.5px solid #60a5fa;color:#60a5fa}
+.lbl-e{border:1.5px dashed #f43f5e;color:#f43f5e;background:rgba(244,63,94,.08)}
+.lbl-b{border:1.5px solid #34d399;color:#34d399}
+.mini-label{font-size:10px;color:#8b92b2;margin-bottom:4px;align-self:flex-start}
+.msg-inp{width:100%;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.15);border-radius:8px;padding:8px 10px;color:#fff;font-size:12px;font-family:'Courier New',monospace;outline:none;margin-bottom:8px}
+.msg-inp:focus{border-color:#6366f1}
+.msg-inp:disabled{opacity:.4}
+.btn-enc{width:100%;padding:8px;background:#6366f1;border:none;border-radius:8px;color:#fff;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;cursor:pointer;margin-bottom:14px;transition:all .2s}
+.btn-enc:hover:not(:disabled){background:#4f46e5}
+.btn-enc:disabled{background:#2d2d3a;color:#555;cursor:not-allowed}
+.dpill{width:100%;padding:7px 10px;border-radius:8px;font-size:11px;font-family:'Courier New',monospace;font-weight:600;text-align:center;margin-bottom:7px;border:1px solid;word-break:break-all;opacity:0;transition:opacity .4s}
+.dpill.vis{opacity:1}
+.dp-cipher{border-color:#c084fc;color:#c084fc;background:rgba(192,132,252,.08)}
+.dp-key-y{border-color:#fbbf24;color:#fbbf24;background:rgba(251,191,36,.08)}
+.dp-plain{border-color:#34d399;color:#34d399;background:rgba(52,211,153,.08)}
+.dp-bad{border-color:#f43f5e;color:#f43f5e;background:rgba(244,63,94,.1)}
+#key-token{width:100%;padding:10px 12px;border-radius:8px;border:2px solid #fbbf24;color:#fbbf24;background:rgba(251,191,36,.1);font-size:13px;font-family:'Courier New',monospace;font-weight:700;text-align:center;cursor:grab;opacity:0;transition:opacity .4s,box-shadow .2s;display:flex;align-items:center;justify-content:center;gap:6px;margin-bottom:6px}
+#key-token.rdy{opacity:1}
+#key-token:hover.rdy{box-shadow:0 0 14px rgba(251,191,36,.35)}
+#key-token.lifted{opacity:.2;cursor:grabbing}
+.hint{font-size:11px;color:rgba(139,146,178,.7);text-align:center;font-style:italic;opacity:0;transition:opacity .4s}
+.hint.vis{opacity:1}
+.scanner{width:100%;padding:10px 8px;border-radius:8px;border:1px dashed rgba(244,63,94,.3);background:rgba(244,63,94,.05);text-align:center;font-size:11px;color:rgba(244,63,94,.6);transition:all .25s;margin-top:4px}
+.scanner.active{border-color:#f43f5e;color:#f43f5e;background:rgba(244,63,94,.18);box-shadow:0 0 18px rgba(244,63,94,.22)}
+.scanner .eye{font-size:22px;margin-bottom:4px;display:block}
+.eve-section{width:100%;margin-top:10px;opacity:0;transition:opacity .4s}
+.eve-section.vis{opacity:1}
+.drop-zone{width:100%;padding:18px 10px;border:2px dashed rgba(52,211,153,.25);border-radius:8px;color:rgba(52,211,153,.4);font-size:11px;font-weight:600;text-align:center;margin-top:auto;opacity:0;transition:opacity .4s,border-color .2s,color .2s,background .2s;text-transform:uppercase;letter-spacing:.5px}
+.drop-zone.rdy{opacity:1}
+.drop-zone.hov{border-color:#34d399;color:#34d399;background:rgba(52,211,153,.06)}
+.bob-section{width:100%;opacity:0;transition:opacity .4s;margin-top:8px}
+.bob-section.vis{opacity:1}
+#flash-overlay{position:absolute;inset:0;border-radius:12px;background:rgba(244,63,94,0);pointer-events:none;transition:background .12s;z-index:50}
+#flash-overlay.on{background:rgba(244,63,94,.22)}
+#ghost{position:absolute;z-index:999;pointer-events:none;display:none;padding:8px 16px;border-radius:8px;border:2px solid #fbbf24;color:#fbbf24;background:#1a1500;font-size:13px;font-family:'Courier New',monospace;font-weight:700;white-space:nowrap;box-shadow:0 4px 20px rgba(251,191,36,.5)}
+.conc{display:none;background:rgba(244,63,94,.1);border:1px solid rgba(244,63,94,.35);border-radius:10px;padding:14px 16px;margin-bottom:12px}
+.conc.vis{display:block}
+.conc-h{color:#fb7185;font-weight:700;font-size:13px;margin-bottom:6px}
+.conc-b{color:#a78bfa;font-size:12px;line-height:1.6}
+.conc-b strong{color:#e2e8f0}
+.btn-reset{width:100%;padding:10px;background:#1e212b;border:1px solid rgba(255,255,255,.1);border-radius:8px;color:#a6accd;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;cursor:pointer;display:none;transition:background .2s}
+.btn-reset:hover{background:#2a2d3a}
 </style>
 
 <div class="lesson-container" style="max-width: 950px; margin: 0 auto; padding-bottom: 60px;">
@@ -164,219 +76,244 @@
         
     {% include "video_player.html" %}
 
-    <!-- ── INTERACTIVE SIMULATOR ── -->
-    <div id="symSim">
-        <div class="sim-header">
-            <h2>Interactive: The Interception Flaw</h2>
-            <p>Type a message and a Symmetric Key below. Watch what happens when Alice tries to send the locked ciphertext to Bob, but is also forced to send the key so Bob can read it.</p>
+    <!-- ── DRAG AND DROP SIMULATOR ── -->
+    <h2 class="sr-only">Key distribution problem interactive simulator — drag the key to Bob and watch Eve intercept it</h2>
+
+    <div id="ks">
+      <div id="flash-overlay"></div>
+      <div id="ghost">🔑 <span id="ghost-kv">KEY</span></div>
+
+      <div id="ks-hdr">
+        <h3>The Key Distribution Problem</h3>
+        <p>Encrypt a message, then try to drag the key across to Bob.<br>Eve controls the network — every packet passes through her.</p>
+      </div>
+
+      <div id="statusbar">→ Type a message and click Encrypt to begin.</div>
+
+      <div class="stage" id="stage">
+
+        <div class="col" id="acol">
+          <div class="col-lbl lbl-a">Alice</div>
+          <div class="mini-label">Plaintext message</div>
+          <input class="msg-inp" id="msginp" type="text" placeholder="e.g. send the money" maxlength="22">
+          <button class="btn-enc" id="btn-enc" onclick="doEncrypt()">🔒 Encrypt</button>
+          <div class="mini-label">Ciphertext (safe to send)</div>
+          <div class="dpill dp-cipher" id="a-ciph">📦</div>
+          <div class="mini-label" id="key-label" style="margin-top:6px;color:rgba(251,191,36,.7);opacity:0;transition:opacity .4s">Secret key (Bob needs this)</div>
+          <div id="key-token">🔑 <span id="kv">—</span></div>
+          <div class="hint" id="drag-hint">Drag the key across to Bob →</div>
         </div>
 
-        <!-- Flying Animation Packet -->
-        <div id="flying-packet">📦 CIPH + 🔑 KEY</div>
-
-        <div class="sim-stage" id="stage-area">
-            
-            <!-- ALICE -->
-            <div class="sim-col alice-col" id="col-alice">
-                <div class="pill-header pill-blue">ALICE (SENDER)</div>
-                
-                <div style="font-size: 10px; color: #8b92b2; margin-bottom: 4px;">Plaintext Message</div>
-                <input type="text" id="inMsg" class="data-pill" value="Enter a message">
-                
-                <div style="font-size: 10px; color: #8b92b2; margin-bottom: 4px;">Secret Key</div>
-                <div id="generatedKey" class="data-pill">AUTO-GENERATED</div>
-
-                <div id="aliceProcess" style="display: flex; flex-direction: column; align-items: center; width: 100%; margin-top: 20px; opacity: 0; transition: opacity 0.5s;">
-                    <div style="font-size: 10px; color: #60a5fa; margin-bottom: 8px;">Encrypting Message...</div>
-                    <div id="aCiph" class="data-pill pill-locked">📦 CIPHERTEXT</div>
-                    <div style="font-size: 10px; color: #f43f5e; margin-bottom: 8px; text-align: center;">Must also send the key<br>so Bob can read it!</div>
-                </div>
-            </div>
-
-            <!-- EVE -->
-            <div class="sim-col eve-col" id="col-eve">
-                <div class="pill-header pill-red">NETWORK (EVE)</div>
-                
-                <svg class="sim-icon icon-red" viewBox="0 0 24 24" style="margin-top: 10px; width: 48px; height: 48px;"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
-                <div style="font-size: 10px; color: #f43f5e; text-align: center; margin-bottom: 10px;">Eve listens to all traffic</div>
-                
-                <div id="eveProcess" class="decrypt-flow" style="border-color: rgba(244,63,94,0.4); background: rgba(244,63,94,0.05);">
-                    <div style="font-size: 10px; color: #f43f5e; font-weight: bold; margin-bottom: 8px;">EVE INTERCEPTS BOTH!</div>
-                    
-                    <div class="flow-row">
-                        <div class="data-pill pill-locked" style="margin:0; padding:6px; font-size:10px;" id="eCiph">📦 CIPH</div>
-                        <div style="color: #fff; font-size: 12px;">+</div>
-                        <div class="data-pill" style="margin:0; padding:6px; font-size:10px; border-color:#fbbf24; color:#fbbf24" id="eKey">🔑 KEY</div>
-                    </div>
-                    
-                    <div class="flow-arrow">↓</div>
-                    
-                    <div class="data-pill pill-error" style="margin:0; width: 100%; box-shadow: 0 0 20px rgba(244,63,94,0.6);" id="eDec">📄 ?</div>
-                </div>
-            </div>
-
-            <!-- BOB -->
-            <div class="sim-col bob-col" id="col-bob">
-                <div class="pill-header pill-green">BOB (RECEIVER)</div>
-                
-                <svg class="sim-icon icon-green" viewBox="0 0 24 24" style="margin-top: 10px;"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
-                
-                <div id="bobProcess" class="decrypt-flow" style="border-color: rgba(16,185,129,0.4); margin-top: auto;">
-                    <div style="font-size: 10px; color: #34d399; font-weight: bold; margin-bottom: 8px;">BOB RECEIVES DATA</div>
-                    
-                    <div class="flow-row">
-                        <div class="data-pill pill-locked" style="margin:0; padding:6px; font-size:10px;" id="bCiph">📦 CIPH</div>
-                        <div style="color: #fff; font-size: 12px;">+</div>
-                        <div class="data-pill" style="margin:0; padding:6px; font-size:10px; border-color:#fbbf24; color:#fbbf24" id="bKey">🔑 KEY</div>
-                    </div>
-                    
-                    <div class="flow-arrow">↓</div>
-                    
-                    <div class="data-pill pill-highlight" style="margin:0; width: 100%;" id="bDec">📄 ?</div>
-                </div>
-            </div>
-
+        <div class="col" id="ecol">
+          <div class="col-lbl lbl-e">Eve</div>
+          <div class="scanner" id="scanner">
+            <span class="eye">👁️</span>
+            <div>Monitoring all traffic</div>
+            <div id="eve-st" style="margin-top:3px;font-size:10px;opacity:.6">waiting...</div>
+          </div>
+          <div class="eve-section" id="eve-sec">
+            <div style="font-size:10px;color:#f43f5e;font-weight:700;margin:10px 0 6px;text-transform:uppercase;letter-spacing:.5px">⚡ Intercepted</div>
+            <div class="dpill dp-cipher vis" id="e-ciph">📦</div>
+            <div class="dpill dp-key-y vis" id="e-key">🔑</div>
+            <div style="font-size:10px;color:#8b92b2;margin:4px 0;text-align:center">→ decrypt →</div>
+            <div class="dpill dp-bad vis" id="e-plain">📄</div>
+          </div>
         </div>
 
-        <!-- TERMINAL LOG -->
-        <div class="log-container" id="sysLog">
-            <div class="log-line"><span class="log-time">[00:00:00]</span> <span class="log-info">SYSTEM:</span> Waiting for user to initiate sequence...</div>
+        <div class="col" id="bcol">
+          <div class="col-lbl lbl-b">Bob</div>
+          <div class="drop-zone" id="dropzone">
+            Drop key here<br>
+            <span style="font-size:10px;opacity:.6">🔓 to decrypt</span>
+          </div>
+          <div class="bob-section" id="bob-sec">
+            <div style="font-size:10px;color:#8b92b2;margin-bottom:4px">Received ciphertext</div>
+            <div class="dpill dp-cipher vis" id="b-ciph">📦</div>
+            <div style="font-size:10px;color:#8b92b2;margin:4px 0 4px;text-align:center">+ key → decrypt →</div>
+            <div class="dpill dp-plain vis" id="b-plain">📄</div>
+            <div class="dpill dp-bad vis" id="b-warn" style="font-size:10px;margin-top:4px">⚠️ But Eve read it too</div>
+          </div>
         </div>
 
-        <button id="btnRunSym" class="btn-run" onclick="runSequence()">▶ Transmit Message & Key</button>
-        <button id="btnReset" class="btn-run" onclick="resetUI()" style="background: #1e212b; color: #a6accd; box-shadow: none; display: none;">Reset Simulator</button>
+      </div>
+
+      <div class="conc" id="conc">
+        <div class="conc-h">⚠️ The Key Distribution Problem</div>
+        <div class="conc-b" id="conc-b"></div>
+      </div>
+      <button class="btn-reset" id="btn-reset" onclick="doReset()">↺ Reset</button>
     </div>
 
+    <!-- NEXT BUTTON -->
     <div style="margin-top: 50px; text-align: right;">
         <p style="color: #888; font-size: 14px; margin-bottom: 10px;">How do we solve this impossible problem?</p>
         <a href="{{ url_for('view_lesson', module_num=2, lesson_num=3) }}" style="background: #6366f1; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold; font-size: 16px; box-shadow: 0 4px 6px rgba(99, 102, 241, 0.2);">
             Start Module 3: Public Key Cryptography →
         </a>
     </div>
+
 </div>
 
 <script>
-    const sleep = ms => new Promise(r => setTimeout(r, ms));
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+let keyVal='', cipherVal='', msgVal='', phase='idle', dragging=false, caught=false;
 
-    function getTimestamp() {
-        const now = new Date();
-        return `[${now.getHours().toString().padStart(2,'0')}:${now.getMinutes().toString().padStart(2,'0')}:${now.getSeconds().toString().padStart(2,'0')}]`;
-    }
+function genKey(){const h='0123456789ABCDEF';let k='';for(let i=0;i<4;i++)k+=h[Math.floor(Math.random()*16)];return k;}
+function fakeCiph(t){return btoa(t).replace(/=/g,'').substring(0,8).toUpperCase()+'..';}
+function setStatus(msg,col){const s=document.getElementById('statusbar');s.textContent=msg;s.style.color=col||'#8b92b2';}
+function show(id){document.getElementById(id).classList.add('vis');}
+function unshow(id){document.getElementById(id).classList.remove('vis');}
 
-    function addLog(msg, type = 'info') {
-        const logBox = document.getElementById('sysLog');
-        const spanClass = `log-${type}`;
-        logBox.innerHTML += `<div class="log-line"><span class="log-time">${getTimestamp()}</span> <span class="${spanClass}">${msg}</span></div>`;
-        logBox.scrollTop = logBox.scrollHeight;
-    }
+function doEncrypt(){
+  const msg=document.getElementById('msginp').value.trim();
+  if(!msg){setStatus('⚠️ Type a message first!','#fbbf24');return;}
+  msgVal=msg; keyVal=genKey(); cipherVal=fakeCiph(msg);
+  document.getElementById('kv').textContent=keyVal;
+  document.getElementById('ghost-kv').textContent=keyVal;
+  document.getElementById('a-ciph').textContent='📦 '+cipherVal;
+  show('a-ciph');
+  document.getElementById('btn-enc').disabled=true;
+  document.getElementById('msginp').disabled=true;
+  document.getElementById('key-label').style.opacity='1';
+  show('key-token'); document.getElementById('key-token').classList.add('rdy');
+  show('drag-hint');
+  show('dropzone'); document.getElementById('dropzone').classList.add('rdy');
+  setStatus('🔒 Encrypted! Now Bob needs the key to read it. Drag the key across →','#60a5fa');
+  phase='key_ready';
+}
 
-    function generateCipher(text) {
-        return btoa(text).replace(/=/g, '').substring(0, 10).toUpperCase() + "..";
-    }
+let offX=0, offY=0;
+function getClient(e){return e.touches?{x:e.touches[0].clientX,y:e.touches[0].clientY}:{x:e.clientX,y:e.clientY};}
 
-    // Animation Function
-    function animatePacket(startColId, endColId) {
-        return new Promise(resolve => {
-            const packet = document.getElementById('flying-packet');
-            const startPct = startColId === 'col-bob' ? 80 : (startColId === 'col-alice' ? 16 : 50);
-            const endPct = endColId === 'col-alice' ? 16 : (endColId === 'col-eve' ? 50 : 80);
+function startDrag(e){
+  if(phase!=='key_ready'||caught)return;
+  dragging=true;
+  const {x,y}=getClient(e);
+  const kt=document.getElementById('key-token');
+  const kr=kt.getBoundingClientRect();
+  offX=x-kr.left; offY=y-kr.top;
+  const ghost=document.getElementById('ghost');
+  const simRect=document.getElementById('ks').getBoundingClientRect();
+  ghost.style.left=(x-simRect.left-offX)+'px';
+  ghost.style.top=(y-simRect.top-offY)+'px';
+  ghost.style.display='block';
+  kt.classList.add('lifted');
+  unshow('drag-hint');
+  setStatus('🔑 Dragging the key — watch Eve!','#fbbf24');
+  e.preventDefault();
+}
 
-            packet.style.transition = 'none';
-            packet.style.left = startPct + '%';
-            
-            void packet.offsetWidth; // Force reflow
+document.getElementById('key-token').addEventListener('mousedown',startDrag);
+document.getElementById('key-token').addEventListener('touchstart',startDrag,{passive:false});
 
-            packet.style.transition = 'left 1.2s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s';
-            packet.style.opacity = '1';
-            packet.style.left = endPct + '%';
+document.addEventListener('mousemove',onMove);
+document.addEventListener('touchmove',onMove,{passive:false});
 
-            setTimeout(() => {
-                packet.style.opacity = '0';
-                setTimeout(resolve, 300);
-            }, 1200);
-        });
-    }
+function onMove(e){
+  if(!dragging||caught)return;
+  e.preventDefault();
+  const {x,y}=getClient(e);
+  const ghost=document.getElementById('ghost');
+  const simRect=document.getElementById('ks').getBoundingClientRect();
+  ghost.style.left=(x-simRect.left-40)+'px';
+  ghost.style.top=(y-simRect.top-16)+'px';
 
-    function resetUI() {
-        document.getElementById('aliceProcess').style.opacity = '0';
-        document.getElementById('eveProcess').style.opacity = '0';
-        document.getElementById('bobProcess').style.opacity = '0';
-        
-        ['eDec', 'bDec'].forEach(id => {
-            document.getElementById(id).innerHTML = '📄 ?';
-        });
+  const eveEl=document.getElementById('ecol');
+  const eveRect=eveEl.getBoundingClientRect();
+  const near=x>eveRect.left-30;
+  const inside=x>eveRect.left;
 
-        document.getElementById('sysLog').innerHTML = '';
-        
-        document.getElementById('inMsg').disabled = false;
-        document.getElementById('btnRunSym').style.display = 'block';
-        document.getElementById('btnReset').style.display = 'none';
-    }
+  eveEl.classList.toggle('alert',near);
+  const sc=document.getElementById('scanner');
+  sc.classList.toggle('active',near);
+  document.getElementById('eve-st').textContent=near?(inside?'CAPTURING...':'DETECTING...'):'waiting...';
 
-    function generateKey(length = 4) {
-        const chars = "0123456789ABCDEF";
-        let key = "";
+  if(inside){
+    caught=true;
+    dragging=false;
+    ghost.style.display='none';
+    doIntercept(x,y);
+  }
 
-        for (let i = 0; i < length; i++) {
-            key += chars[Math.floor(Math.random() * chars.length)];
-        }
+  const dzRect=document.getElementById('dropzone').getBoundingClientRect();
+  document.getElementById('dropzone').classList.toggle('hov',
+    x>=dzRect.left&&x<=dzRect.right&&y>=dzRect.top&&y<=dzRect.bottom);
+}
 
-        return key;
-    }
+document.addEventListener('mouseup',onUp);
+document.addEventListener('touchend',onUp);
 
-    async function runSequence() {
-        const btn = document.getElementById('btnRunSym');
-        let msg = document.getElementById('inMsg').value || "CREDIT CARD";
-        let symKey = generateKey();
-        document.getElementById('generatedKey').innerHTML = `🔑 ${symKey}`;
-        const cipherText = generateCipher(msg);
-        
-        btn.style.display = 'none';
-        document.getElementById('inMsg').disabled = true;
-        
-        addLog("SYSTEM: Transmission sequence initiated.", "info");
+function onUp(e){
+  if(!dragging)return;
+  dragging=false;
+  document.getElementById('ghost').style.display='none';
+  const kt=document.getElementById('key-token');
+  kt.classList.remove('lifted');
+  document.getElementById('dropzone').classList.remove('hov');
+  if(!caught){
+    setStatus('→ Dropped short. Drag the key all the way across to Bob →','#8b92b2');
+    show('drag-hint');
+  }
+}
 
-        // ALICE ENCRYPTS
-        addLog("ALICE: Encrypting message...", "info");
-        document.getElementById('aliceProcess').style.opacity = '1';
-        document.getElementById('aCiph').innerHTML = `📦 ${cipherText}`;
-        await sleep(1500);
+async function doIntercept(){
+  phase='intercepted';
+  document.getElementById('key-token').classList.remove('lifted','rdy');
+  document.getElementById('key-token').style.opacity='0';
+  unshow('drag-hint');
+  document.getElementById('dropzone').classList.remove('hov','rdy');
+  unshow('dropzone');
 
-        // TRANSMIT
-        addLog("ALICE: Sending Ciphertext AND Secret Key across the open network so Bob can read it...", "warn");
-        await sleep(1000);
-        await animatePacket('col-alice', 'col-eve');
+  const flash=document.getElementById('flash-overlay');
+  flash.classList.add('on');
+  document.getElementById('scanner').classList.add('active');
+  document.getElementById('eve-st').textContent='KEY CAPTURED!';
+  document.getElementById('ecol').classList.add('alert');
+  setTimeout(()=>flash.classList.remove('on'),500);
 
-        // EVE INTERCEPTS
-        addLog("EVE: Intercepted the packet!", "error");
-        document.getElementById('eveProcess').style.opacity = '1';
-        document.getElementById('eCiph').innerHTML = `📦 ${cipherText}`;
-        document.getElementById('eKey').innerHTML = `🔑 ${symKey}`;
-        await sleep(1500);
+  setStatus('🚨 Eve intercepted the key!','#f43f5e');
+  await sleep(400);
 
-        addLog("EVE: Found the Symmetric Key! Decrypting the message...", "error");
-        await sleep(1500);
-        document.getElementById('eDec').innerHTML = `📄 ${msg}`;
-        addLog(`EVE SUCCESS: Message compromised! Eve read: "${msg}"`, "error");
-        await sleep(2000);
+  document.getElementById('e-ciph').textContent='📦 '+cipherVal;
+  document.getElementById('e-key').textContent='🔑 '+keyVal;
+  document.getElementById('e-plain').textContent='📄 ...';
+  show('eve-sec');
+  await sleep(900);
 
-        // FORWARD TO BOB
-        addLog("NETWORK: Forwarding the packet to Bob...", "info");
-        await animatePacket('col-eve', 'col-bob');
-        
-        document.getElementById('bobProcess').style.opacity = '1';
-        document.getElementById('bCiph').innerHTML = `📦 ${cipherText}`;
-        document.getElementById('bKey').innerHTML = `🔑 ${symKey}`;
-        await sleep(1500);
+  document.getElementById('e-plain').textContent='📄 '+msgVal;
+  setStatus('🚨 Eve decrypted: "'+msgVal+'" — your message is compromised.','#f43f5e');
+  await sleep(900);
 
-        addLog("BOB: Received data and key. Decrypting...", "success");
-        await sleep(1500);
-        document.getElementById('bDec').innerHTML = `📄 ${msg}`;
-        
-        await sleep(1000);
-        addLog("SYSTEM FAILURE: Bob successfully read the message, but Eve read it too! This is the Key Distribution Problem.", "error");
+  document.getElementById('b-ciph').textContent='📦 '+cipherVal+' (forwarded)';
+  document.getElementById('b-plain').textContent='📄 '+msgVal;
+  show('bob-sec');
+  setStatus('Bob got the message too — but so did Eve. Encryption failed.','#fb7185');
+  await sleep(600);
 
-        document.getElementById('btnReset').style.display = 'block';
-    }
+  document.getElementById('conc-b').innerHTML=
+    `<strong>Every packet you send travels through the network — and Eve owns the network.</strong> It doesn't matter how you route it: the key must physically travel from Alice to Bob, and Eve intercepts it every time.<br><br>`+
+    `This is why Diffie-Hellman was revolutionary. It makes key <em>transmission</em> unnecessary — Alice and Bob independently compute the same secret without ever sending it.`;
+  show('conc');
+  document.getElementById('btn-reset').style.display='block';
+  phase='done';
+}
+
+function doReset(){
+  phase='idle'; caught=false; keyVal=''; cipherVal=''; msgVal='';
+  document.getElementById('msginp').disabled=false;
+  document.getElementById('msginp').value='';
+  document.getElementById('btn-enc').disabled=false;
+  document.getElementById('key-label').style.opacity='0';
+  ['a-ciph','key-token','drag-hint','dropzone','eve-sec','bob-sec','conc'].forEach(unshow);
+  document.getElementById('key-token').classList.remove('rdy','lifted');
+  document.getElementById('key-token').style.opacity='0';
+  document.getElementById('dropzone').classList.remove('rdy','hov');
+  document.getElementById('ecol').classList.remove('alert');
+  document.getElementById('scanner').classList.remove('active');
+  document.getElementById('eve-st').textContent='waiting...';
+  document.getElementById('btn-reset').style.display='none';
+  document.getElementById('ghost').style.display='none';
+  setStatus('→ Type a message and click Encrypt to begin.','#8b92b2');
+}
 </script>
 {% endblock %}
