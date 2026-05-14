@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="main-container">
+
+    <h1 style="margin-bottom:5px;">Achievements</h1>
+    <p style="color:#666; margin-bottom:25px;">
+        View your test performance after completing the post-test.
+    </p>
+
+    {% if not post_taken %}
+        <div style="background:#fff7ed; border-left:5px solid #f97316; padding:20px; border-radius:8px;">
+            <h3 style="margin:0 0 8px 0; color:#9a3412;">Scores Locked</h3>
+            <p style="margin:0; color:#7c2d12;">
+                Your pre-test and post-test scores will be shown after you finish answering the post-test.
+            </p>
+        </div>
+    {% else %}
+        <div style="display:flex; gap:20px; flex-wrap:wrap;">
+
+            <div style="background:white; padding:25px; border-radius:12px; box-shadow:0 4px 12px rgba(0,0,0,0.05); flex:1;">
+                <h3 style="margin-top:0;">Pre-Test Score</h3>
+                <p style="font-size:36px; font-weight:bold; color:#4f46e5; margin:0;">
+                    {{ pre_result.score }}/{{ pre_result.total }}
+                </p>
+            </div>
+
+            <div style="background:white; padding:25px; border-radius:12px; box-shadow:0 4px 12px rgba(0,0,0,0.05); flex:1;">
+                <h3 style="margin-top:0;">Post-Test Score</h3>
+                <p style="font-size:36px; font-weight:bold; color:#10b981; margin:0;">
+                    {{ post_result.score }}/{{ post_result.total }}
+                </p>
+            </div>
+
+            <div style="background:white; padding:25px; border-radius:12px; box-shadow:0 4px 12px rgba(0,0,0,0.05); flex:1;">
+                <h3 style="margin-top:0;">Score Gain</h3>
+                <p style="font-size:36px; font-weight:bold; color:#f97316; margin:0;">
+                    {{ post_result.score - pre_result.score }}
+                </p>
+            </div>
+
+        </div>
+    {% endif %}
+
+</div>
+{% endblock %}

@@ -52,7 +52,11 @@
                                 <span class="stat-label">Interactives</span>
                             </div>
                         </div>
-                        <a href="{{ url_for('module_intro', module_num=1) }}" class="play-btn">▶</a>
+                        {% if modules_unlocked %}
+                            <a href="{{ url_for('module_intro', module_num=1) }}" class="play-btn">▶</a>
+                        {% else %}
+                            <span class="play-btn" style="background:#ccc; cursor:not-allowed;">🔒</span>
+                        {% endif %}
                     </div>
                 </div>
                 <div class="course-card">
@@ -71,7 +75,11 @@
                                 <span class="stat-label">Interactives</span>
                             </div>
                         </div>
-                        <a href="{{ url_for('module_intro', module_num=2) }}" class="play-btn">▶</a>
+                        {% if modules_unlocked %}
+                            <a href="{{ url_for('module_intro', module_num=2) }}" class="play-btn">▶</a>
+                        {% else %}
+                            <span class="play-btn" style="background:#ccc; cursor:not-allowed;">🔒</span>
+                        {% endif %}
                     </div>
                 </div>
                 {% if post_test_exists %}
@@ -87,7 +95,11 @@
                                 <span class="stat-label">Questions</span>
                             </div>
                         </div>
-                        <a href="{{ url_for('take_test', test_type='post') }}" class="play-btn">▶</a>
+                        {% if post_unlocked %}
+                            <a href="{{ url_for('take_test', test_type='post') }}" class="play-btn">▶</a>
+                        {% else %}
+                            <span class="play-btn" style="background:#ccc; cursor:not-allowed;">🔒</span>
+                        {% endif %}
                     </div>
                 </div>
                 {% endif %}

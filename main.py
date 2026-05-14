@@ -415,46 +415,135 @@ def get_test(test_type):
 @app.route('/test/<test_type>')
 @login_required
 def take_test(test_type):
-    questions = get_test(test_type)
-    return render_template('test.html', questions=questions, type=test_type, show_sidebar=False)
+    pre_taken, post_taken, modules_unlocked, post_unlocked = get_student_progress()
 
+    if test_type == "post" and not post_unlocked:
+        flash("You must finish all modules before taking the post-test.")
+        return redirect(url_for('home'))
+
+    questions = get_test(test_type)
+
+    return render_template(
+        'test.html',
+        questions=questions,
+        type=test_type,
+        show_sidebar=False
+    )
+
+@app.route('/achievement')
+@login_required
+def achievement():
+    if current_user.role != 'student':
+        return redirect(url_for('admin_dashboard'))
+
+    user_id = ObjectId(current_user.id)
+
+    pre_result = db.results.find_one(
+        {"user_id": user_id, "test_type": "pre"},
+        sort=[("timestamp", -1)]
+    )
+
+    post_result = db.results.find_one(
+        {"user_id": user_id, "test_type": "post"},
+        sort=[("timestamp", -1)]
+    )
+
+    post_taken = post_result is not None
+
+    return render_template(
+        "user/achievement.html",
+        pre_result=pre_result,
+        post_result=post_result,
+        post_taken=post_taken,
+        show_sidebar=False
+    )
 #---------------------------------------TEMPLATES--------------------------------------------
+def get_student_progress():
+    user_id = ObjectId(current_user.id)
+
+    pre_taken = db.results.find_one({
+        "user_id": user_id,
+        "test_type": "pre"
+    }) is not None
+
+    post_taken = db.results.find_one({
+        "user_id": user_id,
+        "test_type": "post"
+    }) is not None
+
+    completed_lessons = db.module_progress.count_documents({
+        "user_id": user_id
+    })
+
+    total_lessons = 5
+
+    modules_unlocked = pre_taken
+    post_unlocked = completed_lessons >= total_lessons
+
+    return pre_taken, post_taken, modules_unlocked, post_unlocked
 
 @app.route('/')
+@login_required
 def home():
-    if not current_user.is_authenticated:
-        return redirect(url_for('register'))
-
     pre_test_exists = db.tests.find_one({"type": "pre"}) is not None
     post_test_exists = db.tests.find_one({"type": "post"}) is not None
+
+    pre_taken, post_taken, modules_unlocked, post_unlocked = get_student_progress()
 
     return render_template(
         'user/dashboard.html',
         pre_test_exists=pre_test_exists,
         post_test_exists=post_test_exists,
+        pre_taken=pre_taken,
+        post_taken=post_taken,
+        modules_unlocked=modules_unlocked,
+        post_unlocked=post_unlocked,
         show_sidebar=False
     )
 
 @app.route('/module/<int:module_num>/lesson/<int:lesson_num>')
+@login_required
 def view_lesson(module_num, lesson_num):
-    # Dynamically build the lesson code (e.g., "module1_lesson2")
+    pre_taken, post_taken, modules_unlocked, post_unlocked = get_student_progress()
+
+    if not modules_unlocked:
+        flash("You must answer the pre-test first.")
+        return redirect(url_for('home'))
+
     target_code = f"module{module_num}_lesson{lesson_num}"
 
-    current_lesson = db.modules.find_one({"lesson_code": target_code})
+    db.module_progress.update_one(
+        {
+            "user_id": ObjectId(current_user.id),
+            "lesson_code": target_code
+        },
+        {
+            "$set": {
+                "user_id": ObjectId(current_user.id),
+                "lesson_code": target_code,
+                "completed_at": datetime.now(timezone.utc)
+            }
+        },
+        upsert=True
+    )
 
+    current_lesson = db.modules.find_one({"lesson_code": target_code})
 
     file_map = {
         "module1_lesson1": "01_plaintext_vs_cyphertext.html",
         "module1_lesson2": "01_substitution.html",
-
         "module2_lesson1": "02_shared_key.html",
         "module2_lesson2": "02_key_distribution.html",
         "module2_lesson3": "02_deffie.html"
     }
-    
+
     filename = file_map.get(target_code)
+
+    if not filename:
+        return "Lesson not found", 404
+
     template_path = f"topics/module{module_num}/{filename}"
-    
+
     return render_template(
         template_path,
         lesson_data=current_lesson,
@@ -464,7 +553,14 @@ def view_lesson(module_num, lesson_num):
     )
     
 @app.route('/module/<int:module_num>/intro')
+@login_required
 def module_intro(module_num):
+    pre_taken, post_taken, modules_unlocked, post_unlocked = get_student_progress()
+
+    if not modules_unlocked:
+        flash("You must answer the pre-test first.")
+        return redirect(url_for('home'))
+
     intro_map = {
         1: "01_intro.html",
         2: "02_intro.html",
