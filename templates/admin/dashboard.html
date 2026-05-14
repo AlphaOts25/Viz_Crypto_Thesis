@@ -309,11 +309,11 @@
                     -->
                     
                     <td style="padding: 15px 20px; text-align: right; display: flex; justify-content: flex-end; gap: 10px;">
-                        
+                        <!--
                         <a href="#upload-form" style="background: #f3f4f6; color: #374151; padding: 8px 12px; border-radius: 6px; text-decoration: none; font-size: 13px; font-weight: bold; transition: 0.2s;">
                             Edit
                         </a>
-                        
+                        -->
                         {% if module.type == "lesson" %}
                     <form method="POST"
                         action="{{ url_for('delete_lesson', lesson_code=module.lesson_code) }}"

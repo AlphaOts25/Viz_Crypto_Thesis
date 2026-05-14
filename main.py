@@ -9,7 +9,7 @@ from werkzeug.utils import secure_filename
 from dotenv import load_dotenv
 import random
 from collections import defaultdict
-from datetime import datetime
+from datetime import datetime, timezone
 from flask_mail import Mail, Message
 
 app = Flask(__name__)
@@ -71,8 +71,6 @@ def verifyOTP():
                 "email": pending["email"],
                 "password_hash": generate_password_hash(pending["password"]),
                 "role": "student",
-                "quiz_scores": defaultdict(int),
-                "total_score": 0,
                 "professor_id": ObjectId(pending["professor_id"])
             })
 
@@ -274,22 +272,50 @@ def admin_users():
 
         student["pre_score"] = pre_result["score"] if pre_result else "Not taken"
         student["pre_total"] = pre_result["total"] if pre_result else ""
+        student["pre_result_id"] = str(pre_result["_id"]) if pre_result else None
 
         student["post_score"] = post_result["score"] if post_result else "Not taken"
         student["post_total"] = post_result["total"] if post_result else ""
+        student["post_result_id"] = str(post_result["_id"]) if post_result else None
 
     return render_template(
         "admin/users.html",
         students=students,
         show_sidebar=False
     )
+"""
+@app.route('/admin/delete_result/<result_id>', methods=['POST'])
+@login_required
+def delete_result(result_id):
+    if current_user.role != 'admin':
+        return redirect(url_for('home'))
+
+    db.results.delete_one({"_id": ObjectId(result_id)})
+
+    return redirect(url_for('admin_users'))
+"""
+
+@app.route('/admin/delete_result/<result_id>', methods=['POST'])
+@login_required
+def delete_result(result_id):
+    if current_user.role != 'admin':
+        return redirect(url_for('home'))
+
+    result = db.results.delete_one({"_id": ObjectId(result_id)})
+
+    print("Deleting result_id:", result_id)
+    print("Deleted count:", result.deleted_count)
+
+    flash("Result deleted." if result.deleted_count == 1 else "Result not found.")
+
+    return redirect(url_for('admin_users'))
 # ------------------------------ TESTS ------------------------------
 
 def create_test(test_type):
     test = {
         "type": test_type,   # "pre" or "post"
         "title": f"{test_type.capitalize()} Test",
-        "created_at": datetime.utcnow()
+        "created_at": datetime.now(timezone.utc)
     }
 
     result = db.tests.insert_one(test)
@@ -354,7 +380,7 @@ def submit_test():
         "test_type": test_type,
         "score": score,
         "total": len(questions),
-        "timestamp": datetime.utcnow()
+        "timestamp": datetime.now(timezone.utc)
     })
     
     flash(f'Test submitted! Your score: {score}/{len(questions)}')

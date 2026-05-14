@@ -32,27 +32,51 @@
 
                     <td style="padding:15px 20px;">
                         {% if student.pre_score == "Not taken" %}
-                            <span style="color:#b91c1c; font-weight:bold;">Not taken</span>
+                            <span style="color:#b91c1c; font-weight:bold; text-align:center;">-</span>
                         {% else %}
-                            <span style="color:#4f46e5; font-weight:bold;">
-                                {{ student.pre_score }}/{{ student.pre_total }}
-                            </span>
+                            <div style="display:flex; align-items:center; gap:10px;">
+                                <span style="color:#4f46e5; font-weight:bold;">
+                                    {{ student.pre_score }}/{{ student.pre_total }}
+                                </span>
+
+                                <form method="POST"
+                                    action="{{ url_for('delete_result', result_id=student.pre_result_id) }}"
+                                    onsubmit="return confirm('Delete this pre-test attempt?');"
+                                    style="margin:0;">
+                                    <button type="submit"
+                                            style="background:none; border:none; color:#b91c1c; cursor:pointer; font-size:16px;">
+                                        ⛔
+                                    </button>
+                                </form>
+                            </div>
                         {% endif %}
                     </td>
 
                     <td style="padding:15px 20px;">
                         {% if student.post_score == "Not taken" %}
-                            <span style="color:#b91c1c; font-weight:bold;">Not taken</span>
+                            <span style="color:#b91c1c; font-weight:bold;">-</span>
                         {% else %}
-                            <span style="color:#10b981; font-weight:bold;">
-                                {{ student.post_score }}/{{ student.post_total }}
-                            </span>
+                            <div style="display:flex; align-items:center; gap:10px;">
+                                <span style="color:#10b981; font-weight:bold;">
+                                    {{ student.post_score }}/{{ student.post_total }}
+                                </span>
+
+                                <form method="POST"
+                                    action="{{ url_for('delete_result', result_id=student.post_result_id) }}"
+                                    onsubmit="return confirm('Delete this post-test attempt?');"
+                                    style="margin:0;">
+                                    <button type="submit"
+                                            style="background:none; border:none; color:#b91c1c; cursor:pointer; font-size:16px;">
+                                        ⛔
+                                    </button>
+                                </form>
+                            </div>
                         {% endif %}
                     </td>
                 </tr>
                 {% else %}
                 <tr>
-                    <td colspan="4" style="padding:40px; text-align:center; color:#888;">
+                    <td colspan="3" style="padding:40px; text-align:center; color:#888;">
                         No students found.
                     </td>
                 </tr>
