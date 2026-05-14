@@ -27,6 +27,7 @@
                     <a href="#">Profile</a>
                     <a href="{{ url_for('achievement') }}">Achievement</a>
                 {% elif current_user.role == 'admin' %}
+                    <a href="{{ url_for('admin_dashboard') }}">Dashboard</a>
                     <a href="{{ url_for('admin_users') }}">Results</a>
                     <a href="#">Settings</a>
                 {% endif %}
