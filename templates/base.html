@@ -9,10 +9,13 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
 
     <link rel="stylesheet" href="{{ url_for('static', filename='css/sidebar.css') }}">
+    {% block extra_css %}{% endblock %}
 </head>
 <body>
 
-    {% include 'partials/navbar.html' %}
+    {% if show_navbar is not defined or show_navbar %}
+        {% include 'partials/navbar.html' %}
+    {% endif %}
 
     <div class="page-wrapper">
         
@@ -29,5 +32,6 @@
 
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>
     <script src="{{ url_for('static', filename='js/bar.js') }}"></script>
+    {% block extra_js %}{% endblock %}
 </body>
 </html>

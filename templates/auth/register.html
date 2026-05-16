@@ -1,59 +1,99 @@
 {% extends "base.html" %}
 
+{% block extra_css %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/auth.css') }}">
+{% endblock %}
+
 {% block content %}
-<div style="max-width: 400px; margin: 50px auto; background: white; padding: 30px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
-    
-    <h2 style="margin-top: 0; color: #333; text-align: center; margin-bottom: 20px;">Create an Account</h2>
-    
-    {% with messages = get_flashed_messages() %}
-      {% if messages %}
-        {% for message in messages %}
-          <div style="background: #fef2f2; color: #991b1b; padding: 10px; border-radius: 4px; margin-bottom: 15px; text-align: center; font-size: 14px; border: 1px solid #f87171;">
-            {{ message }}
-          </div>
-        {% endfor %}
-      {% endif %}
-    {% endwith %}
+<div class="auth-page">
 
-    <form method="POST" action="{{ url_for('register') }}">
-        
-        <div style="margin-bottom: 15px;">
-            <label style="display: block; color: #555; font-size: 14px; font-weight: bold; margin-bottom: 5px;">Username</label>
-            <input type="text" name="username" required style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box;">
+    <div class="auth-left">
+        <div class="auth-card">
+            <div class="auth-logo">CV</div>
+
+            <h2>Create Account</h2>
+            <p class="auth-subtitle">Register to access the cryptography learning modules.</p>
+
+            {% with messages = get_flashed_messages() %}
+                {% if messages %}
+                    {% for message in messages %}
+                        <div class="auth-alert">{{ message }}</div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+
+            <form method="POST" action="{{ url_for('register') }}">
+                <div class="auth-group">
+                    <label>Username</label>
+                    <input type="text" name="username" required>
+                </div>
+
+                <div class="auth-group">
+                    <label>Email Address</label>
+                    <input type="email" name="email" required>
+                </div>
+
+                <div class="auth-group">
+                    <label>Select Your Professor</label>
+                    <select name="professor_id" required>
+                        <option value="" disabled selected>Choose from list</option>
+                        {% for admin in admins %}
+                            <option value="{{ admin._id }}">Prof. {{ admin.username }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="auth-group">
+                    <label>Password</label>
+                    <input type="password" name="password" required>
+                </div>
+
+                <div class="auth-group">
+                    <label>Confirm Password</label>
+                    <input type="password" name="confirm_password" required>
+                </div>
+
+                <button type="submit" class="auth-btn">Sign Up</button>
+            </form>
+
+            <div class="auth-link">
+                Already have an account?
+                <a href="{{ url_for('login') }}">Log in here</a>
+            </div>
         </div>
-
-        <div style="margin-bottom: 15px;">
-            <label style="display: block; color: #555; font-size: 14px; font-weight: bold; margin-bottom: 5px;">Email Address</label>
-            <input type="email" name="email" required style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box;">
-        </div>
-
-        <div style="margin-bottom: 15px;">
-            <label style="display: block; color: #555; font-size: 14px; font-weight: bold; margin-bottom: 5px;">Select Your Professor</label>
-            <select name="professor_id" required style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; background: white;">
-                <option value="" disabled selected>-- Choose from list --</option>
-                {% for admin in admins %}
-                    <option value="{{ admin._id }}">Prof. {{ admin.username }}</option>
-                {% endfor %}
-            </select>
-        </div>
-
-        <div style="margin-bottom: 15px;">
-            <label style="display: block; color: #555; font-size: 14px; font-weight: bold; margin-bottom: 5px;">Password</label>
-            <input type="password" name="password" required style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box;">
-        </div>
-
-        <div style="margin-bottom: 20px;">
-            <label style="display: block; color: #555; font-size: 14px; font-weight: bold; margin-bottom: 5px;">Confirm Password</label>
-            <input type="password" name="confirm_password" required style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box;">
-        </div>
-
-        <button type="submit" style="width: 100%; background: #6366f1; color: white; border: none; padding: 12px; border-radius: 4px; font-weight: bold; font-size: 16px; cursor: pointer; transition: 0.2s;">
-            Sign Up
-        </button>
-    </form>
-
-    <div style="text-align: center; margin-top: 20px; font-size: 14px; color: #666;">
-        Already have an account? <a href="{{ url_for('login') }}" style="color: #6366f1; text-decoration: none; font-weight: bold;">Log in here</a>.
     </div>
+
+    <div class="auth-right">
+        <div class="auth-slider">
+            <div class="slide active">
+                <div class="slide-visual">🔐</div>
+                <h3>Start With the Basics</h3>
+                <p>Begin with plaintext, ciphertext, encryption, decryption, and classical ciphers.</p>
+            </div>
+
+            <div class="slide">
+                <div class="slide-visual">🔑</div>
+                <h3>Understand Keys</h3>
+                <p>Learn how shared keys and encryption processes protect information.</p>
+            </div>
+
+            <div class="slide">
+                <div class="slide-visual">📈</div>
+                <h3>Measure Improvement</h3>
+                <p>Your learning progress is evaluated through pre-test and post-test performance.</p>
+            </div>
+
+            <div class="slider-dots">
+                <span class="slider-dot active"></span>
+                <span class="slider-dot"></span>
+                <span class="slider-dot"></span>
+            </div>
+        </div>
+    </div>
+
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/auth.js') }}"></script>
 {% endblock %}

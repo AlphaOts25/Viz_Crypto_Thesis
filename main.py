@@ -9,12 +9,29 @@ from werkzeug.utils import secure_filename
 from dotenv import load_dotenv
 import random
 from collections import defaultdict
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 from flask_mail import Mail, Message
+from itsdangerous import URLSafeTimedSerializer
 
 app = Flask(__name__)
 # IMPORTANT: In a real app, this should be a random string hidden in a .env file
-app.secret_key = 'super_secret_thesis_key_change_this_later' 
+app.secret_key = os.getenv("APP_SECRET_KEY") 
+
+app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(minutes=30)
+
+#--------------------------------------cache blocker---------------------------------------
+@app.after_request
+def prevent_cache(response):
+    response.headers["Cache-Control"] = "no-store, no-cache, must-revalidate, max-age=0"
+    response.headers["Pragma"] = "no-cache"
+    response.headers["Expires"] = "0"
+    return response
+
+@app.before_request
+def refresh_session():
+    session.permanent = True
+    session.modified = True
+#-------------------------------------------------------------------------
 
 load_dotenv()
 
@@ -29,6 +46,8 @@ app.config['MAIL_USERNAME'] = os.getenv('MAIL_USERNAME')
 app.config['MAIL_PASSWORD'] = os.getenv('MAIL_PASSWORD')
 
 mail = Mail(app)
+app.config['SERIALIZER_SECRET_KEY'] = os.getenv("SERIALIZER_SECRET_KEY")
+serializer = URLSafeTimedSerializer(app.config['SERIALIZER_SECRET_KEY'])
 
 # --- Setup Flask-Login ---
 login_manager = LoginManager()
@@ -83,7 +102,11 @@ def verifyOTP():
         else:
             flash('Invalid OTP')
 
-    return render_template('auth/verifyOTP.html')
+    return render_template(
+        'auth/verifyOTP.html',
+        show_navbar=False,
+        show_sidebar=False
+    )
 # ---------- LOGIN ----------------------------------------------
 @app.route('/register', methods=['GET', 'POST'])
 def register():
@@ -130,18 +153,30 @@ def register():
         return redirect(url_for('verifyOTP'))
 
     admins = list(db.users.find({"role": "admin"}))
-    return render_template('auth/register.html', admins=admins)
+    return render_template(
+        'auth/register.html',
+        admins=admins,
+        show_navbar=False,
+        show_sidebar=False
+    )
 
 
 @app.route('/logout')
 @login_required
 def logout():
     logout_user()
+    session.clear()
+    flash("You have been logged out.")
     return redirect(url_for('login'))
 
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
+    if current_user.is_authenticated:
+        if current_user.role == 'admin':
+            return redirect(url_for('admin_dashboard'))
+        return redirect(url_for('home'))
+
     if request.method == 'POST':
         submitted_username = request.form['username']
         submitted_password = request.form['password']
@@ -151,7 +186,8 @@ def login():
         if user and check_password_hash(user['password_hash'], submitted_password):
             user_obj = User(id=user['_id'], username=user['username'], role=user['role'])
             login_user(user_obj)
-            
+            session.permanent = True
+
             if user['role'] == 'admin':
                 return redirect(url_for('admin_dashboard'))
             else:
@@ -160,9 +196,91 @@ def login():
             flash('Invalid username or password.')
             return redirect(url_for('login'))
 
-    return render_template('auth/login.html')
+    return render_template(
+        'auth/login.html',
+        show_navbar=False,
+        show_sidebar=False
+    )
 
+@app.route('/forgotpassword', methods=['GET', 'POST'])
+def forgotpassword():
+    if request.method == 'POST':
+        email = request.form.get('email')
 
+        user = db.users.find_one({"email": email})
+
+        if user:
+            token = serializer.dumps(email, salt='password-reset-salt')
+
+            reset_link = url_for(
+                'resetpassword',
+                token=token,
+                _external=True
+            )
+
+            msg = Message(
+                'Password Reset Request',
+                sender=app.config['MAIL_USERNAME'],
+                recipients=[email]
+            )
+
+            msg.body = f"""
+You requested to reset your password.
+
+Click this link to reset it:
+{reset_link}
+
+This link will expire in 30 minutes.
+"""
+
+            mail.send(msg)
+
+        flash('If the email exists, a password reset link has been sent.')
+        return redirect(url_for('forgotpassword'))
+
+    return render_template(
+        'auth/forgotpassword.html',
+        show_navbar=False,
+        show_sidebar=False
+    )
+
+@app.route('/resetpassword/<token>', methods=['GET', 'POST'])
+def resetpassword(token):
+    try:
+        email = serializer.loads(
+            token,
+            salt='password-reset-salt',
+            max_age=1800
+        )
+    except:
+        flash('The reset link is invalid or expired.')
+        return redirect(url_for('forgotpassword'))
+
+    if request.method == 'POST':
+        password = request.form.get('password')
+        confirm_password = request.form.get('confirm_password')
+
+        if password != confirm_password:
+            flash('Passwords do not match.')
+            return redirect(url_for('resetpassword', token=token))
+
+        db.users.update_one(
+            {"email": email},
+            {
+                "$set": {
+                    "password_hash": generate_password_hash(password)
+                }
+            }
+        )
+
+        flash('Password updated successfully. You can now log in.')
+        return redirect(url_for('login'))
+
+    return render_template(
+        'auth/resetpassword.html',
+        show_navbar=False,
+        show_sidebar=False
+    )
 # ------------------------------ ADMIN ------------------------------
 
 @app.route('/admin/dashboard')
