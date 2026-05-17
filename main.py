@@ -1,21 +1,23 @@
 from flask import Flask, render_template, request, redirect, url_for, flash, session
-from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user, login_required
-from werkzeug.security import check_password_hash
-from werkzeug.security import generate_password_hash    
+from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
+from werkzeug.security import check_password_hash, generate_password_hash
 from bson.objectid import ObjectId
 from pymongo import MongoClient
 import os
-from werkzeug.utils import secure_filename
 from dotenv import load_dotenv
-import random
+import random, math
 from collections import defaultdict
 from datetime import datetime, timezone, timedelta
 from flask_mail import Mail, Message
 from itsdangerous import URLSafeTimedSerializer
 
+load_dotenv()
+
 app = Flask(__name__)
-# IMPORTANT: In a real app, this should be a random string hidden in a .env file
-app.secret_key = os.getenv("APP_SECRET_KEY") 
+app.secret_key = os.getenv("APP_SECRET_KEY")
+
+if not app.secret_key:
+    raise RuntimeError("APP_SECRET_KEY is missing from .env")
 
 app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(minutes=30)
 
@@ -32,8 +34,6 @@ def refresh_session():
     session.permanent = True
     session.modified = True
 #-------------------------------------------------------------------------
-
-load_dotenv()
 
 #MONGO
 client = MongoClient(os.getenv("MONGO_URI"))
@@ -293,19 +293,27 @@ def admin_dashboard():
     module_count = db.modules.count_documents({})
     student_count = db.users.count_documents({"role": "student"})
 
-    modules = list(db.modules.find())
     tests = list(db.tests.find())
 
-    for m in modules:
-        m["type"] = "lesson"
+    for test in tests:
+        test["display_type"] = "Pre-test" if test["type"] == "pre" else "Post-test"
+        test["title"] = test["display_type"]
+        test["id"] = str(test["_id"])
 
-    for t in tests:
-        t["type"] = "test"
-        t["lesson_code"] = f"{t['type'].upper()}_TEST"
-        t["title"] = f"{t['type'].capitalize()} Test"
-        t["video_url"] = None
+        questions = list(db.questions.find({"test_id": test["_id"]}))
 
-    curriculum = modules + tests
+        test["questions"] = []
+        for q in questions:
+            test["questions"].append({
+                "text": q.get("question_text", ""),
+                "a": q.get("choices", {}).get("a", ""),
+                "b": q.get("choices", {}).get("b", ""),
+                "c": q.get("choices", {}).get("c", ""),
+                "d": q.get("choices", {}).get("d", ""),
+                "correct": q.get("correct_answer", "")
+            })
+
+    curriculum = tests
 
     return render_template(
         'admin/dashboard.html',
@@ -315,59 +323,119 @@ def admin_dashboard():
         show_sidebar=False
     )
 
+def calculate_test_statistics():
+    students = list(db.users.find({"role": "student"}))
+    paired_scores = []
 
-@app.route('/admin/add_lesson', methods=['POST'])
-@login_required
-def add_lesson():
+    for student in students:
+        pre = db.results.find_one(
+            {"user_id": student["_id"], "test_type": "pre"},
+            sort=[("timestamp", -1)]
+        )
 
-    if current_user.role != 'admin':
-        return redirect(url_for('home'))
+        post = db.results.find_one(
+            {"user_id": student["_id"], "test_type": "post"},
+            sort=[("timestamp", -1)]
+        )
 
-    lesson_code = request.form.get('lesson_code')
-    title = request.form.get('title')
-    content = request.form.get('content')
-    video_file = request.files.get('video_file')
+        if pre and post:
+            paired_scores.append({
+                "pre": pre["score"],
+                "post": post["score"]
+            })
 
-    update_data = {
-        "title": title,
-        "content": content
+    n = len(paired_scores)
+
+    if n == 0:
+        return {
+            "mean_pre": 0,
+            "mean_post": 0,
+            "mean_gain": 0,
+            "t_value": "N/A",
+            "effect_size": "N/A",
+            "effect_label": "N/A"
+        }
+
+    pre_scores = [s["pre"] for s in paired_scores]
+    post_scores = [s["post"] for s in paired_scores]
+    gains = [s["post"] - s["pre"] for s in paired_scores]
+
+    mean_pre = sum(pre_scores) / n
+    mean_post = sum(post_scores) / n
+    mean_gain = sum(gains) / n
+
+    if n < 2:
+        t_value = "N/A"
+        effect_size = "N/A"
+        effect_label = "N/A"
+    else:
+        variance = sum((g - mean_gain) ** 2 for g in gains) / (n - 1)
+        sd_gain = math.sqrt(variance)
+
+        if sd_gain == 0:
+            t_value = "N/A"
+            effect_size = "N/A"
+            effect_label = "N/A"
+        else:
+            t_value = mean_gain / (sd_gain / math.sqrt(n))
+            effect_size = mean_gain / sd_gain
+
+            abs_effect = abs(effect_size)
+
+            if abs_effect < 0.2:
+                effect_label = "Very small"
+            elif abs_effect < 0.5:
+                effect_label = "Small"
+            elif abs_effect < 0.8:
+                effect_label = "Moderate"
+            else:
+                effect_label = "Large"
+
+    return {
+        "mean_pre": round(mean_pre, 2),
+        "mean_post": round(mean_post, 2),
+        "mean_gain": round(mean_gain, 2),
+        "t_value": round(t_value, 3) if isinstance(t_value, float) else t_value,
+        "effect_size": round(effect_size, 3) if isinstance(effect_size, float) else effect_size,
+        "effect_label": effect_label
     }
 
-    if video_file and video_file.filename != '':
-        filename = secure_filename(video_file.filename)
-        file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-        video_file.save(file_path)
-        update_data["video_url"] = f"/static/uploads/videos/{filename}"
 
-    db.modules.update_one(
-        {"lesson_code": lesson_code},
-        {"$set": update_data},
-        upsert=True
-    )
-    
-    flash(f'Successfully uploaded video for {title}!')
-    return redirect(url_for('admin_dashboard'))
+def calculate_question_statistics():
+    stats = []
 
+    tests = list(db.tests.find().sort("_id", 1))
 
-@app.route('/admin/delete_lesson/<lesson_code>', methods=['POST'])
-@login_required
-def delete_lesson(lesson_code):
+    for test in tests:
+        questions = list(db.questions.find({"test_id": test["_id"]}).sort("_id", 1))
 
-    if current_user.role != 'admin':
-        return redirect(url_for('home'))
+        for index, question in enumerate(questions, start=1):
+            correct_count = 0
+            wrong_count = 0
 
-    lesson = db.modules.find_one({"lesson_code": lesson_code})
+            results = list(db.results.find({"test_type": test["type"]}))
 
-    if lesson and lesson.get('video_url'):
-        filename = lesson['video_url'].split('/')[-1]
-        file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+            for result in results:
+                for answer in result.get("answers", []):
+                    if answer.get("question_id") == question["_id"]:
+                        if answer.get("is_correct"):
+                            correct_count += 1
+                        else:
+                            wrong_count += 1
 
-        if os.path.exists(file_path):
-            os.remove(file_path)
+            total = correct_count + wrong_count
 
-    db.modules.delete_one({"lesson_code": lesson_code})
+            stats.append({
+                "test_type": "Pre-test" if test["type"] == "pre" else "Post-test",
+                "number": index,
+                "question_text": question.get("question_text", ""),
+                "correct_count": correct_count,
+                "wrong_count": wrong_count,
+                "correct_percentage": round((correct_count / total) * 100, 2) if total > 0 else 0,
+                "wrong_percentage": round((wrong_count / total) * 100, 2) if total > 0 else 0
+            })
 
-    return redirect(url_for('admin_dashboard'))
+    return stats
 
 @app.route('/admin/users')
 @login_required
@@ -396,22 +464,16 @@ def admin_users():
         student["post_total"] = post_result["total"] if post_result else ""
         student["post_result_id"] = str(post_result["_id"]) if post_result else None
 
+    test_stats = calculate_test_statistics()
+    question_stats = calculate_question_statistics()
+
     return render_template(
         "admin/users.html",
         students=students,
+        test_stats=test_stats,
+        question_stats=question_stats,
         show_sidebar=False
     )
-"""
-@app.route('/admin/delete_result/<result_id>', methods=['POST'])
-@login_required
-def delete_result(result_id):
-    if current_user.role != 'admin':
-        return redirect(url_for('home'))
-
-    db.results.delete_one({"_id": ObjectId(result_id)})
-
-    return redirect(url_for('admin_users'))
-"""
 
 @app.route('/admin/delete_result/<result_id>', methods=['POST'])
 @login_required
@@ -474,6 +536,46 @@ def add_test():
 
     return redirect(url_for('admin_dashboard'))
 
+@app.route('/edit_test/<test_id>', methods=['POST'])
+@login_required
+def edit_test(test_id):
+
+    if current_user.role != 'admin':
+        return redirect(url_for('home'))
+
+    test_object_id = ObjectId(test_id)
+    test_type = request.form.get("type")
+
+    db.tests.update_one(
+        {"_id": test_object_id},
+        {"$set": {"type": test_type}}
+    )
+
+    db.questions.delete_many({"test_id": test_object_id})
+
+    grouped = defaultdict(dict)
+
+    for key, value in request.form.items():
+        if key.startswith("questions"):
+            parts = key.replace("]", "").split("[")
+            grouped[parts[1]][parts[2]] = value
+
+    for q in grouped.values():
+        db.questions.insert_one({
+            "test_id": test_object_id,
+            "question_text": q.get("text"),
+            "choices": {
+                "a": q.get("a"),
+                "b": q.get("b"),
+                "c": q.get("c"),
+                "d": q.get("d")
+            },
+            "correct_answer": q.get("correct")
+        })
+
+    flash("Test updated successfully.")
+    return redirect(url_for('admin_dashboard'))
+
 @app.route('/submit_test', methods=['POST'])
 @login_required
 def submit_test():
@@ -485,19 +587,30 @@ def submit_test():
     
     # Calculate score
     score = 0
+    answers = []
+
     questions = list(db.questions.find({"test_id": test["_id"]}))
-    
+
     for idx, question in enumerate(questions):
         user_answer = request.form.get(f'question_{idx}')
-        if user_answer == question['correct_answer']:
+        is_correct = user_answer == question['correct_answer']
+
+        if is_correct:
             score += 1
-    
-    # Store result
+
+        answers.append({
+            "question_id": question["_id"],
+            "user_answer": user_answer,
+            "correct_answer": question["correct_answer"],
+            "is_correct": is_correct
+        })
+
     db.results.insert_one({
         "user_id": ObjectId(current_user.id),
         "test_type": test_type,
         "score": score,
         "total": len(questions),
+        "answers": answers,
         "timestamp": datetime.now(timezone.utc)
     })
     
@@ -702,4 +815,4 @@ os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True, use_reloader=False)

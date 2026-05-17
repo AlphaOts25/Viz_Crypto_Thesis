@@ -179,16 +179,7 @@
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
         <div>
             <h1 style="margin: 0; font-size: 28px;">Admin Dashboard</h1>
-            <p style="color: #666; margin-top: 5px;">Manage your cryptography curriculum and materials.</p>
         </div>
-        <button onclick="openTestModal()" 
-            style="background:#6366f1; color:white; padding:12px 20px; border:none; border-radius:6px; font-weight:bold;">
-            + Add Test
-        </button>
-        <a href="{{ url_for('admin_users') }}"
-            style="background:#10b981; color:white; padding:12px 20px; border-radius:6px; font-weight:bold; text-decoration:none; display:inline-block;">
-            View User Scores
-        </a>
     </div>
 
     <div style="display: flex; gap: 20px; margin-bottom: 40px;">
@@ -201,57 +192,20 @@
             <p style="color: #888; margin: 5px 0 0 0; font-size: 13px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">Enrolled Students</p>
         </div>
     </div>
-    
-    <div style="background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); margin-bottom: 30px;">
-        <h2 style="margin-top: 0; font-size: 18px; color: #333; margin-bottom: 20px;">Upload / Update Lesson Video</h2>
-        
-        <form method="POST" action="{{ url_for('add_lesson') }}" enctype="multipart/form-data" style="display: flex; gap: 15px; flex-wrap: wrap;">
-        
-            <div style="flex: 1; min-width: 200px;">
-                <label style="display: block; font-size: 12px; font-weight: bold; color: #666; margin-bottom: 5px;">Select Lesson</label>
-                <select name="lesson_code" required style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px;">
-                    <option value="module1_lesson1">Module 1: Plaintext vs Ciphertext</option>
-                    <option value="module1_lesson2">Module 1: Caesar Cipher</option>
-                    <option value="module2_lesson1">Module 2: Shared Key Concepts</option>
-                    <!-- <option value="module2_lesson2">Module 2: AES Standard</option> -->
-                    <option value="module2_lesson2">Module 2: Key Distribution Problem</option>
-                    <!-- <option value="module3_lesson1">Module 3: Secure Distribution Issue</option> -->
-                    <!-- <option value="module3_lesson2">Module 3: MITM</option> -->
-                    <option value="module2_lesson3">Module 2: Diffie-Hellman Exchange</option>
-                </select>
-            </div>
-
-            <div style="flex: 1; min-width: 200px;">
-                <label style="display: block; font-size: 12px; font-weight: bold; color: #666; margin-bottom: 5px;">Display Title</label>
-                <input type="text" name="title" required placeholder="e.g., Intro to Cryptography" style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box;">
-            </div>
-
-            <div style="flex: 2; min-width: 300px;">
-                <label style="display: block; font-size: 12px; font-weight: bold; color: #666; margin-bottom: 5px;">Upload MP4 Video</label>
-                <input type="file" name="video_file" accept="video/mp4" style="width: 100%; padding: 7px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; background: #f9fafb;">
-            </div>
-
-            <div style="display: flex; align-items: flex-end;">
-                <button type="submit" style="background: #10b981; color: white; border: none; padding: 10px 20px; height: 40px; border-radius: 6px; font-weight: bold; cursor: pointer;">
-                    Upload Video
-                </button>
-            </div>
-        </form>
-    </div>
     <div id="testModal">
         <div class="modal-content">
-            <form method="POST" action="{{ url_for('add_test') }}">
+            <form id="testForm" method="POST" action="{{ url_for('add_test') }}">
                 <div class="modal-grid">
 
                     <!-- LEFT -->
                     <div class="modal-left">
                         <div class="modal-header">
-                            <h2>Create Test</h2>
+                            <h2 id="modalTitle">Create Test</h2>
                             <button type="button" class="modal-close" onclick="closeTestModal()">✕</button>
                         </div>
 
                         <label>Test Type</label>
-                        <select name="type" required>
+                        <select id="testType" name="type" required>
                             <option value="pre">Pre-test</option>
                             <option value="post">Post-test</option>
                         </select>
@@ -274,16 +228,20 @@
     </div>
     
     <div style="background: white; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); overflow: hidden;">
-        <div style="padding: 20px; border-bottom: 1px solid #e5e7eb; background: #f9fafb;">
-            <h3 style="margin: 0; font-size: 16px; color: #333;">Curriculum Manager</h3>
+        <div style="padding: 20px; border-bottom: 1px solid #e5e7eb; background: #f9fafb; display: flex; justify-content: space-between; align-items: center;">
+            <h3 style="margin: 0; font-size: 16px; color: #333;">Test Manager</h3>
+
+            <button onclick="openTestModal()" 
+                style="background:#6366f1; color:white; padding:12px 20px; border:none; border-radius:6px; font-weight:bold;">
+                Add Test
+            </button>
         </div>
         
         <table style="width: 100%; border-collapse: collapse; text-align: left;">
             <thead>
                 <tr style="border-bottom: 2px solid #e5e7eb; color: #6b7280; font-size: 13px; text-transform: uppercase;">
-                    <th style="padding: 15px 20px;">Lesson Code</th>
+                    <th style="padding: 15px 20px;">Test Type</th>
                     <th style="padding: 15px 20px;">Display Title</th>
-                    <!--<th style="padding: 15px 20px;">Video Status</th>-->
                     <th style="padding: 15px 20px; text-align: right;">Actions</th>
                 </tr>
             </thead>
@@ -292,47 +250,33 @@
                 <tr style="border-bottom: 1px solid #f3f4f6;">
                     
                     <td style="padding: 15px 20px; font-weight: bold; color: #4f46e5; font-size: 14px;">
-                        {{ module.lesson_code }}
+                        {{ module.display_type }}
                     </td>
-                    
+
                     <td style="padding: 15px 20px; color: #333; font-weight: 500;">
                         {{ module.title }}
                     </td>
-                    <!--
-                    <td style="padding: 15px 20px;">
-                        {% if module.video_url %}
-                            <span style="background: #d1fae5; color: #065f46; padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: bold;">✓ Uploaded</span>
-                        {% else %}
-                            <span style="background: #fee2e2; color: #991b1b; padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: bold;">Missing Video</span>
-                        {% endif %}
-                    </td>
-                    -->
                     
                     <td style="padding: 15px 20px; text-align: right; display: flex; justify-content: flex-end; gap: 10px;">
-                        <!--
-                        <a href="#upload-form" style="background: #f3f4f6; color: #374151; padding: 8px 12px; border-radius: 6px; text-decoration: none; font-size: 13px; font-weight: bold; transition: 0.2s;">
+                        <button type="button"
+                            data-id="{{ module.id }}"
+                            data-type="{{ module.type }}"
+                            data-questions='{{ module.questions | tojson | forceescape }}'
+                            onclick="openEditModalFromButton(this)"
+                            style="background:#e0e7ff; color:#3730a3; border:none; padding:8px 12px; border-radius:6px; font-size:13px; font-weight:bold; cursor:pointer;">
                             Edit
-                        </a>
-                        -->
-                        {% if module.type == "lesson" %}
-                    <form method="POST"
-                        action="{{ url_for('delete_lesson', lesson_code=module.lesson_code) }}"
-                        onsubmit="return confirm('Delete this lesson?');"
-                        style="margin:0;">
-                    {% else %}
-                    <form method="POST"
-                        action="{{ url_for('delete_test', test_id=module._id) }}"
-                        onsubmit="return confirm('Delete this test?');"
-                        style="margin:0;">
-                    {% endif %}
-
-                        <button type="submit"
-                            style="background:#fee2e2; color:#b91c1c; border:none; padding:8px 12px; border-radius:6px; font-size:13px; font-weight:bold; cursor:pointer;">
-                            Delete
                         </button>
 
-                    </form>
+                        <form method="POST"
+                            action="{{ url_for('delete_test', test_id=module._id) }}"
+                            onsubmit="return confirm('Delete this test?');"
+                            style="margin:0;">
 
+                            <button type="submit"
+                                style="background:#fee2e2; color:#b91c1c; border:none; padding:8px 12px; border-radius:6px; font-size:13px; font-weight:bold; cursor:pointer;">
+                                Delete
+                            </button>
+                        </form>
                     </td>
                 </tr>
                 {% else %}
@@ -351,6 +295,28 @@
 let questionIndex = 0;
 
 function openTestModal() {
+    questionIndex = 0;
+
+    document.getElementById("modalTitle").innerText = "Create Test";
+    document.getElementById("testForm").action = "{{ url_for('add_test') }}";
+    document.getElementById("testType").value = "pre";
+    document.getElementById("questions-container").innerHTML = "";
+
+    document.getElementById("testModal").style.display = "block";
+}
+
+function openEditModal(testId, testType, questions) {
+    questionIndex = 0;
+
+    document.getElementById("modalTitle").innerText = "Edit Test";
+    document.getElementById("testForm").action = `/edit_test/${testId}`;
+    document.getElementById("testType").value = testType;
+    document.getElementById("questions-container").innerHTML = "";
+
+    questions.forEach(q => {
+        addQuestion(q);
+    });
+
     document.getElementById("testModal").style.display = "block";
 }
 
@@ -358,32 +324,74 @@ function closeTestModal() {
     document.getElementById("testModal").style.display = "none";
 }
 
-function addQuestion() {
+function addQuestion(data = null) {
     const container = document.getElementById("questions-container");
+
+    const text = data ? data.text : "";
+    const a = data ? data.a : "";
+    const b = data ? data.b : "";
+    const c = data ? data.c : "";
+    const d = data ? data.d : "";
+    const correct = data ? data.correct : "";
 
     const block = document.createElement("div");
     block.classList.add("question-block");
 
     block.innerHTML = `
         <textarea name="questions[${questionIndex}][text]" 
-            placeholder="Enter question" required></textarea>
+            placeholder="Enter question" required>${text}</textarea>
 
-        <input name="questions[${questionIndex}][a]" placeholder="Choice A" required>
-        <input name="questions[${questionIndex}][b]" placeholder="Choice B" required>
-        <input name="questions[${questionIndex}][c]" placeholder="Choice C" required>
-        <input name="questions[${questionIndex}][d]" placeholder="Choice D" required>
+        <div style="display:flex; align-items:center; gap:8px;">
+            <span>A.</span>
+            <input name="questions[${questionIndex}][a]" placeholder="Choice A" value="${a}" required>
+        </div>
+
+        <div style="display:flex; align-items:center; gap:8px;">
+            <span>B.</span>
+            <input name="questions[${questionIndex}][b]" placeholder="Choice B" value="${b}" required>
+        </div>
+
+        <div style="display:flex; align-items:center; gap:8px;">
+            <span>C.</span>
+            <input name="questions[${questionIndex}][c]" placeholder="Choice C" value="${c}" required>
+        </div>
+
+        <div style="display:flex; align-items:center; gap:8px;">
+            <span>D.</span>
+            <input name="questions[${questionIndex}][d]" placeholder="Choice D" value="${d}" required>
+        </div>
 
         <select name="questions[${questionIndex}][correct]" required>
-            <option value="">Correct</option>
-            <option value="a">A</option>
-            <option value="b">B</option>
-            <option value="c">C</option>
-            <option value="d">D</option>
+            <option value="">Correct Answer</option>
+            <option value="a" ${correct === "a" ? "selected" : ""}>A</option>
+            <option value="b" ${correct === "b" ? "selected" : ""}>B</option>
+            <option value="c" ${correct === "c" ? "selected" : ""}>C</option>
+            <option value="d" ${correct === "d" ? "selected" : ""}>D</option>
         </select>
+
+        <button type="button"
+            onclick="deleteQuestion(this)"
+            style="background:#fee2e2; color:#b91c1c; border:none; padding:8px 12px; border-radius:6px; font-size:13px; font-weight:bold; cursor:pointer; margin-bottom:10px;">
+            Delete Question
+        </button>
+
+        <hr style="margin:15px 0;">
     `;
 
     container.appendChild(block);
     questionIndex++;
+}
+
+function openEditModalFromButton(button) {
+    const testId = button.dataset.id;
+    const testType = button.dataset.type;
+    const questions = JSON.parse(button.dataset.questions);
+
+    openEditModal(testId, testType, questions);
+}
+
+function deleteQuestion(button) {
+    button.closest(".question-block").remove();
 }
 </script>
 {% endblock %}

@@ -4,8 +4,8 @@
 <div class="main-container">
 
     <a href="{{ url_for('admin_dashboard') }}"
-        style="display:inline-block; background:#f3f4f6; color:#374151; padding:10px 16px; border-radius:6px; font-weight:bold; text-decoration:none; margin-bottom:20px;">
-        ← Back to Dashboard
+        style="display:inline-block; background:#f3f4f6; color:#374151; padding:10px 16px; border-radius:6px; font-weight:bold; text-decoration:none; margin-bottom:-30px;">
+        ← 
     </a>
 
     <h1 style="margin-bottom: 5px;">User Scores</h1>
@@ -13,6 +13,42 @@
         View student pre-test and post-test scores.
     </p>
 
+    <!-- SUMMARY STATISTICS -->
+    <div style="display:grid; grid-template-columns:repeat(5, 1fr); gap:15px; margin-bottom:30px;">
+
+        <div style="background:white; padding:20px; border-radius:12px; box-shadow:0 4px 12px rgba(0,0,0,0.05);">
+            <h3 style="margin:0; color:#4f46e5;">{{ test_stats.mean_pre }}</h3>
+            <p style="margin:5px 0 0; color:#666; font-size:13px;">Mean Pre-test Score</p>
+            <small>Average score before using the app.</small>
+        </div>
+
+        <div style="background:white; padding:20px; border-radius:12px; box-shadow:0 4px 12px rgba(0,0,0,0.05);">
+            <h3 style="margin:0; color:#10b981;">{{ test_stats.mean_post }}</h3>
+            <p style="margin:5px 0 0; color:#666; font-size:13px;">Mean Post-test Score</p>
+            <small>Average score after using the app.</small>
+        </div>
+
+        <div style="background:white; padding:20px; border-radius:12px; box-shadow:0 4px 12px rgba(0,0,0,0.05);">
+            <h3 style="margin:0; color:#f59e0b;">{{ test_stats.mean_gain }}</h3>
+            <p style="margin:5px 0 0; color:#666; font-size:13px;">Mean Gain Score</p>
+            <small>Post-test mean − Pre-test mean.</small>
+        </div>
+
+        <div style="background:white; padding:20px; border-radius:12px; box-shadow:0 4px 12px rgba(0,0,0,0.05);">
+            <h3 style="margin:0; color:#6366f1;">{{ test_stats.t_value }}</h3>
+            <p style="margin:5px 0 0; color:#666; font-size:13px;">Paired Sample t-test</p>
+            <small>Determines if improvement is statistically significant.</small>
+        </div>
+
+        <div style="background:white; padding:20px; border-radius:12px; box-shadow:0 4px 12px rgba(0,0,0,0.05);">
+            <h3 style="margin:0; color:#dc2626;">{{ test_stats.effect_size }}</h3>
+            <p style="margin:5px 0 0; color:#666; font-size:13px;">Effect Size</p>
+            <small>{{ test_stats.effect_label }}</small>
+        </div>
+
+    </div>
+
+    <!-- STUDENT SCORES TABLE -->
     <div style="background:white; border-radius:12px; box-shadow:0 4px 12px rgba(0,0,0,0.05); overflow:hidden;">
         <table style="width:100%; border-collapse:collapse; text-align:left;">
             <thead>
@@ -32,7 +68,7 @@
 
                     <td style="padding:15px 20px;">
                         {% if student.pre_score == "Not taken" %}
-                            <span style="color:#b91c1c; font-weight:bold; text-align:center;">-</span>
+                            <span style="color:#b91c1c; font-weight:bold;">-</span>
                         {% else %}
                             <div style="display:flex; align-items:center; gap:10px;">
                                 <span style="color:#4f46e5; font-weight:bold;">
@@ -78,6 +114,60 @@
                 <tr>
                     <td colspan="3" style="padding:40px; text-align:center; color:#888;">
                         No students found.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- QUESTION ANALYSIS -->
+    <h2 style="margin-top:40px;">Question Analysis</h2>
+    <p style="color:#666; margin-bottom:20px;">
+        Shows the percentage of students who answered each question correctly or incorrectly.
+    </p>
+
+    <div style="background:white; border-radius:12px; box-shadow:0 4px 12px rgba(0,0,0,0.05); overflow:hidden;">
+        <table style="width:100%; border-collapse:collapse; text-align:left;">
+            <thead>
+                <tr style="background:#f9fafb; border-bottom:2px solid #e5e7eb; color:#6b7280; font-size:13px; text-transform:uppercase;">
+                    <th style="padding:15px 20px;">Test</th>
+                    <th style="padding:15px 20px;">No.</th>
+                    <th style="padding:15px 20px;">Question</th>
+                    <th style="padding:15px 20px;">Correct</th>
+                    <th style="padding:15px 20px;">Wrong</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for q in question_stats %}
+                <tr style="border-bottom:1px solid #f3f4f6;">
+                    <td style="padding:15px 20px; font-weight:bold;">
+                        {{ q.test_type }}
+                    </td>
+
+                    <td style="padding:15px 20px;">
+                        {{ q.number }}
+                    </td>
+
+                    <td style="padding:15px 20px;">
+                        {{ q.question_text }}
+                    </td>
+
+                    <td style="padding:15px 20px; color:#10b981; font-weight:bold;">
+                        {{ q.correct_percentage }}%
+                        <span style="color:#666; font-weight:normal;">({{ q.correct_count }})</span>
+                    </td>
+
+                    <td style="padding:15px 20px; color:#dc2626; font-weight:bold;">
+                        {{ q.wrong_percentage }}%
+                        <span style="color:#666; font-weight:normal;">({{ q.wrong_count }})</span>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="5" style="padding:40px; text-align:center; color:#888;">
+                        No question statistics available yet.
                     </td>
                 </tr>
                 {% endfor %}
