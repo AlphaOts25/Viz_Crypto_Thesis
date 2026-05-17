@@ -4,316 +4,927 @@
 {% block content %}
 <style>
 h2.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
-#ks * {box-sizing:border-box;margin:0;padding:0}
-#ks{background:#11141e;border-radius:16px;padding:24px;color:#fff;font-family:system-ui,sans-serif;position:relative;border:1px solid rgba(255,255,255,.06);overflow:visible;user-select:none;-webkit-user-select:none;margin-top:40px;}
-#ks-hdr{text-align:center;margin-bottom:18px}
-#ks-hdr h3{font-size:18px;font-weight:600;margin-bottom:6px;color:#fff}
-#ks-hdr p{font-size:13px;color:#8b92b2;line-height:1.5}
-#statusbar{background:rgba(0,0,0,.35);border-radius:8px;padding:9px 14px;font-size:12px;font-family:'Courier New',monospace;color:#8b92b2;margin-bottom:14px;min-height:38px;transition:color .3s;line-height:1.5}
-.stage{display:grid;grid-template-columns:1fr 1fr 1fr;min-height:360px;border-radius:12px;overflow:hidden;border:1px solid rgba(255,255,255,.05);margin-bottom:14px;position:relative}
-.col{padding:18px 14px;display:flex;flex-direction:column;align-items:center;position:relative}
-#acol{background:#13161f;border-right:1px solid rgba(255,255,255,.05)}
-#ecol{background:#160e14;border-right:1px solid rgba(244,63,94,.25);transition:background .2s}
-#ecol.alert{background:rgba(244,63,94,.14)}
-#bcol{background:#0d1610}
-.col-lbl{font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:5px 14px;border-radius:20px;margin-bottom:14px;white-space:nowrap}
-.lbl-a{border:1.5px solid #60a5fa;color:#60a5fa}
-.lbl-e{border:1.5px dashed #f43f5e;color:#f43f5e;background:rgba(244,63,94,.08)}
-.lbl-b{border:1.5px solid #34d399;color:#34d399}
-.mini-label{font-size:10px;color:#8b92b2;margin-bottom:4px;align-self:flex-start}
-.msg-inp{width:100%;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.15);border-radius:8px;padding:8px 10px;color:#fff;font-size:12px;font-family:'Courier New',monospace;outline:none;margin-bottom:8px}
-.msg-inp:focus{border-color:#6366f1}
-.msg-inp:disabled{opacity:.4}
-.btn-enc{width:100%;padding:8px;background:#6366f1;border:none;border-radius:8px;color:#fff;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;cursor:pointer;margin-bottom:14px;transition:all .2s}
-.btn-enc:hover:not(:disabled){background:#4f46e5}
-.btn-enc:disabled{background:#2d2d3a;color:#555;cursor:not-allowed}
-.dpill{width:100%;padding:7px 10px;border-radius:8px;font-size:11px;font-family:'Courier New',monospace;font-weight:600;text-align:center;margin-bottom:7px;border:1px solid;word-break:break-all;opacity:0;transition:opacity .4s}
-.dpill.vis{opacity:1}
-.dp-cipher{border-color:#c084fc;color:#c084fc;background:rgba(192,132,252,.08)}
-.dp-key-y{border-color:#fbbf24;color:#fbbf24;background:rgba(251,191,36,.08)}
-.dp-plain{border-color:#34d399;color:#34d399;background:rgba(52,211,153,.08)}
-.dp-bad{border-color:#f43f5e;color:#f43f5e;background:rgba(244,63,94,.1)}
-#key-token{width:100%;padding:10px 12px;border-radius:8px;border:2px solid #fbbf24;color:#fbbf24;background:rgba(251,191,36,.1);font-size:13px;font-family:'Courier New',monospace;font-weight:700;text-align:center;cursor:grab;opacity:0;transition:opacity .4s,box-shadow .2s;display:flex;align-items:center;justify-content:center;gap:6px;margin-bottom:6px}
-#key-token.rdy{opacity:1}
-#key-token:hover.rdy{box-shadow:0 0 14px rgba(251,191,36,.35)}
-#key-token.lifted{opacity:.2;cursor:grabbing}
-.hint{font-size:11px;color:rgba(139,146,178,.7);text-align:center;font-style:italic;opacity:0;transition:opacity .4s}
-.hint.vis{opacity:1}
-.scanner{width:100%;padding:10px 8px;border-radius:8px;border:1px dashed rgba(244,63,94,.3);background:rgba(244,63,94,.05);text-align:center;font-size:11px;color:rgba(244,63,94,.6);transition:all .25s;margin-top:4px}
-.scanner.active{border-color:#f43f5e;color:#f43f5e;background:rgba(244,63,94,.18);box-shadow:0 0 18px rgba(244,63,94,.22)}
-.scanner .eye{font-size:22px;margin-bottom:4px;display:block}
-.eve-section{width:100%;margin-top:10px;opacity:0;transition:opacity .4s}
-.eve-section.vis{opacity:1}
-.drop-zone{width:100%;padding:18px 10px;border:2px dashed rgba(52,211,153,.25);border-radius:8px;color:rgba(52,211,153,.4);font-size:11px;font-weight:600;text-align:center;margin-top:auto;opacity:0;transition:opacity .4s,border-color .2s,color .2s,background .2s;text-transform:uppercase;letter-spacing:.5px}
-.drop-zone.rdy{opacity:1}
-.drop-zone.hov{border-color:#34d399;color:#34d399;background:rgba(52,211,153,.06)}
-.bob-section{width:100%;opacity:0;transition:opacity .4s;margin-top:8px}
-.bob-section.vis{opacity:1}
-#flash-overlay{position:absolute;inset:0;border-radius:12px;background:rgba(244,63,94,0);pointer-events:none;transition:background .12s;z-index:50}
-#flash-overlay.on{background:rgba(244,63,94,.22)}
-#ghost{position:absolute;z-index:999;pointer-events:none;display:none;padding:8px 16px;border-radius:8px;border:2px solid #fbbf24;color:#fbbf24;background:#1a1500;font-size:13px;font-family:'Courier New',monospace;font-weight:700;white-space:nowrap;box-shadow:0 4px 20px rgba(251,191,36,.5)}
-.conc{display:none;background:rgba(244,63,94,.1);border:1px solid rgba(244,63,94,.35);border-radius:10px;padding:14px 16px;margin-bottom:12px}
-.conc.vis{display:block}
-.conc-h{color:#fb7185;font-weight:700;font-size:13px;margin-bottom:6px}
-.conc-b{color:#a78bfa;font-size:12px;line-height:1.6}
-.conc-b strong{color:#e2e8f0}
-.btn-reset{width:100%;padding:10px;background:#1e212b;border:1px solid rgba(255,255,255,.1);border-radius:8px;color:#a6accd;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;cursor:pointer;display:none;transition:background .2s}
-.btn-reset:hover{background:#2a2d3a}
+
+/* ══════════════════════════════════════
+   KEY DISTRIBUTION PROBLEM — v2
+   Network topology · Animated packets
+   Both ciphertext + key travel together
+   Eve always intercepts the key
+══════════════════════════════════════ */
+#kd{
+  background:#0c0e16;
+  border-radius:18px;
+  padding:28px 28px 22px;
+  color:#e2e8f0;
+  font-family:'Inter','Segoe UI',system-ui,sans-serif;
+  border:1px solid rgba(255,255,255,.06);
+  margin-top:40px;
+  position:relative;
+  overflow:hidden;
+  user-select:none;
+  -webkit-user-select:none;
+}
+#kd *{box-sizing:border-box;}
+
+/* Header */
+#kd-hdr{text-align:center;margin-bottom:20px;}
+#kd-hdr h3{font-size:18px;font-weight:700;color:#fff;margin-bottom:6px;}
+#kd-hdr p{font-size:13px;color:#64748b;line-height:1.5;}
+
+/* Status bar */
+#kd-status{
+  background:rgba(0,0,0,.4);
+  border-radius:8px;
+  padding:10px 16px;
+  font-size:13px;
+  font-family:'Courier New',monospace;
+  color:#94a3b8;
+  margin-bottom:16px;
+  min-height:40px;
+  line-height:1.5;
+  transition:color .3s;
+  border:1px solid rgba(255,255,255,.04);
+}
+
+/* ── Network Stage ── */
+#net-stage{
+  position:relative;
+  width:100%;
+  height:300px;
+  margin-bottom:18px;
+  border-radius:12px;
+  background:rgba(0,0,0,.3);
+  border:1px solid rgba(255,255,255,.04);
+  overflow:visible;
+}
+#net-svg{
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:100%;
+  overflow:visible;
+}
+
+/* Route path lines */
+.r-line{fill:none;stroke-width:2;stroke-linecap:round;stroke-dasharray:6 4;opacity:.18;transition:opacity .4s,stroke .4s;}
+.r-line.active{opacity:.7;stroke-dasharray:none;}
+.r-line.done-ok{opacity:.25;stroke-dasharray:none;}
+.r-line.done-fail{opacity:.12;stroke-dasharray:none;}
+#rl1{stroke:#60a5fa;}
+#rl2{stroke:#a78bfa;}
+#rl3{stroke:#34d399;}
+
+/* Network nodes (positioned divs) */
+.net-node{
+  position:absolute;
+  transform:translate(-50%,-50%);
+  display:flex;flex-direction:column;align-items:center;gap:4px;
+  pointer-events:none;
+  transition:all .3s;
+}
+.node-circle{
+  width:46px;height:46px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:18px;font-weight:700;
+  border:2px solid;
+  transition:all .3s;
+  position:relative;
+  z-index:2;
+}
+.node-label{
+  font-size:10px;font-weight:600;text-align:center;
+  text-transform:uppercase;letter-spacing:.5px;
+  line-height:1.2;white-space:nowrap;
+}
+
+/* Alice */
+#n-alice .node-circle{background:rgba(59,130,246,.15);border-color:#3b82f6;color:#60a5fa;}
+#n-alice .node-label{color:#60a5fa;}
+
+/* Bob */
+#n-bob .node-circle{background:rgba(52,211,153,.1);border-color:#10b981;color:#34d399;}
+#n-bob .node-label{color:#34d399;}
+
+/* Routers */
+.node-router .node-circle{background:rgba(100,116,139,.08);border-color:rgba(100,116,139,.3);color:#94a3b8;font-size:14px;}
+.node-router .node-label{color:#475569;}
+.node-router.route1 .node-circle{border-color:rgba(96,165,250,.35);color:#60a5fa;}
+.node-router.route2 .node-circle{border-color:rgba(167,139,250,.35);color:#a78bfa;}
+.node-router.route3 .node-circle{border-color:rgba(52,211,153,.35);color:#34d399;}
+
+/* Eve node */
+#n-eve{
+  position:absolute;
+  transform:translate(-50%,-50%);
+  display:flex;flex-direction:column;align-items:center;gap:3px;
+  pointer-events:none;
+  transition:left .6s cubic-bezier(.4,0,.2,1), top .6s cubic-bezier(.4,0,.2,1), opacity .4s;
+  opacity:0;
+  z-index:20;
+}
+#n-eve .node-circle{
+  width:44px;height:44px;border-radius:50%;
+  background:rgba(244,63,94,.15);border:2px solid #f43f5e;
+  display:flex;align-items:center;justify-content:center;font-size:20px;
+  box-shadow:0 0 0 0 rgba(244,63,94,.4);
+  transition:box-shadow .3s;
+}
+#n-eve.active .node-circle{
+  box-shadow:0 0 0 8px rgba(244,63,94,.15), 0 0 24px rgba(244,63,94,.3);
+  animation:evePulse 1s ease infinite;
+}
+@keyframes evePulse{
+  0%,100%{box-shadow:0 0 0 6px rgba(244,63,94,.15),0 0 20px rgba(244,63,94,.25);}
+  50%{box-shadow:0 0 0 12px rgba(244,63,94,.07),0 0 30px rgba(244,63,94,.4);}
+}
+#n-eve .node-label{color:#f43f5e;font-size:10px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;}
+#n-eve.vis{opacity:1;}
+
+/* Packet tokens */
+.pkt{
+  position:absolute;
+  transform:translate(-50%,-50%);
+  border-radius:20px;
+  padding:5px 12px;
+  font-size:12px;font-weight:700;font-family:'Courier New',monospace;
+  display:flex;align-items:center;gap:5px;
+  white-space:nowrap;
+  border:1.5px solid;
+  pointer-events:none;
+  opacity:0;
+  transition:opacity .3s;
+  z-index:15;
+}
+.pkt.vis{opacity:1;}
+#pkt-ciph{
+  background:rgba(15,17,28,.95);border-color:#c084fc;color:#e2e8f0;
+  box-shadow:0 2px 12px rgba(192,132,252,.25);
+}
+#pkt-key{
+  background:rgba(15,12,0,.95);border-color:#fbbf24;color:#fbbf24;
+  box-shadow:0 2px 12px rgba(251,191,36,.3);
+}
+
+/* Intercept burst */
+#intercept-burst{
+  position:absolute;
+  transform:translate(-50%,-50%);
+  width:60px;height:60px;border-radius:50%;
+  background:radial-gradient(circle,rgba(244,63,94,.5),transparent 70%);
+  pointer-events:none;
+  opacity:0;
+  z-index:16;
+  transition:opacity .15s;
+}
+#intercept-burst.on{opacity:1;}
+
+/* ── Route Buttons ── */
+#route-btns{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:10px;
+  margin-bottom:14px;
+}
+.r-btn{
+  background:rgba(255,255,255,.03);
+  border:1.5px solid rgba(255,255,255,.1);
+  border-radius:10px;
+  padding:12px 10px;
+  cursor:pointer;
+  transition:all .2s;
+  text-align:center;
+  display:flex;flex-direction:column;align-items:center;gap:4px;
+}
+.r-btn:hover:not(:disabled):not(.used){
+  background:rgba(255,255,255,.07);
+  transform:translateY(-2px);
+}
+.r-btn:active:not(:disabled):not(.used){transform:translateY(0);}
+.r-btn:disabled,.r-btn.used{cursor:not-allowed;opacity:.45;}
+.r-btn.used{opacity:.35;}
+.r-btn-icon{font-size:20px;}
+.r-btn-name{font-size:12px;font-weight:700;color:#e2e8f0;}
+.r-btn-desc{font-size:10px;color:#475569;line-height:1.3;}
+.r-btn-result{font-size:11px;font-weight:700;margin-top:3px;display:none;}
+.r-btn.used .r-btn-result{display:block;}
+.r-btn.fail .r-btn-result{color:#f43f5e;}
+#btn-r1{border-top:2px solid rgba(96,165,250,.4);}
+#btn-r2{border-top:2px solid rgba(167,139,250,.4);}
+#btn-r3{border-top:2px solid rgba(52,211,153,.4);}
+
+/* Encrypt-the-key special button */
+#btn-enc-key{
+  width:100%;
+  background:rgba(245,158,11,.06);
+  border:1.5px dashed rgba(245,158,11,.35);
+  border-radius:10px;
+  padding:12px 16px;
+  color:#fbbf24;
+  font-size:13px;font-weight:700;
+  cursor:pointer;
+  transition:all .2s;
+  margin-bottom:14px;
+  display:none;
+  text-align:center;
+  font-family:'Inter',sans-serif;
+}
+#btn-enc-key:hover:not(:disabled){background:rgba(245,158,11,.12);border-color:rgba(245,158,11,.6);}
+#btn-enc-key:disabled{opacity:.35;cursor:not-allowed;}
+
+/* Attempt counter */
+#attempt-ctr{
+  text-align:center;
+  font-size:11px;
+  color:#334155;
+  font-family:'Courier New',monospace;
+  margin-bottom:10px;
+  letter-spacing:.5px;
+}
+.att-dot{
+  display:inline-block;
+  width:8px;height:8px;border-radius:50%;
+  background:rgba(255,255,255,.08);
+  margin:0 3px;
+  transition:background .4s;
+}
+.att-dot.fail{background:#f43f5e;}
+.att-dot.try{background:#fbbf24;animation:dotPulse .8s ease infinite;}
+@keyframes dotPulse{0%,100%{opacity:1;}50%{opacity:.4;}}
+
+/* Intercept counter badge */
+#eve-count{
+  position:absolute;
+  top:14px;right:14px;
+  background:rgba(244,63,94,.12);
+  border:1px solid rgba(244,63,94,.3);
+  border-radius:20px;
+  padding:4px 12px;
+  font-size:11px;color:#f43f5e;font-weight:700;
+  font-family:'Courier New',monospace;
+  opacity:0;transition:opacity .4s;
+}
+#eve-count.vis{opacity:1;}
+
+/* Legend */
+#legend{
+  display:flex;gap:16px;justify-content:center;
+  font-size:10px;color:#475569;margin-bottom:14px;flex-wrap:wrap;
+}
+.leg-item{display:flex;align-items:center;gap:5px;}
+.leg-dot{width:10px;height:10px;border-radius:3px;border:1.5px solid;}
+
+/* Conclusion */
+#conclusion{
+  background:rgba(244,63,94,.07);
+  border:1px solid rgba(244,63,94,.25);
+  border-radius:12px;
+  padding:20px 22px;
+  display:none;
+  animation:slideUp .4s ease;
+}
+@keyframes slideUp{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:none;}}
+#conclusion.vis{display:block;}
+.conc-hdr{color:#fb7185;font-weight:700;font-size:14px;margin-bottom:10px;}
+.conc-body{color:#94a3b8;font-size:13px;line-height:1.7;}
+.conc-body strong{color:#e2e8f0;}
+.conc-body em{color:#a5b4fc;}
+.dh-teaser{
+  margin-top:14px;
+  background:rgba(99,102,241,.08);
+  border:1px solid rgba(99,102,241,.2);
+  border-radius:8px;
+  padding:12px 16px;
+  font-size:12px;color:#a5b4fc;line-height:1.6;
+}
+.dh-teaser strong{color:#c7d2fe;}
+
+/* Reset */
+#btn-reset{
+  width:100%;padding:10px;
+  background:#111827;
+  border:1px solid rgba(255,255,255,.08);
+  border-radius:8px;
+  color:#64748b;font-size:12px;font-weight:700;
+  text-transform:uppercase;letter-spacing:.5px;
+  cursor:pointer;display:none;margin-top:12px;
+  transition:background .2s,color .2s;
+  font-family:'Inter',sans-serif;
+}
+#btn-reset:hover{background:#1e2433;color:#94a3b8;}
+
+/* Flash overlay */
+#kd-flash{
+  position:absolute;inset:0;border-radius:18px;
+  background:rgba(244,63,94,0);
+  pointer-events:none;z-index:100;
+  transition:background .12s;
+}
+#kd-flash.on{background:rgba(244,63,94,.18);}
+
+/* Recursive key panel */
+#recursive-panel{
+  background:rgba(245,158,11,.06);
+  border:1px solid rgba(245,158,11,.2);
+  border-radius:10px;
+  padding:14px 18px;
+  display:none;
+  margin-bottom:12px;
+  animation:slideUp .3s ease;
+}
+#recursive-panel.vis{display:block;}
+.rec-hdr{color:#fbbf24;font-weight:700;font-size:13px;margin-bottom:6px;}
+.rec-body{color:#94a3b8;font-size:12px;line-height:1.6;}
+.rec-chain{
+  display:flex;align-items:center;gap:6px;
+  flex-wrap:wrap;margin:10px 0;
+  font-size:11px;font-family:'Courier New',monospace;
+}
+.rec-box{
+  padding:4px 10px;border-radius:6px;
+  background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.3);
+  color:#fbbf24;white-space:nowrap;
+}
+.rec-arrow{color:#475569;font-size:14px;}
+.rec-box.problem{
+  background:rgba(244,63,94,.12);border-color:rgba(244,63,94,.3);color:#fb7185;
+}
 </style>
 
 <div class="lesson-container" style="max-width: 950px; margin: 0 auto; padding-bottom: 60px;">
 
-    <!-- HEADER -->
-    <div class="lesson-header" style="margin-bottom: 40px;">
-        <p style="color: #6366f1; font-weight: bold; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 1px;">Topic 3</p>
-        <h1 style="font-size: 36px; margin-top: 0; margin-bottom: 15px;">The Key Distribution Vulnerability</h1>
-        <p style="font-size: 18px; color: #555; line-height: 1.6;">
-            Symmetric algorithms like AES are mathematically unbreakable. But they all share one fatal flaw: to use a symmetric key, you must share it. If you send the key across the internet, the entire system breaks.
-        </p>
+  <!-- HEADER -->
+  <div class="lesson-header" style="margin-bottom: 40px;">
+    <p style="color: #6366f1; font-weight: bold; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 1px;">Topic 3</p>
+    <h1 style="font-size: 36px; margin-top: 0; margin-bottom: 15px;">The Key Distribution Vulnerability</h1>
+    <p style="font-size: 18px; color: #555; line-height: 1.6;">
+      Symmetric algorithms like AES are mathematically unbreakable. But they all share one fatal flaw: to use a symmetric key, you must share it. If you send the key across the internet, the entire system breaks.
+    </p>
+  </div>
+
+  <h1>Key Distribution Problem</h1>
+  {% include "video_player.html" %}
+
+  <h2 class="sr-only">Key distribution interactive — try every network route to send the key to Bob while Eve intercepts every path</h2>
+
+  <div id="kd">
+    <div id="kd-flash"></div>
+    <div id="eve-count">👁 Eve intercepted: <span id="eve-n">0</span></div>
+
+    <!-- Header -->
+    <div id="kd-hdr">
+      <h3>There Is No Safe Route for the Key</h3>
+      <p>Alice encrypted her message. Bob needs the key to read it.<br>
+      Try every route — Eve monitors every node on the internet.</p>
     </div>
 
-    <h1>Key Distribution Problem</h1>
-        
-    {% include "video_player.html" %}
+    <!-- Status bar -->
+    <div id="kd-status">→ Choose a route to send the key to Bob.</div>
 
-    <!-- ── DRAG AND DROP SIMULATOR ── -->
-    <h2 class="sr-only">Key distribution problem interactive simulator — drag the key to Bob and watch Eve intercept it</h2>
-
-    <div id="ks">
-      <div id="flash-overlay"></div>
-      <div id="ghost">🔑 <span id="ghost-kv">KEY</span></div>
-
-      <div id="ks-hdr">
-        <h3>The Key Distribution Problem</h3>
-        <p>Encrypt a message, then try to drag the key across to Bob.<br>Eve controls the network — every packet passes through her.</p>
-      </div>
-
-      <div id="statusbar">→ Type a message and click Encrypt to begin.</div>
-
-      <div class="stage" id="stage">
-
-        <div class="col" id="acol">
-          <div class="col-lbl lbl-a">Alice</div>
-          <div class="mini-label">Plaintext message</div>
-          <input class="msg-inp" id="msginp" type="text" placeholder="e.g. send the money" maxlength="22">
-          <button class="btn-enc" id="btn-enc" onclick="doEncrypt()">🔒 Encrypt</button>
-          <div class="mini-label">Ciphertext (safe to send)</div>
-          <div class="dpill dp-cipher" id="a-ciph">📦</div>
-          <div class="mini-label" id="key-label" style="margin-top:6px;color:rgba(251,191,36,.7);opacity:0;transition:opacity .4s">Secret key (Bob needs this)</div>
-          <div id="key-token">🔑 <span id="kv">—</span></div>
-          <div class="hint" id="drag-hint">Drag the key across to Bob →</div>
-        </div>
-
-        <div class="col" id="ecol">
-          <div class="col-lbl lbl-e">Eve</div>
-          <div class="scanner" id="scanner">
-            <span class="eye">👁️</span>
-            <div>Monitoring all traffic</div>
-            <div id="eve-st" style="margin-top:3px;font-size:10px;opacity:.6">waiting...</div>
-          </div>
-          <div class="eve-section" id="eve-sec">
-            <div style="font-size:10px;color:#f43f5e;font-weight:700;margin:10px 0 6px;text-transform:uppercase;letter-spacing:.5px">⚡ Intercepted</div>
-            <div class="dpill dp-cipher vis" id="e-ciph">📦</div>
-            <div class="dpill dp-key-y vis" id="e-key">🔑</div>
-            <div style="font-size:10px;color:#8b92b2;margin:4px 0;text-align:center">→ decrypt →</div>
-            <div class="dpill dp-bad vis" id="e-plain">📄</div>
-          </div>
-        </div>
-
-        <div class="col" id="bcol">
-          <div class="col-lbl lbl-b">Bob</div>
-          <div class="drop-zone" id="dropzone">
-            Drop key here<br>
-            <span style="font-size:10px;opacity:.6">🔓 to decrypt</span>
-          </div>
-          <div class="bob-section" id="bob-sec">
-            <div style="font-size:10px;color:#8b92b2;margin-bottom:4px">Received ciphertext</div>
-            <div class="dpill dp-cipher vis" id="b-ciph">📦</div>
-            <div style="font-size:10px;color:#8b92b2;margin:4px 0 4px;text-align:center">+ key → decrypt →</div>
-            <div class="dpill dp-plain vis" id="b-plain">📄</div>
-            <div class="dpill dp-bad vis" id="b-warn" style="font-size:10px;margin-top:4px">⚠️ But Eve read it too</div>
-          </div>
-        </div>
-
-      </div>
-
-      <div class="conc" id="conc">
-        <div class="conc-h">⚠️ The Key Distribution Problem</div>
-        <div class="conc-b" id="conc-b"></div>
-      </div>
-      <button class="btn-reset" id="btn-reset" onclick="doReset()">↺ Reset</button>
+    <!-- Legend -->
+    <div id="legend">
+      <div class="leg-item"><div class="leg-dot" style="border-color:#c084fc;background:rgba(192,132,252,.15)"></div><span>Ciphertext 📦 (safe to send — already encrypted)</span></div>
+      <div class="leg-item"><div class="leg-dot" style="border-color:#fbbf24;background:rgba(251,191,36,.15)"></div><span>Secret key 🔑 (this is what Eve wants)</span></div>
+      <div class="leg-item"><div class="leg-dot" style="border-color:#f43f5e;background:rgba(244,63,94,.15)"></div><span>Eve — monitors all nodes</span></div>
     </div>
 
-    <!-- NEXT BUTTON -->
-    <div style="margin-top: 50px; text-align: right;">
-        <p style="color: #888; font-size: 14px; margin-bottom: 10px;">How do we solve this impossible problem?</p>
-        <a href="{{ url_for('view_lesson', module_num=2, lesson_num=3) }}" style="background: #6366f1; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold; font-size: 16px; box-shadow: 0 4px 6px rgba(99, 102, 241, 0.2);">
-            Topic 3: Diffie-Hellman Key Exchange →
-        </a>
+    <!-- ── Network Stage ── -->
+    <div id="net-stage">
+
+      <!-- SVG: path lines only -->
+      <svg id="net-svg" viewBox="0 0 640 300" preserveAspectRatio="xMidYMid meet">
+        <!-- Route 1 — top -->
+        <path id="rl1" class="r-line" d="M 88 150 L 210 70 L 430 70 L 552 150"/>
+        <!-- Route 2 — middle -->
+        <path id="rl2" class="r-line" d="M 88 150 L 320 150 L 552 150"/>
+        <!-- Route 3 — bottom -->
+        <path id="rl3" class="r-line" d="M 88 150 L 210 230 L 430 230 L 552 150"/>
+
+        <!-- X marks for failed routes -->
+        <text id="x1" x="310" y="58" text-anchor="middle" font-size="14" fill="#f43f5e" opacity="0" font-weight="700">✕ intercepted</text>
+        <text id="x2" x="310" y="138" text-anchor="middle" font-size="14" fill="#f43f5e" opacity="0" font-weight="700">✕ intercepted</text>
+        <text id="x3" x="310" y="218" text-anchor="middle" font-size="14" fill="#f43f5e" opacity="0" font-weight="700">✕ intercepted</text>
+      </svg>
+
+      <!-- Alice node -->
+      <div class="net-node" id="n-alice" style="left:13.75%;top:50%">
+        <div class="node-circle">👩</div>
+        <div class="node-label" style="color:#60a5fa">Alice</div>
+      </div>
+
+      <!-- Bob node -->
+      <div class="net-node" id="n-bob" style="left:86.25%;top:50%">
+        <div class="node-circle">👨</div>
+        <div class="node-label" style="color:#34d399">Bob</div>
+      </div>
+
+      <!-- Route 1 routers -->
+      <div class="net-node node-router route1" id="nr1a" style="left:32.8%;top:23.3%">
+        <div class="node-circle" style="width:38px;height:38px;font-size:13px;">🖥</div>
+        <div class="node-label">ISP<br>Router</div>
+      </div>
+      <div class="net-node node-router route1" id="nr1b" style="left:67.2%;top:23.3%">
+        <div class="node-circle" style="width:38px;height:38px;font-size:13px;">🖥</div>
+        <div class="node-label">Backbone<br>Node</div>
+      </div>
+
+      <!-- Route 2 router -->
+      <div class="net-node node-router route2" id="nr2a" style="left:50%;top:50%">
+        <div class="node-circle" style="width:38px;height:38px;font-size:13px;">🔀</div>
+        <div class="node-label">Central<br>Hub</div>
+      </div>
+
+      <!-- Route 3 routers -->
+      <div class="net-node node-router route3" id="nr3a" style="left:32.8%;top:76.7%">
+        <div class="node-circle" style="width:38px;height:38px;font-size:13px;">🛡</div>
+        <div class="node-label">VPN<br>Server</div>
+      </div>
+      <div class="net-node node-router route3" id="nr3b" style="left:67.2%;top:76.7%">
+        <div class="node-circle" style="width:38px;height:38px;font-size:13px;">🔁</div>
+        <div class="node-label">Exit<br>Node</div>
+      </div>
+
+      <!-- Eve (moves to intercept point) -->
+      <div id="n-eve" style="left:50%;top:50%">
+        <div class="node-circle">👁</div>
+        <div class="node-label">Eve</div>
+      </div>
+
+      <!-- Moving packets -->
+      <div class="pkt" id="pkt-ciph" style="left:13.75%;top:50%">📦 <span id="pkt-ciph-val">CIPH</span></div>
+      <div class="pkt" id="pkt-key"  style="left:13.75%;top:50%">🔑 <span id="pkt-key-val">KEY</span></div>
+
+      <!-- Intercept burst -->
+      <div id="intercept-burst"></div>
+
+    </div><!-- /net-stage -->
+
+    <!-- Attempt dots -->
+    <div id="attempt-ctr">
+      <span class="att-dot" id="dot0"></span>
+      <span class="att-dot" id="dot1"></span>
+      <span class="att-dot" id="dot2"></span>
+      &nbsp;attempts
     </div>
 
-</div>
+    <!-- Route buttons -->
+    <div id="route-btns">
+      <button class="r-btn" id="btn-r1" onclick="tryRoute(0)">
+        <div class="r-btn-icon">🌐</div>
+        <div class="r-btn-name">Route 1</div>
+        <div class="r-btn-desc">Via ISP router<br>+ backbone node</div>
+        <div class="r-btn-result">❌ Key intercepted</div>
+      </button>
+      <button class="r-btn" id="btn-r2" onclick="tryRoute(1)">
+        <div class="r-btn-icon">🔀</div>
+        <div class="r-btn-name">Route 2</div>
+        <div class="r-btn-desc">Direct via<br>central hub</div>
+        <div class="r-btn-result">❌ Key intercepted</div>
+      </button>
+      <button class="r-btn" id="btn-r3" onclick="tryRoute(2)">
+        <div class="r-btn-icon">🛡</div>
+        <div class="r-btn-name">Route 3</div>
+        <div class="r-btn-desc">Encrypted VPN<br>+ exit node</div>
+        <div class="r-btn-result">❌ Key intercepted</div>
+      </button>
+    </div>
+
+    <!-- Encrypt-the-key button (shown after all 3 fail) -->
+    <button id="btn-enc-key" onclick="tryEncryptKey()">
+      💡 What if we encrypt the key itself before sending it?
+    </button>
+
+    <!-- Recursive key explanation -->
+    <div id="recursive-panel">
+      <div class="rec-hdr">♾ Infinite Regress — The Recursive Problem</div>
+      <div class="rec-body">
+        To encrypt the key, you need <em>another</em> key. But to send that key, you need <em>another</em> key... and so on forever.
+        <div class="rec-chain">
+          <div class="rec-box">Key A</div><div class="rec-arrow">→ encrypt with →</div>
+          <div class="rec-box">Key B</div><div class="rec-arrow">→ encrypt with →</div>
+          <div class="rec-box">Key C</div><div class="rec-arrow">→ encrypt with →</div>
+          <div class="rec-box problem">Key ? (never ends)</div>
+        </div>
+        You always end up needing to securely share <em>some</em> key. The problem just moves, it never disappears.
+      </div>
+    </div>
+
+    <!-- Conclusion -->
+    <div id="conclusion">
+      <div class="conc-hdr">⚠️ The Key Distribution Problem Is Unsolvable with Symmetric Encryption</div>
+      <div class="conc-body">
+        <strong>Eve doesn't need to break the encryption.</strong> She just intercepts the key.
+        Every router, hub, VPN server, and exit node on the internet is a potential interception point.
+        No matter how many hops you add or tunnels you create, the key must physically travel
+        from Alice to Bob — and Eve can sit on any node along the way.<br><br>
+        Encrypting the key itself just creates a new key that needs sharing — an infinite regress.
+        <strong>This is why symmetric encryption alone cannot secure the internet.</strong>
+        <div class="dh-teaser">
+          <strong>Diffie-Hellman (1976)</strong> solved this by making key <em>transmission</em> unnecessary.
+          Alice and Bob each work with a public number and a private secret. They exchange only public values —
+          which Eve can see — yet independently compute the <em>same</em> shared secret without ever sending it.
+          Eve intercepts everything and still can't reconstruct the key.
+        </div>
+      </div>
+    </div>
+
+    <button id="btn-reset" onclick="doReset()">↺ Reset — Try Again</button>
+
+  </div><!-- /kd -->
+
+  <!-- NEXT BUTTON -->
+  <div style="margin-top: 50px; text-align: right;">
+    <p style="color: #888; font-size: 14px; margin-bottom: 10px;">How do we solve this impossible problem?</p>
+    <a href="{{ url_for('view_lesson', module_num=2, lesson_num=3) }}"
+       style="background:#6366f1;color:white;padding:12px 24px;text-decoration:none;border-radius:6px;font-weight:bold;font-size:16px;box-shadow:0 4px 6px rgba(99,102,241,.2);">
+      Start Module 3: Public Key Cryptography →
+    </a>
+  </div>
+
+</div><!-- /lesson-container -->
 
 <script>
+/* ══════════════════════════════════════════════════════════
+   KEY DISTRIBUTION PROBLEM — Interactive Network Simulator
+══════════════════════════════════════════════════════════ */
+
 const sleep = ms => new Promise(r => setTimeout(r, ms));
-let keyVal='', cipherVal='', msgVal='', phase='idle', dragging=false, caught=false;
 
-function genKey(){const h='0123456789ABCDEF';let k='';for(let i=0;i<4;i++)k+=h[Math.floor(Math.random()*16)];return k;}
-function fakeCiph(t){return btoa(t).replace(/=/g,'').substring(0,8).toUpperCase()+'..';}
-function setStatus(msg,col){const s=document.getElementById('statusbar');s.textContent=msg;s.style.color=col||'#8b92b2';}
-function show(id){document.getElementById(id).classList.add('vis');}
-function unshow(id){document.getElementById(id).classList.remove('vis');}
+/* ── Route definitions ──
+   waypoints are % positions [left%, top%] within #net-stage
+   eveAt = which waypoint index Eve intercepts the key at
+*/
+const ROUTES = [
+  {
+    svgLine: 'rl1',
+    xMark: 'x1',
+    btnId: 'btn-r1',
+    name: 'Route 1 (ISP Router)',
+    color: '#60a5fa',
+    waypoints: [
+      [13.75, 50],   // Alice
+      [32.8,  23.3], // ISP Router  ← Eve intercepts here
+      [67.2,  23.3], // Backbone Node
+      [86.25, 50],   // Bob
+    ],
+    eveAt: 1,
+    eveMsg: 'ISP Router A is tapped. Eve has had hardware access since day one.',
+    nodeId: 'nr1a',
+  },
+  {
+    svgLine: 'rl2',
+    xMark: 'x2',
+    btnId: 'btn-r2',
+    name: 'Route 2 (Central Hub)',
+    color: '#a78bfa',
+    waypoints: [
+      [13.75, 50],   // Alice
+      [50,    50],   // Central Hub  ← Eve intercepts here
+      [86.25, 50],   // Bob
+    ],
+    eveAt: 1,
+    eveMsg: 'The central backbone hub routes 40% of all traffic. Eve owns the switch.',
+    nodeId: 'nr2a',
+  },
+  {
+    svgLine: 'rl3',
+    xMark: 'x3',
+    btnId: 'btn-r3',
+    name: 'Route 3 (VPN Server)',
+    color: '#34d399',
+    waypoints: [
+      [13.75, 50],   // Alice
+      [32.8,  76.7], // VPN Server   ← Eve intercepts here
+      [67.2,  76.7], // Exit Node
+      [86.25, 50],   // Bob
+    ],
+    eveAt: 1,
+    eveMsg: 'The VPN provider is compromised. Eve decrypts the tunnel before re-encrypting onward.',
+    nodeId: 'nr3a',
+  },
+];
 
-function doEncrypt(){
-  const msg=document.getElementById('msginp').value.trim();
-  if(!msg){setStatus('⚠️ Type a message first!','#fbbf24');return;}
-  msgVal=msg; keyVal=genKey(); cipherVal=fakeCiph(msg);
-  document.getElementById('kv').textContent=keyVal;
-  document.getElementById('ghost-kv').textContent=keyVal;
-  document.getElementById('a-ciph').textContent='📦 '+cipherVal;
-  show('a-ciph');
-  document.getElementById('btn-enc').disabled=true;
-  document.getElementById('msginp').disabled=true;
-  document.getElementById('key-label').style.opacity='1';
-  show('key-token'); document.getElementById('key-token').classList.add('rdy');
-  show('drag-hint');
-  show('dropzone'); document.getElementById('dropzone').classList.add('rdy');
-  setStatus('🔒 Encrypted! Now Bob needs the key to read it. Drag the key across →','#60a5fa');
-  phase='key_ready';
+/* ── State ── */
+let busy       = false;
+let attempted  = [];   // which route indices tried
+let eveCount   = 0;
+let ciphVal    = 'A3F9..';
+let keyValStr  = 'B7C2';
+let phase      = 'ready'; // ready | animating | done
+
+/* ── Init: generate fake values ── */
+function init() {
+  const h = '0123456789ABCDEF';
+  keyValStr = '';
+  for (let i = 0; i < 4; i++) keyValStr += h[Math.floor(Math.random() * 16)];
+  document.getElementById('pkt-ciph-val').textContent = ciphVal;
+  document.getElementById('pkt-key-val').textContent  = keyValStr;
 }
 
-let offX=0, offY=0;
-function getClient(e){return e.touches?{x:e.touches[0].clientX,y:e.touches[0].clientY}:{x:e.clientX,y:e.clientY};}
-
-function startDrag(e){
-  if(phase!=='key_ready'||caught)return;
-  dragging=true;
-  const {x,y}=getClient(e);
-  const kt=document.getElementById('key-token');
-  const kr=kt.getBoundingClientRect();
-  offX=x-kr.left; offY=y-kr.top;
-  const ghost=document.getElementById('ghost');
-  const simRect=document.getElementById('ks').getBoundingClientRect();
-  ghost.style.left=(x-simRect.left-offX)+'px';
-  ghost.style.top=(y-simRect.top-offY)+'px';
-  ghost.style.display='block';
-  kt.classList.add('lifted');
-  unshow('drag-hint');
-  setStatus('🔑 Dragging the key — watch Eve!','#fbbf24');
-  e.preventDefault();
-}
-
-document.getElementById('key-token').addEventListener('mousedown',startDrag);
-document.getElementById('key-token').addEventListener('touchstart',startDrag,{passive:false});
-
-document.addEventListener('mousemove',onMove);
-document.addEventListener('touchmove',onMove,{passive:false});
-
-function onMove(e){
-  if(!dragging||caught)return;
-  e.preventDefault();
-  const {x,y}=getClient(e);
-  const ghost=document.getElementById('ghost');
-  const simRect=document.getElementById('ks').getBoundingClientRect();
-  ghost.style.left=(x-simRect.left-40)+'px';
-  ghost.style.top=(y-simRect.top-16)+'px';
-
-  const eveEl=document.getElementById('ecol');
-  const eveRect=eveEl.getBoundingClientRect();
-  const near=x>eveRect.left-30;
-  const inside=x>eveRect.left;
-
-  eveEl.classList.toggle('alert',near);
-  const sc=document.getElementById('scanner');
-  sc.classList.toggle('active',near);
-  document.getElementById('eve-st').textContent=near?(inside?'CAPTURING...':'DETECTING...'):'waiting...';
-
-  if(inside){
-    caught=true;
-    dragging=false;
-    ghost.style.display='none';
-    doIntercept(x,y);
-  }
-
-  const dzRect=document.getElementById('dropzone').getBoundingClientRect();
-  document.getElementById('dropzone').classList.toggle('hov',
-    x>=dzRect.left&&x<=dzRect.right&&y>=dzRect.top&&y<=dzRect.bottom);
-}
-
-document.addEventListener('mouseup',onUp);
-document.addEventListener('touchend',onUp);
-
-function onUp(e){
-  if(!dragging)return;
-  dragging=false;
-  document.getElementById('ghost').style.display='none';
-  const kt=document.getElementById('key-token');
-  kt.classList.remove('lifted');
-  document.getElementById('dropzone').classList.remove('hov');
-  if(!caught){
-    setStatus('→ Dropped short. Drag the key all the way across to Bob →','#8b92b2');
-    show('drag-hint');
+/* ── Packet position helper ──
+   Moves a .pkt div to [leftPct, topPct] within #net-stage instantly or via animation
+*/
+function movePkt(id, leftPct, topPct, instant) {
+  const el = document.getElementById(id);
+  if (instant) {
+    el.style.transition = 'none';
+    el.style.left = leftPct + '%';
+    el.style.top  = topPct  + '%';
+    void el.offsetWidth; // flush
+    el.style.transition = '';
+  } else {
+    el.style.left = leftPct + '%';
+    el.style.top  = topPct  + '%';
   }
 }
 
-async function doIntercept(){
-  phase='intercepted';
-  document.getElementById('key-token').classList.remove('lifted','rdy');
-  document.getElementById('key-token').style.opacity='0';
-  unshow('drag-hint');
-  document.getElementById('dropzone').classList.remove('hov','rdy');
-  unshow('dropzone');
+/* ── Lerp-based animation along waypoints ── */
+function animateAlongPath(pktId, waypoints, msPerSegment, onReachWaypoint) {
+  return new Promise(resolve => {
+    const el = document.getElementById(pktId);
+    let seg = 0;
+    let startTime = null;
 
-  const flash=document.getElementById('flash-overlay');
-  flash.classList.add('on');
-  document.getElementById('scanner').classList.add('active');
-  document.getElementById('eve-st').textContent='KEY CAPTURED!';
-  document.getElementById('ecol').classList.add('alert');
-  setTimeout(()=>flash.classList.remove('on'),500);
+    function tick(ts) {
+      if (!startTime) startTime = ts;
+      const elapsed = ts - startTime;
+      const t = Math.min(elapsed / msPerSegment, 1);
 
-  setStatus('🚨 Eve intercepted the key!','#f43f5e');
-  await sleep(400);
+      const from = waypoints[seg];
+      const to   = waypoints[seg + 1];
+      if (!to) { resolve(); return; }
 
-  document.getElementById('e-ciph').textContent='📦 '+cipherVal;
-  document.getElementById('e-key').textContent='🔑 '+keyVal;
-  document.getElementById('e-plain').textContent='📄 ...';
-  show('eve-sec');
-  await sleep(900);
+      // ease in-out
+      const e = t < .5 ? 2*t*t : -1+(4-2*t)*t;
+      el.style.left = (from[0] + (to[0] - from[0]) * e) + '%';
+      el.style.top  = (from[1] + (to[1] - from[1]) * e) + '%';
 
-  document.getElementById('e-plain').textContent='📄 '+msgVal;
-  setStatus('🚨 Eve decrypted: "'+msgVal+'" — your message is compromised.','#f43f5e');
-  await sleep(900);
-
-  document.getElementById('b-ciph').textContent='📦 '+cipherVal+' (forwarded)';
-  document.getElementById('b-plain').textContent='📄 '+msgVal;
-  show('bob-sec');
-  setStatus('Bob got the message too — but so did Eve. Encryption failed.','#fb7185');
-  await sleep(600);
-
-  document.getElementById('conc-b').innerHTML=
-    `<strong>Every packet you send travels through the network — and Eve owns the network.</strong> It doesn't matter how you route it: the key must physically travel from Alice to Bob, and Eve intercepts it every time.<br><br>`+
-    `This is why Diffie-Hellman was revolutionary. It makes key <em>transmission</em> unnecessary — Alice and Bob independently compute the same secret without ever sending it.`;
-  show('conc');
-  document.getElementById('btn-reset').style.display='block';
-  phase='done';
+      if (t >= 1) {
+        seg++;
+        startTime = null;
+        if (onReachWaypoint) onReachWaypoint(seg); // seg is now the arrived index
+        if (seg >= waypoints.length - 1) { resolve(); return; }
+      }
+      requestAnimationFrame(tick);
+    }
+    requestAnimationFrame(tick);
+  });
 }
 
-function doReset(){
-  phase='idle'; caught=false; keyVal=''; cipherVal=''; msgVal='';
-  document.getElementById('msginp').disabled=false;
-  document.getElementById('msginp').value='';
-  document.getElementById('btn-enc').disabled=false;
-  document.getElementById('key-label').style.opacity='0';
-  ['a-ciph','key-token','drag-hint','dropzone','eve-sec','bob-sec','conc'].forEach(unshow);
-  document.getElementById('key-token').classList.remove('rdy','lifted');
-  document.getElementById('key-token').style.opacity='0';
-  document.getElementById('dropzone').classList.remove('rdy','hov');
-  document.getElementById('ecol').classList.remove('alert');
-  document.getElementById('scanner').classList.remove('active');
-  document.getElementById('eve-st').textContent='waiting...';
-  document.getElementById('btn-reset').style.display='none';
-  document.getElementById('ghost').style.display='none';
-  setStatus('→ Type a message and click Encrypt to begin.','#8b92b2');
+/* ── Eve position ── */
+function moveEve(leftPct, topPct) {
+  const eve = document.getElementById('n-eve');
+  eve.style.left = leftPct + '%';
+  eve.style.top  = topPct  + '%';
 }
+
+/* ── Status helper ── */
+function setStatus(msg, color) {
+  const s = document.getElementById('kd-status');
+  s.textContent = msg;
+  s.style.color = color || '#94a3b8';
+}
+
+/* ── Update attempt dots ── */
+function updateDots() {
+  for (let i = 0; i < 3; i++) {
+    const dot = document.getElementById('dot' + i);
+    if (i < attempted.length) dot.className = 'att-dot fail';
+    else if (i === attempted.length) dot.className = 'att-dot try';
+    else dot.className = 'att-dot';
+  }
+}
+
+/* ── Disable all route buttons ── */
+function lockAllRoutes() {
+  ROUTES.forEach(r => {
+    const b = document.getElementById(r.btnId);
+    b.disabled = true;
+  });
+}
+
+/* ═══════════════════════════════════════
+   MAIN ROUTE ATTEMPT
+═══════════════════════════════════════ */
+async function tryRoute(idx) {
+  if (busy || attempted.includes(idx)) return;
+  busy = true;
+  phase = 'animating';
+
+  const route = ROUTES[idx];
+  attempted.push(idx);
+  updateDots();
+  lockAllRoutes();
+
+  // Mark button as in-progress
+  const btn = document.getElementById(route.btnId);
+  btn.classList.add('used');
+
+  // Highlight this route's SVG line
+  const svgLine = document.getElementById(route.svgLine);
+  svgLine.classList.add('active');
+  svgLine.style.stroke = route.color;
+
+  /* ── Position both packets at Alice ── */
+  movePkt('pkt-ciph', route.waypoints[0][0], route.waypoints[0][1], true);
+  movePkt('pkt-key',  route.waypoints[0][0], route.waypoints[0][1], true);
+  document.getElementById('pkt-ciph').classList.add('vis');
+  document.getElementById('pkt-key').classList.add('vis');
+
+  /* ── Move Eve to just off-screen (lurking) ── */
+  const evePos = route.waypoints[route.eveAt];
+  moveEve(evePos[0] - 10, evePos[1] - 10); // slightly offset, will snap in
+  const eveEl = document.getElementById('n-eve');
+  eveEl.classList.add('vis');
+  eveEl.classList.remove('active');
+
+  setStatus(`📡 Sending ciphertext + key via ${route.name}…`, '#94a3b8');
+
+  /* ── Animate BOTH packets toward intercept point ──
+     They travel together, segment by segment
+     Stop just before the Eve node for drama
+  */
+  const preIntercept = route.waypoints.slice(0, route.eveAt + 1); // up to Eve's node
+
+  // Run both packets in parallel to intercept point
+  let interceptTriggered = false;
+  const ciphDone = animateAlongPath('pkt-ciph', preIntercept, 700, null);
+  const keyDone  = animateAlongPath('pkt-key',  preIntercept, 700, wp => {
+    if (wp === route.eveAt && !interceptTriggered) {
+      interceptTriggered = true;
+    }
+  });
+
+  await Promise.all([ciphDone, keyDone]);
+  await sleep(150);
+
+  /* ── Eve intercepts the KEY ── */
+  moveEve(evePos[0], evePos[1]);
+  eveEl.classList.add('active');
+
+  // Flash + burst
+  const burst = document.getElementById('intercept-burst');
+  burst.style.left = evePos[0] + '%';
+  burst.style.top  = evePos[1] + '%';
+  burst.classList.add('on');
+  document.getElementById('kd-flash').classList.add('on');
+  setTimeout(() => {
+    burst.classList.remove('on');
+    document.getElementById('kd-flash').classList.remove('on');
+  }, 400);
+
+  // Key disappears — Eve grabbed it
+  document.getElementById('pkt-key').classList.remove('vis');
+
+  eveCount++;
+  document.getElementById('eve-n').textContent = eveCount;
+  document.getElementById('eve-count').classList.add('vis');
+
+  setStatus(`🚨 Eve intercepted the key at the ${route.name.replace(/Route \d \(/,'').replace(')','').trim()}! "${route.eveMsg}"`, '#f43f5e');
+  await sleep(1200);
+
+  /* ── Ciphertext continues to Bob ── */
+  setStatus(`📦 Ciphertext still reaches Bob (it was already encrypted — Eve has a copy too)`, '#94a3b8');
+  const postIntercept = [
+    route.waypoints[route.eveAt],
+    ...route.waypoints.slice(route.eveAt + 1)
+  ];
+  await animateAlongPath('pkt-ciph', postIntercept, 700, null);
+  await sleep(300);
+
+  // Fade out packets
+  document.getElementById('pkt-ciph').classList.remove('vis');
+  eveEl.classList.remove('active');
+
+  // Mark route with X
+  const xEl = document.getElementById(route.xMark);
+  xEl.style.transition = 'opacity .4s';
+  xEl.style.opacity = '1';
+
+  // Mark button failed
+  btn.classList.add('fail');
+  svgLine.classList.remove('active');
+  svgLine.classList.add('done-fail');
+
+  await sleep(500);
+
+  /* ── Unlock remaining route buttons ── */
+  ROUTES.forEach((r, i) => {
+    if (!attempted.includes(i)) {
+      document.getElementById(r.btnId).disabled = false;
+    }
+  });
+
+  /* ── Check if all routes tried ── */
+  if (attempted.length >= ROUTES.length) {
+    await sleep(600);
+    setStatus('All routes exhausted. Eve intercepted every key. 👁', '#f43f5e');
+    // Show "encrypt the key" option
+    document.getElementById('btn-enc-key').style.display = 'block';
+  } else {
+    const left = ROUTES.length - attempted.length;
+    setStatus(`Key intercepted. ${left} route${left>1?'s':''} remaining — try another path.`, '#fbbf24');
+  }
+
+  busy = false;
+  phase = 'ready';
+}
+
+/* ═══════════════════════════════════════
+   ENCRYPT THE KEY ATTEMPT
+═══════════════════════════════════════ */
+async function tryEncryptKey() {
+  if (busy) return;
+  busy = true;
+  const btn = document.getElementById('btn-enc-key');
+  btn.disabled = true;
+  btn.textContent = '🔄 Thinking…';
+
+  await sleep(800);
+  btn.textContent = '❌ This creates a new problem…';
+
+  document.getElementById('recursive-panel').classList.add('vis');
+  setStatus('💡 To encrypt the key, you need another key. To send that key, you need another key... infinite regress.', '#fbbf24');
+
+  await sleep(1800);
+  showConclusion();
+  busy = false;
+}
+
+/* ═══════════════════════════════════════
+   CONCLUSION
+═══════════════════════════════════════ */
+function showConclusion() {
+  document.getElementById('conclusion').classList.add('vis');
+  document.getElementById('btn-reset').style.display = 'block';
+  document.getElementById('conclusion').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  setStatus('✅ You have discovered why the internet needs Diffie-Hellman key exchange.', '#34d399');
+  phase = 'done';
+}
+
+/* ═══════════════════════════════════════
+   RESET
+═══════════════════════════════════════ */
+function doReset() {
+  busy = false; attempted = []; eveCount = 0; phase = 'ready';
+
+  // SVG
+  ['rl1','rl2','rl3'].forEach(id => {
+    const el = document.getElementById(id);
+    el.className = 'r-line';
+    el.style.stroke = '';
+  });
+  ['x1','x2','x3'].forEach(id => {
+    document.getElementById(id).style.opacity = '0';
+  });
+
+  // Packets
+  ['pkt-ciph','pkt-key'].forEach(id => {
+    const el = document.getElementById(id);
+    el.classList.remove('vis');
+    el.style.transition = 'none';
+    el.style.left = '13.75%';
+    el.style.top  = '50%';
+    void el.offsetWidth;
+    el.style.transition = '';
+  });
+
+  // Eve
+  const eve = document.getElementById('n-eve');
+  eve.classList.remove('vis','active');
+  eve.style.transition = 'none';
+  eve.style.left = '50%'; eve.style.top = '50%';
+  void eve.offsetWidth;
+  eve.style.transition = '';
+
+  // Burst
+  document.getElementById('intercept-burst').classList.remove('on');
+
+  // Buttons
+  ROUTES.forEach(r => {
+    const b = document.getElementById(r.btnId);
+    b.disabled = false;
+    b.classList.remove('used','fail');
+  });
+  document.getElementById('btn-enc-key').style.display = 'none';
+  document.getElementById('btn-enc-key').disabled = false;
+  document.getElementById('btn-enc-key').textContent = '💡 What if we encrypt the key itself before sending it?';
+
+  // Panels
+  document.getElementById('recursive-panel').classList.remove('vis');
+  document.getElementById('conclusion').classList.remove('vis');
+  document.getElementById('btn-reset').style.display = 'none';
+  document.getElementById('eve-count').classList.remove('vis');
+
+  // Dots
+  for (let i = 0; i < 3; i++) document.getElementById('dot' + i).className = 'att-dot';
+  updateDots();
+
+  setStatus('→ Choose a route to send the key to Bob.');
+  init();
+}
+
+/* ── Boot ── */
+init();
+updateDots();
 </script>
 {% endblock %}
