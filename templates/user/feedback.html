@@ -1,0 +1,177 @@
+{% extends "base.html" %}
+
+{% block content %}
+<style>
+    .feedback-container {
+        max-width: 900px;
+        margin: 0 auto;
+        padding: 40px 20px;
+    }
+
+    .feedback-card {
+        background: white;
+        border-radius: 12px;
+        padding: 35px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    }
+
+    .feedback-header {
+        margin-bottom: 30px;
+    }
+
+    .feedback-header h1 {
+        margin-bottom: 8px;
+        color: #1f2937;
+    }
+
+    .feedback-header p {
+        color: #6b7280;
+        line-height: 1.6;
+    }
+
+    .sus-item {
+        padding: 20px 0;
+        border-bottom: 1px solid #e5e7eb;
+    }
+
+    .sus-question {
+        font-weight: 600;
+        color: #1f2937;
+        margin-bottom: 12px;
+        line-height: 1.5;
+    }
+
+    .rating-row {
+        display: flex;
+        justify-content: space-between;
+        gap: 10px;
+    }
+
+    .rating-option {
+        flex: 1;
+        text-align: center;
+        border: 1px solid #d1d5db;
+        border-radius: 8px;
+        padding: 10px;
+        cursor: pointer;
+        background: #f9fafb;
+    }
+
+    .rating-option:hover {
+        border-color: #6366f1;
+        background: #eef2ff;
+    }
+
+    .rating-option input {
+        margin-bottom: 6px;
+    }
+
+    .rating-labels {
+        display: flex;
+        justify-content: space-between;
+        font-size: 12px;
+        color: #6b7280;
+        margin-top: 8px;
+    }
+
+    textarea {
+        width: 100%;
+        min-height: 140px;
+        padding: 14px;
+        border: 1px solid #d1d5db;
+        border-radius: 8px;
+        resize: vertical;
+        font-size: 14px;
+        font-family: inherit;
+    }
+
+    textarea:focus {
+        outline: none;
+        border-color: #6366f1;
+        box-shadow: 0 0 0 3px rgba(99,102,241,0.15);
+    }
+
+    .btn-submit {
+        margin-top: 25px;
+        width: 100%;
+        padding: 14px;
+        background: #6366f1;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-weight: bold;
+        cursor: pointer;
+        font-size: 15px;
+    }
+
+    .btn-submit:hover {
+        background: #4f46e5;
+    }
+</style>
+
+<div class="feedback-container">
+    <div class="feedback-card">
+
+        <a href="{{ url_for('home') }}"
+            style="display:inline-block; background:#f3f4f6; color:#374151; padding:10px 16px; border-radius:6px; font-weight:bold; text-decoration:none; margin-bottom:-30px;">
+            Back to Dashboard 
+        </a>
+
+        <div class="feedback-header">
+            <h1>System Usability Scale Feedback</h1>
+            <p>
+                Rate each statement from 1 to 5 based on your experience using the web-based cryptography visualization tool.
+            </p>
+        </div>
+
+        <form method="POST" action="{{ url_for('submit_feedback') }}">
+
+            {% set questions = [
+                "I think that I would like to use this system frequently.",
+                "I found the system unnecessarily complex.",
+                "I thought the system was easy to use.",
+                "I think that I would need the support of a technical person to be able to use this system.",
+                "I found the various functions in this system were well integrated.",
+                "I thought there was too much inconsistency in this system.",
+                "I would imagine that most people would learn to use this system very quickly.",
+                "I found the system very cumbersome to use.",
+                "I felt very confident using the system.",
+                "I needed to learn a lot of things before I could get going with this system."
+            ] %}
+
+            {% for question in questions %}
+            <div class="sus-item">
+                <div class="sus-question">
+                    {{ loop.index }}. {{ question }}
+                </div>
+
+                <div class="rating-row">
+                    {% for score in range(1, 6) %}
+                    <label class="rating-option">
+                        <input type="radio" name="q{{ loop.index }}" value="{{ score }}" required>
+                        <div>{{ score }}</div>
+                    </label>
+                    {% endfor %}
+                </div>
+
+                <div class="rating-labels">
+                    <span>Strongly Disagree</span>
+                    <span>Strongly Agree</span>
+                </div>
+            </div>
+            {% endfor %}
+
+            <div class="sus-item">
+                <div class="sus-question">
+                    Additional Comments / Feedback
+                </div>
+                <textarea name="comments" placeholder="Write your comments or suggestions here..."></textarea>
+            </div>
+
+            <button type="submit" class="btn-submit">Submit Feedback</button>
+
+        </form>
+
+    </div>
+</div>
+{% endblock %}

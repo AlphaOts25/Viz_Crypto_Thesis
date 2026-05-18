@@ -24,8 +24,9 @@
             <div class="dropdown-menu" id="dropdownMenu">
 
                 {% if current_user.role == 'student' %}
-                    <a href="#">Profile</a>
-                    <a href="{{ url_for('achievement') }}">Achievement</a>
+                    <!-- <a href="#">Profile</a> -->
+                    <a href="{{ url_for('achievement') }}">Results</a>
+                    <a href="{{ url_for('feedback') }}">Give Feedback</a>
                 {% elif current_user.role == 'admin' %}
                     <a href="{{ url_for('admin_dashboard') }}">Dashboard</a>
                     <a href="{{ url_for('admin_users') }}">Results</a>

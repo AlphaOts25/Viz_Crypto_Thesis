@@ -490,6 +490,62 @@ def delete_result(result_id):
     flash("Result deleted." if result.deleted_count == 1 else "Result not found.")
 
     return redirect(url_for('admin_users'))
+
+#-------------feedback----------------
+@app.route('/feedback')
+@login_required
+def feedback():
+    if current_user.role != 'student':
+        return redirect(url_for('admin_dashboard'))
+
+    existing_feedback = db.feedback.find_one({
+        "user_id": ObjectId(current_user.id)
+    })
+
+    if existing_feedback:
+        flash("You have already submitted your feedback.")
+        return redirect(url_for('home'))
+
+    return render_template(
+        "user/feedback.html",
+        show_sidebar=False
+    )
+
+@app.route('/submit_feedback', methods=['POST'])
+@login_required
+def submit_feedback():
+    if current_user.role != 'student':
+        return redirect(url_for('admin_dashboard'))
+
+    user_id = ObjectId(current_user.id)
+
+    existing_feedback = db.feedback.find_one({
+        "user_id": user_id
+    })
+
+    if existing_feedback:
+        flash("You have already submitted your feedback.")
+        return redirect(url_for('home'))
+
+    responses = {}
+
+    for i in range(1, 11):
+        responses[f"q{i}"] = int(request.form.get(f"q{i}"))
+
+    comments = request.form.get("comments")
+
+    db.feedback.insert_one({
+        "user_id": user_id,
+        "responses": responses,
+        "comments": comments,
+        "submitted_at": datetime.now(timezone.utc)
+    })
+
+    flash("Feedback submitted successfully.")
+    return redirect(url_for('home'))
+
+
+
 # ------------------------------ TESTS ------------------------------
 
 def create_test(test_type):
@@ -511,8 +567,16 @@ def add_test():
 
     test_type = request.form.get("type")
 
+    existing_test = db.tests.find_one({"type": test_type})
+
+    if existing_test:
+        flash(f"{test_type.capitalize()} test already exists. Edit the existing test instead.")
+        return redirect(url_for('admin_dashboard'))
+
     test_id = db.tests.insert_one({
-        "type": test_type
+        "type": test_type,
+        "title": f"{test_type.capitalize()} Test",
+        "created_at": datetime.now(timezone.utc)
     }).inserted_id
 
     grouped = defaultdict(dict)
@@ -535,6 +599,7 @@ def add_test():
             "correct_answer": q.get("correct")
         })
 
+    flash("Test created successfully.")
     return redirect(url_for('admin_dashboard'))
 
 @app.route('/edit_test/<test_id>', methods=['POST'])
@@ -647,7 +712,11 @@ def submit_test():
         "timestamp": datetime.now(timezone.utc)
     })
 
-    flash(f'Test submitted! Your score: {score}/{len(question_ids)}')
+    if test_type == "post":
+        flash("POST_TEST_COMPLETED")
+    else:
+        flash(f'Test submitted! Your score: {score}/{len(question_ids)}')
+
     return redirect(url_for('home'))
 
 

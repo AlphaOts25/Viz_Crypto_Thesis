@@ -172,6 +172,63 @@
     from { opacity: 0; transform: translateY(-10px); }
     to { opacity: 1; transform: translateY(0); }
 }
+
+/* Feedback */
+.feedback-modal {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.55);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2000;
+}
+
+.feedback-modal-box {
+    background: white;
+    width: 420px;
+    max-width: 90%;
+    padding: 30px;
+    border-radius: 14px;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+    text-align: center;
+}
+
+.feedback-modal-box h2 {
+    margin-top: 0;
+    color: #111827;
+}
+
+.feedback-modal-box p {
+    color: #6b7280;
+    line-height: 1.6;
+    margin-bottom: 25px;
+}
+
+.feedback-modal-actions {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+}
+
+.feedback-btn {
+    background: #6366f1;
+    color: white;
+    padding: 12px 18px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.feedback-close-btn {
+    background: #f3f4f6;
+    color: #374151;
+    border: none;
+    padding: 12px 18px;
+    border-radius: 8px;
+    font-weight: bold;
+    cursor: pointer;
+}
 </style>
 
 <div class="main-container">
@@ -282,13 +339,35 @@
                 {% else %}
                 <tr>
                     <td colspan="4" style="padding: 40px; text-align: center; color: #888;">
-                        No modules found. Start by adding a new lesson above!
+                        No tests found. Click Add Test to create one.
                     </td>
                 </tr>
                 {% endfor %}
             </tbody>
         </table>
     </div>
+    {% with messages = get_flashed_messages() %}
+        {% if "POST_TEST_COMPLETED" in messages %}
+            <div id="feedbackModal" class="feedback-modal">
+                <div class="feedback-modal-box">
+                    <h2>Post-test Submitted</h2>
+                    <p>
+                        You have completed the post-test. Please provide your feedback about your experience using the cryptography visualization tool.
+                    </p>
+
+                    <div class="feedback-modal-actions">
+                        <a href="{{ url_for('feedback') }}" class="feedback-btn">
+                            Give Feedback
+                        </a>
+
+                        <button type="button" onclick="closeFeedbackModal()" class="feedback-close-btn">
+                            Later
+                        </button>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+    {% endwith %}
 </div>
 
 <script>
@@ -392,6 +471,13 @@ function openEditModalFromButton(button) {
 
 function deleteQuestion(button) {
     button.closest(".question-block").remove();
+}
+
+function closeFeedbackModal() {
+    const modal = document.getElementById("feedbackModal");
+    if (modal) {
+        modal.style.display = "none";
+    }
 }
 </script>
 {% endblock %}
