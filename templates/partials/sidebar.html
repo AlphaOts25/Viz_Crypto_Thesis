@@ -1,13 +1,10 @@
-<aside class="sidebar">
+<aside class="sidebar" id="sidebar">
 
     <h3 class="sidebar-title">Curriculum</h3>
 
     <!-- Pre-Test -->
     {% if pre_test_exists %}
-    <a href="{{ url_for('take_test', test_type='pre') }}"
-       class="sidebar-link assessment-link">
-
-        <span class="assessment-badge">Assessment</span>
+    <a href="{{ url_for('take_test', test_type='pre') }}" class="sidebar-assessment">
         Pre-Test
     </a>
     {% endif %}
@@ -62,10 +59,7 @@
 
     <!-- Post-Test -->
     {% if post_test_exists %}
-    <a href="{{ url_for('take_test', test_type='post') }}"
-       class="sidebar-link assessment-link">
-
-        <span class="assessment-badge">Assessment</span>
+    <a href="{{ url_for('take_test', test_type='post') }}" class="sidebar-assessment">
         Post-Test
     </a>
     {% endif %}

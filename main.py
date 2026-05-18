@@ -53,6 +53,7 @@ serializer = URLSafeTimedSerializer(app.config['SERIALIZER_SECRET_KEY'])
 login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = 'login' # Tells Flask where to send users who aren't logged in
+login_manager.login_message = None
 
 # Create a User class that Flask-Login can understand
 class User(UserMixin):
@@ -576,24 +577,56 @@ def edit_test(test_id):
     flash("Test updated successfully.")
     return redirect(url_for('admin_dashboard'))
 
+def has_taken_test(user_id, test_type):
+    return db.results.find_one({
+        "$or": [
+            {"user_id": ObjectId(user_id), "test_type": test_type},
+            {"user_id": str(user_id), "test_type": test_type}
+        ]
+    }) is not None
+
 @app.route('/submit_test', methods=['POST'])
 @login_required
 def submit_test():
     test_type = request.form.get('test_type')
+    user_id = ObjectId(current_user.id)
+
+    if test_type not in ["pre", "post"]:
+        return redirect(url_for('home'))
+
+    already_taken = db.results.find_one({
+        "$or": [
+            {"user_id": ObjectId(current_user.id), "test_type": test_type},
+            {"user_id": current_user.id, "test_type": test_type}
+        ]
+    })
+
+    if already_taken:
+        flash("You have already taken this test.")
+        return redirect(url_for('home'))
+
     test = db.tests.find_one({"type": test_type})
-    
+
     if not test:
         return redirect(url_for('home'))
-    
-    # Calculate score
+
+    question_ids = request.form.getlist("question_ids[]")
+
     score = 0
     answers = []
 
-    questions = list(db.questions.find({"test_id": test["_id"]}))
+    for idx, question_id in enumerate(question_ids):
+        question = db.questions.find_one({
+            "_id": ObjectId(question_id),
+            "test_id": test["_id"]
+        })
 
-    for idx, question in enumerate(questions):
-        user_answer = request.form.get(f'question_{idx}')
-        is_correct = user_answer == question['correct_answer']
+        if not question:
+            continue
+
+        user_answer = request.form.get(f"question_{idx}")
+        correct_answer = question["correct_answer"]
+        is_correct = user_answer == correct_answer
 
         if is_correct:
             score += 1
@@ -601,20 +634,20 @@ def submit_test():
         answers.append({
             "question_id": question["_id"],
             "user_answer": user_answer,
-            "correct_answer": question["correct_answer"],
+            "correct_answer": correct_answer,
             "is_correct": is_correct
         })
 
     db.results.insert_one({
-        "user_id": ObjectId(current_user.id),
+        "user_id": user_id,
         "test_type": test_type,
         "score": score,
-        "total": len(questions),
+        "total": len(question_ids),
         "answers": answers,
         "timestamp": datetime.now(timezone.utc)
     })
-    
-    flash(f'Test submitted! Your score: {score}/{len(questions)}')
+
+    flash(f'Test submitted! Your score: {score}/{len(question_ids)}')
     return redirect(url_for('home'))
 
 
@@ -638,14 +671,35 @@ def get_test(test_type):
     if not test:
         return []
 
-    questions = list(db.questions.find({"test_id": test["_id"]}))
-    random.shuffle(questions)
+    questions = list(db.questions.find({"test_id": test["_id"]}).sort("_id", 1))
 
     return questions
 
 @app.route('/test/<test_type>')
 @login_required
 def take_test(test_type):
+    if current_user.role != 'student':
+        return redirect(url_for('admin_dashboard'))
+
+    if test_type not in ["pre", "post"]:
+        return redirect(url_for('home'))
+
+    user_id = ObjectId(current_user.id)
+
+    already_taken = db.results.find_one({
+        "user_id": user_id,
+        "test_type": test_type
+    })
+
+    if already_taken:
+        return render_template(
+            "test.html",
+            questions=[],
+            type=test_type,
+            already_taken=True,
+            show_sidebar=False
+        )
+
     pre_taken, post_taken, modules_unlocked, post_unlocked = get_student_progress()
 
     if test_type == "post" and not post_unlocked:
@@ -655,9 +709,10 @@ def take_test(test_type):
     questions = get_test(test_type)
 
     return render_template(
-        'test.html',
+        "test.html",
         questions=questions,
         type=test_type,
+        already_taken=False,
         show_sidebar=False
     )
 
@@ -742,15 +797,16 @@ def view_lesson(module_num, lesson_num):
         return redirect(url_for('home'))
 
     target_code = f"module{module_num}_lesson{lesson_num}"
+    user_id = ObjectId(current_user.id)
 
     db.module_progress.update_one(
         {
-            "user_id": ObjectId(current_user.id),
+            "user_id": user_id,
             "lesson_code": target_code
         },
         {
             "$set": {
-                "user_id": ObjectId(current_user.id),
+                "user_id": user_id,
                 "lesson_code": target_code,
                 "completed_at": datetime.now(timezone.utc)
             }

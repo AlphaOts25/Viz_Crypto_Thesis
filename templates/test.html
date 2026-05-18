@@ -239,7 +239,15 @@
         <p style="color: #6b7280; font-size: 1.1em;">Test your knowledge on cryptography</p>
     </div>
 
-    {% if questions %}
+    {% if already_taken %}
+        <div class="empty-state">
+            <div class="empty-state-icon">✅</div>
+            <h2>You have already taken this test.</h2>
+            <p>You can only answer the {{ type }} test once.</p>
+            <a href="{{ url_for('home') }}" class="btn-cancel">← Back to Home</a>
+        </div>
+
+    {% elif questions %}
         <div class="progress-bar">
             <div class="progress-fill" id="progressFill" style="width: 0%"></div>
         </div>
@@ -257,6 +265,8 @@
             {% for question in questions %}
             {% set q_index = loop.index0 %}
 
+            <input type="hidden" name="question_ids[]" value="{{ question._id }}">
+
             <div class="question-block">
                 <span class="question-number">Question {{ loop.index }} of {{ questions|length }}</span>
                 <p class="question-text">{{ question.question_text }}</p>
@@ -271,11 +281,14 @@
                             value="{{ choice_key }}"
                             data-question="{{ q_index }}"
                         >
-                        <label for="q{{ q_index }}_{{ choice_key }}">{{ choice_value }}</label>
+                        <label for="q{{ q_index }}_{{ choice_key }}">
+                            {{ choice_key.upper() }}. {{ choice_value }}
+                        </label>
                     </div>
                     {% endfor %}
                 </div>
             </div>
+
             {% endfor %}
 
             <div class="button-group">
@@ -301,6 +314,11 @@ document.addEventListener('DOMContentLoaded', function() {
     const progressFill = document.getElementById('progressFill');
     const answeredCountSpan = document.getElementById('answeredCount');
     const totalCountSpan = document.getElementById('totalCount');
+
+    if (!testForm || !totalCountSpan) {
+        return;
+    }
+    
     const totalQuestions = parseInt(totalCountSpan.textContent);
 
     function updateProgress() {
