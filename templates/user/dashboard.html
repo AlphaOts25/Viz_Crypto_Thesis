@@ -61,6 +61,53 @@
     font-weight: bold;
     cursor: pointer;
 }
+
+.score-modal {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.55);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2000;
+}
+
+.score-modal-box {
+    background: white;
+    width: 420px;
+    max-width: 90%;
+    padding: 30px;
+    border-radius: 14px;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+    text-align: center;
+}
+
+.score-modal-box h2 {
+    margin-top: 0;
+    color: #111827;
+}
+
+.score-display {
+    font-size: 42px;
+    font-weight: bold;
+    color: #4f46e5;
+    margin: 18px 0;
+}
+
+.score-note {
+    color: #6b7280;
+    margin-bottom: 24px;
+}
+
+.score-modal-btn {
+    background: #6366f1;
+    color: white;
+    border: none;
+    padding: 12px 22px;
+    border-radius: 8px;
+    font-weight: bold;
+    cursor: pointer;
+}
     </style>
 
     <div class="main-container">
@@ -183,9 +230,42 @@
             {% endif %}
         {% endwith %}
     </div>
+    {% with messages = get_flashed_messages() %}
+    {% for message in messages %}
+        {% if message.startswith("PRE_TEST_COMPLETED:") %}
+            {% set parts = message.split(":") %}
+
+            <div id="preScoreModal" class="score-modal">
+                <div class="score-modal-box">
+                    <h2>Pre-test Submitted</h2>
+
+                    <p>Your pre-test score is:</p>
+
+                    <div class="score-display">
+                        {{ parts[1] }}/{{ parts[2] }}
+                    </div>
+
+                    <p class="score-note">
+                        You may now proceed to the learning modules.
+                    </p>
+
+                    <button type="button" onclick="closePreScoreModal()" class="score-modal-btn">
+                        Continue
+                    </button>
+                </div>
+            </div>
+        {% endif %}
+    {% endfor %}
+{% endwith %}
     <script>
         function closeFeedbackModal() {
             const modal = document.getElementById("feedbackModal");
+            if (modal) {
+                modal.style.display = "none";
+            }
+        }
+        function closePreScoreModal() {
+            const modal = document.getElementById("preScoreModal");
             if (modal) {
                 modal.style.display = "none";
             }

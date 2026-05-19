@@ -811,10 +811,12 @@ def submit_test():
         "timestamp": datetime.now(timezone.utc)
     })
 
-    if test_type == "post":
+    if test_type == "pre":
+        flash(f"PRE_TEST_COMPLETED:{score}:{len(question_ids)}")
+    elif test_type == "post":
         flash("POST_TEST_COMPLETED")
     else:
-        flash(f'Test submitted! Your score: {score}/{len(question_ids)}')
+        flash(f"Test submitted! Your score: {score}/{len(question_ids)}")
 
     return redirect(url_for('home'))
 

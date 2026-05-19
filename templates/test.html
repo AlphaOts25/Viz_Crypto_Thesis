@@ -231,6 +231,50 @@
             width: 100%;
         }
     }
+    .warning-modal {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.55);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 3000;
+}
+
+.warning-modal.show {
+    display: flex;
+}
+
+.warning-modal-box {
+    background: white;
+    width: 420px;
+    max-width: 90%;
+    padding: 30px;
+    border-radius: 14px;
+    text-align: center;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+}
+
+.warning-modal-box h2 {
+    margin-top: 0;
+    color: #991b1b;
+}
+
+.warning-modal-box p {
+    color: #6b7280;
+    line-height: 1.6;
+}
+
+.warning-modal-btn {
+    margin-top: 20px;
+    background: #dc2626;
+    color: white;
+    border: none;
+    padding: 12px 22px;
+    border-radius: 8px;
+    font-weight: bold;
+    cursor: pointer;
+}
 </style>
 
 <div class="test-container">
@@ -241,7 +285,7 @@
 
     {% if already_taken %}
         <div class="empty-state">
-            <div class="empty-state-icon">✅</div>
+            <div class="empty-state-icon">✔</div>
             <h2>You have already taken this test.</h2>
             <p>You can only answer the {{ type }} test once.</p>
             <a href="{{ url_for('home') }}" class="btn-cancel">← Back to Home</a>
@@ -259,7 +303,7 @@
             <input type="hidden" name="test_type" value="{{ type }}">
             
             <div class="error-message" id="errorMessage">
-                ⚠️ Please answer all questions before submitting.
+                🚫 Please answer all questions before submitting.
             </div>
 
             {% for question in questions %}
@@ -296,6 +340,16 @@
                 <button type="submit" class="btn-submit" id="submitBtn">Submit Test</button>
             </div>
         </form>
+        <div id="warningModal" class="warning-modal">
+            <div class="warning-modal-box">
+                <h2>Incomplete Test</h2>
+                <p>Please answer all questions before submitting your test.</p>
+
+                <button type="button" class="warning-modal-btn" onclick="closeWarningModal()">
+                    Okay
+                </button>
+            </div>
+        </div>
     {% else %}
         <div class="empty-state">
             <div class="empty-state-icon">📝</div>
@@ -305,12 +359,16 @@
         </div>
     {% endif %}
 </div>
-
 <script>
+function closeWarningModal() {
+    const warningModal = document.getElementById("warningModal");
+    if (warningModal) {
+        warningModal.classList.remove("show");
+    }
+}
+
 document.addEventListener('DOMContentLoaded', function() {
     const testForm = document.getElementById('testForm');
-    const submitBtn = document.getElementById('submitBtn');
-    const errorMessage = document.getElementById('errorMessage');
     const progressFill = document.getElementById('progressFill');
     const answeredCountSpan = document.getElementById('answeredCount');
     const totalCountSpan = document.getElementById('totalCount');
@@ -318,7 +376,7 @@ document.addEventListener('DOMContentLoaded', function() {
     if (!testForm || !totalCountSpan) {
         return;
     }
-    
+
     const totalQuestions = parseInt(totalCountSpan.textContent);
 
     function updateProgress() {
@@ -339,30 +397,29 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     const radioButtons = document.querySelectorAll('input[type="radio"]');
+
     radioButtons.forEach(radio => {
         radio.addEventListener('change', updateProgress);
     });
 
-    if (testForm) {
-        testForm.addEventListener('submit', function(e) {
-            const radioButtons = document.querySelectorAll('input[type="radio"]');
-            const answeredSet = new Set();
+    testForm.addEventListener('submit', function(e) {
+        const answeredSet = new Set();
 
-            radioButtons.forEach(radio => {
-                if (radio.checked) {
-                    answeredSet.add(radio.dataset.question);
-                }
-            });
-
-            if (answeredSet.size < totalQuestions) {
-                e.preventDefault();
-                errorMessage.classList.add('show');
-                setTimeout(() => {
-                    errorMessage.classList.remove('show');
-                }, 4000);
+        radioButtons.forEach(radio => {
+            if (radio.checked) {
+                answeredSet.add(radio.dataset.question);
             }
         });
-    }
+
+        if (answeredSet.size < totalQuestions) {
+            e.preventDefault();
+
+            const warningModal = document.getElementById("warningModal");
+            if (warningModal) {
+                warningModal.classList.add("show");
+            }
+        }
+    });
 
     updateProgress();
 });
