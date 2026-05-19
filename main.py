@@ -875,13 +875,67 @@ def achievement():
 
     post_taken = post_result is not None
 
+    attempts = []
+
+    if post_taken:
+        results = [pre_result, post_result]
+
+        for result in results:
+            if not result:
+                continue
+
+            attempt_answers = []
+
+            for answer in result.get("answers", []):
+                question = db.questions.find_one({
+                    "_id": answer.get("question_id")
+                })
+
+                if not question:
+                    continue
+
+                choices = []
+
+                for key, value in question.get("choices", {}).items():
+                    is_user_choice = key == answer.get("user_answer")
+                    is_correct_answer = key == answer.get("correct_answer")
+
+                    if is_correct_answer:
+                        status = "correct"
+                    elif is_user_choice and not answer.get("is_correct"):
+                        status = "wrong"
+                    else:
+                        status = "neutral"
+
+                    choices.append({
+                        "key": key.upper(),
+                        "value": value,
+                        "status": status,
+                        "is_user_choice": is_user_choice,
+                        "is_correct_answer": is_correct_answer
+                    })
+
+                attempt_answers.append({
+                    "question_text": question.get("question_text", ""),
+                    "choices": choices
+                })
+
+            attempts.append({
+                "test_type": "Pre-test" if result.get("test_type") == "pre" else "Post-test",
+                "score": result.get("score"),
+                "total": result.get("total"),
+                "answers": attempt_answers
+            })
+
     return render_template(
         "user/achievement.html",
         pre_result=pre_result,
         post_result=post_result,
         post_taken=post_taken,
+        attempts=attempts,
         show_sidebar=False
     )
+
 #---------------------------------------TEMPLATES--------------------------------------------
 def get_student_progress():
     user_id = ObjectId(current_user.id)

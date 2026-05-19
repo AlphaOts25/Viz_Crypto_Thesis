@@ -2,6 +2,23 @@
 {% extends "base.html" %}
 
 {% block content %}
+<style>
+    @media (max-width: 768px) {
+    .sim-stage {
+        flex-direction: column;
+        min-height: auto;
+    }
+
+    .sim-col {
+        width: 100%;
+        padding: 20px 10px;
+    }
+
+    #symSim {
+        padding: 20px;
+    }
+}
+</style>
 <div class="lesson-container" style="max-width: 850px; margin: 0 auto; padding-bottom: 60px;">
 
     <div class="lesson-header" style="margin-bottom: 40px;">
@@ -48,7 +65,7 @@
     
     <div class="interactive-test" style="background: #1e1e2e; border-radius: 12px; padding: 30px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); color: white;">
         <h2 style="text-align: center; color: #fff; font-size: 30px;">An Interactive Simulation</h2>
-        <h2 style="text-align:center; color: #1f1e2e; font-size: 30px;">s</h2>
+        <h2 style="text-align:center; color: #1f1e2e; font-size: 30px;"></h2>
         <h2 style="margin-top: 0; color: #fff; font-size: 20px;">How Does Encryption and Decryption Works?</h2>
         <p style="color: #a6accd; font-size: 14px; margin-bottom: 20px;">Click the button to view a step-by-step demonstration of encryption and decryption, presented clearly and simply by the computer.</p>
         <div class="crypto-wrap">

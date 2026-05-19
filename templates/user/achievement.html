@@ -1,12 +1,65 @@
 {% extends "base.html" %}
 
 {% block content %}
+<style>
+    .attempt-card {
+        background:white;
+        border-radius:12px;
+        padding:25px;
+        margin-top:25px;
+        box-shadow:0 4px 12px rgba(0,0,0,0.05);
+    }
+
+    .question-box {
+        padding:18px 0;
+        border-bottom:1px solid #f3f4f6;
+    }
+
+    .question-box:last-child {
+        border-bottom:none;
+    }
+
+    .question-text {
+        font-weight:bold;
+        color:#111827;
+        margin-bottom:12px;
+    }
+
+    .choice {
+        padding:12px 14px;
+        border-radius:8px;
+        margin-bottom:8px;
+        border:1px solid #e5e7eb;
+        background:#f9fafb;
+    }
+
+    .choice.correct {
+        background:#dcfce7;
+        border-color:#22c55e;
+        color:#166534;
+        font-weight:bold;
+    }
+
+    .choice.wrong {
+        background:#fee2e2;
+        border-color:#ef4444;
+        color:#991b1b;
+        font-weight:bold;
+    }
+
+    .answer-note {
+        font-size:13px;
+        margin-left:8px;
+        font-weight:bold;
+    }
+</style>
+
 <div class="main-container">
 
     <a href="{{ url_for('home') }}"
-            style="display:inline-block; background:#f3f4f6; color:#374151; padding:10px 16px; border-radius:6px; font-weight:bold; text-decoration:none; margin-bottom:-30px;">
-            Back to Dashboard 
-        </a>
+        style="display:inline-block; background:#f3f4f6; color:#374151; padding:10px 16px; border-radius:6px; font-weight:bold; text-decoration:none; margin-bottom:-30px;">
+        Back to Dashboard 
+    </a>
 
     <h1 style="margin-bottom:5px;">Achievements</h1>
     <p style="color:#666; margin-bottom:25px;">
@@ -45,6 +98,45 @@
             </div>
 
         </div>
+
+        <h2 style="margin-top:40px;">Attempt Review</h2>
+        <p style="color:#666; margin-bottom:20px;">
+            Review your selected answers and the correct answers.
+        </p>
+
+        {% for attempt in attempts %}
+        <div class="attempt-card">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+                <h3 style="margin:0;">{{ attempt.test_type }}</h3>
+                <span style="background:#eef2ff; color:#4f46e5; padding:8px 14px; border-radius:999px; font-weight:bold;">
+                    {{ attempt.score }}/{{ attempt.total }}
+                </span>
+            </div>
+
+            {% for answer in attempt.answers %}
+            <div class="question-box">
+                <div class="question-text">
+                    {{ loop.index }}. {{ answer.question_text }}
+                </div>
+
+                {% for choice in answer.choices %}
+                <div class="choice {{ choice.status }}">
+                    {{ choice.key }}. {{ choice.value }}
+
+                    {% if choice.is_user_choice and choice.is_correct_answer %}
+                        <span class="answer-note">Correct</span>
+                    {% elif choice.is_user_choice and not choice.is_correct_answer %}
+                        <span class="answer-note">Your answer</span>
+                    {% elif choice.is_correct_answer %}
+                        <span class="answer-note">Correct</span>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </div>
+            {% endfor %}
+        </div>
+        {% endfor %}
+
     {% endif %}
 
 </div>

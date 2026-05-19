@@ -99,3 +99,21 @@
 .dropdown-menu.show-menu {
     display: block;
 }
+
+@media (max-width: 768px) {
+    .navbar {
+        padding: 12px 16px;
+    }
+
+    .nav-brand a {
+        font-size: 16px;
+    }
+
+    .nav-actions span {
+        display: none;
+    }
+
+    .menu-btn {
+        font-size: 24px;
+    }
+}

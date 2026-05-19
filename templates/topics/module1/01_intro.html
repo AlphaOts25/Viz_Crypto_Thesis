@@ -2,6 +2,23 @@
 {% extends "base.html" %}
 
 {% block content %}
+<style>
+    @media (max-width: 768px) {
+    .sim-stage {
+        flex-direction: column;
+        min-height: auto;
+    }
+
+    .sim-col {
+        width: 100%;
+        padding: 20px 10px;
+    }
+
+    #symSim {
+        padding: 20px;
+    }
+}
+</style>
 <div class="lesson-header" style="margin-bottom: 30px;">
     <p style="color: #6366f1; font-weight: bold; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 1px;">Module 1</p>
     <h1 style="font-size: 36px; margin-top: 0; margin-bottom: 15px;">Introduction to Encryption & Decryption</h1>

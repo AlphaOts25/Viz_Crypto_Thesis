@@ -261,3 +261,23 @@ body:has(.auth-page) .content-area {
 .slider-dot {
     cursor: pointer;
 }
+
+@media (max-width: 900px) {
+    .auth-page {
+        grid-template-columns: 1fr;
+    }
+
+    .auth-right {
+        display: none;
+    }
+
+    .auth-left {
+        min-height: 100vh;
+        padding: 24px;
+    }
+
+    .auth-card {
+        max-width: 100%;
+        padding: 30px 20px;
+    }
+}
