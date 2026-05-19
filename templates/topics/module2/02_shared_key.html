@@ -365,6 +365,22 @@
     transition: opacity 0.2s; border: 1px solid rgba(255,255,255,0.08);
 }
 .tip:hover .tip-text { visibility: visible; opacity: 1; }
+
+@media (max-width: 768px) {
+    .sim-stage {
+        flex-direction: column;
+        min-height: auto;
+    }
+
+    .sim-col {
+        width: 100%;
+        padding: 20px 10px;
+    }
+
+    #symSim {
+        padding: 20px;
+    }
+}
 </style>
 
 <div class="lesson-container" style="max-width: 950px; margin: 0 auto; padding-bottom: 60px;">

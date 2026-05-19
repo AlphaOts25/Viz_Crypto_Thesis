@@ -3,21 +3,27 @@
 
 {% block content %}
 <style>
-    @media (max-width: 768px) {
-    .sim-stage {
-        flex-direction: column;
-        min-height: auto;
-    }
-
-    .sim-col {
+    .interactive-wrapper,
+    #symSim,
+    .crypto-wrap {
         width: 100%;
-        padding: 20px 10px;
+        max-width: 100%;
+        overflow-x: hidden;
     }
 
-    #symSim {
-        padding: 20px;
+    .interactive-wrapper *,
+    #symSim *,
+    .crypto-wrap * {
+        box-sizing: border-box;
     }
-}
+
+    .interactive-wrapper input,
+    #symSim input,
+    .crypto-wrap input {
+        width: 100%;
+        max-width: 100%;
+        min-width: 0;
+    }
 </style>
 <div class="lesson-container" style="max-width: 850px; margin: 0 auto; padding-bottom: 60px;">
 
