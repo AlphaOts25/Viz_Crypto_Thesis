@@ -39,11 +39,14 @@ def refresh_session():
 client = MongoClient(os.getenv("MONGO_URI"))
 db = client['fatvdb']
 
-app.config['MAIL_SERVER'] = 'smtp.gmail.com'
+app.config['MAIL_SERVER'] = 'smtp-relay.brevo.com'
 app.config['MAIL_PORT'] = 587
 app.config['MAIL_USE_TLS'] = True
+app.config['MAIL_USE_SSL'] = False
 app.config['MAIL_USERNAME'] = os.getenv('MAIL_USERNAME')
-app.config['MAIL_PASSWORD'] = os.getenv('MAIL_PASSWORD')
+app.config['MAIL_PASSWORD'] = os.getenv('MAIL_PASSWORD').replace(" ", "")
+app.config['MAIL_DEFAULT_SENDER'] = os.getenv('MAIL_DEFAULT_SENDER')
+app.config['MAIL_TIMEOUT'] = 30
 
 mail = Mail(app)
 app.config['SERIALIZER_SECRET_KEY'] = os.getenv("SERIALIZER_SECRET_KEY")
@@ -116,13 +119,6 @@ def register():
         email = request.form.get('email')
         password = request.form.get('password')
         confirm_password = request.form.get('confirm_password')
-        professor = db.users.find_one({"role": "admin"})
-
-        if not professor:
-            flash("No professor/admin account exists yet.")
-            return redirect(url_for('register'))
-
-        professor_id = professor["_id"]
 
         if password != confirm_password:
             flash('Passwords do not match!')
@@ -131,15 +127,30 @@ def register():
         existing_user = db.users.find_one({
             "$or": [{"username": username}, {"email": email}]
         })
-        
+
         if existing_user:
             flash('Username or Email already exists.')
             return redirect(url_for('register'))
 
+        # Automatically assign the default professor/admin
+        professor = db.users.find_one({"role": "admin"})
+
+        if not professor:
+            flash("No default professor/admin account exists yet.")
+            return redirect(url_for('register'))
+
+        professor_id = professor["_id"]
+
         otp = str(random.randint(100000, 999999))
 
-        session['otp'] = otp
+        print("GENERATED OTP:", otp)
+        print("SENDING OTP TO:", email)
+        print("MAIL USER:", app.config['MAIL_USERNAME'])
+        print("MAIL PASSWORD LOADED:", bool(app.config['MAIL_PASSWORD']))
 
+        print("MAIL PASSWORD LENGTH:", len(app.config['MAIL_PASSWORD']))
+
+        session['otp'] = otp
         session['pending_user'] = {
             "username": username,
             "email": email,
@@ -148,16 +159,31 @@ def register():
         }
 
         msg = Message(
-            'Your OTP Code',
-            sender=app.config['MAIL_USERNAME'],
+            subject='Cryptography Visualizer Account Verification',
             recipients=[email]
         )
 
-        msg.body = f'Your OTP is: {otp}'
+        msg.body = f"""
+        Hello,
 
-        mail.send(msg)
+        Your verification code is: {otp}
 
-        return redirect(url_for('verifyOTP'))
+        Use this code to complete your account registration.
+
+        If you did not request this, ignore this email.
+        """
+
+        try:
+            mail.send(msg)
+            print("OTP sent to:", email)
+            print("Assigned professor_id:", professor_id)
+            flash("OTP sent. Check your inbox and spam folder.")
+            return redirect(url_for('verifyOTP'))
+
+        except Exception as e:
+            print("MAIL ERROR:", e)
+            flash("OTP could not be sent. Please check email configuration.")
+            return redirect(url_for('register'))
 
     return render_template(
         'auth/register.html',
