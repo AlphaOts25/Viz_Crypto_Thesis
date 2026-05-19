@@ -236,7 +236,7 @@ This link will expire in 30 minutes.
 
             mail.send(msg)
 
-        flash('If the email exists, a password reset link has been sent.')
+        flash('If the email exists, a password reset link has been sent. Kindly check your spam also.')
         return redirect(url_for('forgotpassword'))
 
     return render_template(
@@ -418,7 +418,7 @@ def calculate_question_statistics():
 
             for result in results:
                 for answer in result.get("answers", []):
-                    if answer.get("question_id") == question["_id"]:
+                    if str(answer.get("question_id")) == str(question["_id"]):
                         if answer.get("is_correct"):
                             correct_count += 1
                         else:
@@ -427,16 +427,80 @@ def calculate_question_statistics():
             total = correct_count + wrong_count
 
             stats.append({
-                "test_type": "Pre-test" if test["type"] == "pre" else "Post-test",
-                "number": index,
-                "question_text": question.get("question_text", ""),
-                "correct_count": correct_count,
-                "wrong_count": wrong_count,
-                "correct_percentage": round((correct_count / total) * 100, 2) if total > 0 else 0,
-                "wrong_percentage": round((wrong_count / total) * 100, 2) if total > 0 else 0
-            })
+            "test_type": "Pre-test" if test["type"] == "pre" else "Post-test",
+            "number": index,
+            "question_text": question.get("question_text", ""),
+            "correct_count": correct_count,
+            "wrong_count": wrong_count,
+            "total": total,
+            "correct_percentage": round((correct_count / total) * 100, 2) if total > 0 else 0,
+            "wrong_percentage": round((wrong_count / total) * 100, 2) if total > 0 else 0
+        })
 
     return stats
+
+def calculate_sus_score(responses):
+    total = 0
+
+    for i in range(1, 11):
+        score = int(responses.get(f"q{i}", 0))
+
+        if i % 2 == 1:
+            total += score - 1
+        else:
+            total += 5 - score
+
+    return total * 2.5
+
+
+def interpret_sus_score(score):
+    if score < 50:
+        return "Poor"
+    elif score < 68:
+        return "Marginal"
+    elif score < 80:
+        return "Good"
+    else:
+        return "Excellent"
+
+
+def calculate_sus_statistics():
+    feedbacks = list(db.feedback.find())
+
+    sus_results = []
+
+    for feedback in feedbacks:
+        user = db.users.find_one({"_id": feedback["user_id"]})
+
+        responses = feedback.get("responses", {})
+        sus_score = feedback.get("sus_score")
+
+        if sus_score is None:
+            sus_score = calculate_sus_score(responses)
+
+        sus_results.append({
+            "username": user["username"] if user else "Unknown User",
+            "sus_score": round(sus_score, 2),
+            "interpretation": interpret_sus_score(sus_score),
+            "comments": feedback.get("comments", "")
+        })
+
+    if len(sus_results) == 0:
+        return {
+            "mean_sus": 0,
+            "interpretation": "No feedback yet",
+            "respondent_count": 0
+        }, []
+
+    mean_sus = sum(item["sus_score"] for item in sus_results) / len(sus_results)
+
+    sus_stats = {
+        "mean_sus": round(mean_sus, 2),
+        "interpretation": interpret_sus_score(mean_sus),
+        "respondent_count": len(sus_results)
+    }
+
+    return sus_stats, sus_results
 
 @app.route('/admin/users')
 @login_required
@@ -467,12 +531,15 @@ def admin_users():
 
     test_stats = calculate_test_statistics()
     question_stats = calculate_question_statistics()
+    sus_stats, sus_results = calculate_sus_statistics()
 
     return render_template(
         "admin/users.html",
         students=students,
         test_stats=test_stats,
         question_stats=question_stats,
+        sus_stats=sus_stats,
+        sus_results=sus_results,
         show_sidebar=False
     )
 
@@ -533,10 +600,12 @@ def submit_feedback():
         responses[f"q{i}"] = int(request.form.get(f"q{i}"))
 
     comments = request.form.get("comments")
+    sus_score = calculate_sus_score(responses)
 
     db.feedback.insert_one({
         "user_id": user_id,
         "responses": responses,
+        "sus_score": sus_score,
         "comments": comments,
         "submitted_at": datetime.now(timezone.utc)
     })
@@ -618,6 +687,7 @@ def edit_test(test_id):
     )
 
     db.questions.delete_many({"test_id": test_object_id})
+    db.results.delete_many({"test_type": test_type})
 
     grouped = defaultdict(dict)
 

@@ -134,40 +134,136 @@
                     <th style="padding:15px 20px;">Test</th>
                     <th style="padding:15px 20px;">No.</th>
                     <th style="padding:15px 20px;">Question</th>
-                    <th style="padding:15px 20px;">Correct</th>
-                    <th style="padding:15px 20px;">Wrong</th>
+                    <th style="padding:15px 20px;">Correct / Total / Wrong</th>
                 </tr>
             </thead>
 
             <tbody>
                 {% for q in question_stats %}
                 <tr style="border-bottom:1px solid #f3f4f6;">
+    <td style="padding:18px 20px; font-weight:bold; width:110px;">
+        {{ q.test_type }}
+    </td>
+
+    <td style="padding:18px 20px; width:60px;">
+        {{ q.number }}
+    </td>
+
+    <td style="padding:18px 20px; width:35%;">
+        {{ q.question_text }}
+    </td>
+
+    <td style="padding:18px 20px;">
+        <div style="display:grid; grid-template-columns:90px 1fr 90px; align-items:center; gap:12px;">
+
+            <!-- LEFT CORRECT STAT -->
+            <div style="text-align:right; color:#059669; font-weight:bold;">
+                {{ q.correct_count }} 
+                <span style="font-weight:normal; color:#6b7280;">
+                    ({{ q.correct_percentage }}%)
+                        </span>
+                    </div>
+
+                    <!-- BAR -->
+                    <div style="position:relative;">
+                        <div style="height:22px; width:100%; background:#e5e7eb; border-radius:999px; overflow:hidden; display:flex;">
+
+                            <div style="height:100%; width:{{ q.correct_percentage }}%; background:#10b981;"></div>
+
+                            <div style="height:100%; width:{{ q.wrong_percentage }}%; background:#ef4444;"></div>
+
+                        </div>
+
+                        <div style="position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:bold; color:#111827;">
+                            {{ q.total }}
+                        </div>
+                    </div>
+
+                    <!-- RIGHT WRONG STAT -->
+                    <div style="text-align:left; color:#dc2626; font-weight:bold;">
+                        {{ q.wrong_count }}
+                        <span style="font-weight:normal; color:#6b7280;">
+                            ({{ q.wrong_percentage }}%)
+                        </span>
+                    </div>
+
+                </div>
+            </td>
+        </tr>
+        {% else %}
+        <tr>
+            <td colspan="4" style="padding:40px; text-align:center; color:#888;">
+                No question statistics available yet.
+            </td>
+        </tr>
+        {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <!-- SUS USABILITY ANALYSIS -->
+    <h2 style="margin-top:40px;">Usability Feedback Analysis</h2>
+    <p style="color:#666; margin-bottom:20px;">
+        Shows individual SUS scores, mean SUS score, interpretation, and qualitative comments.
+    </p>
+
+    <div style="display:grid; grid-template-columns:repeat(3, 1fr); gap:15px; margin-bottom:25px;">
+        <div style="background:white; padding:20px; border-radius:12px; box-shadow:0 4px 12px rgba(0,0,0,0.05);">
+            <h3 style="margin:0; color:#6366f1;">{{ sus_stats.mean_sus }}</h3>
+            <p style="margin:5px 0 0; color:#666; font-size:13px;">Mean SUS Score</p>
+            <small>Average usability score from all respondents.</small>
+        </div>
+
+        <div style="background:white; padding:20px; border-radius:12px; box-shadow:0 4px 12px rgba(0,0,0,0.05);">
+            <h3 style="margin:0; color:#10b981;">{{ sus_stats.interpretation }}</h3>
+            <p style="margin:5px 0 0; color:#666; font-size:13px;">Interpretation</p>
+            <small>Overall usability rating.</small>
+        </div>
+
+        <div style="background:white; padding:20px; border-radius:12px; box-shadow:0 4px 12px rgba(0,0,0,0.05);">
+            <h3 style="margin:0; color:#f59e0b;">{{ sus_stats.respondent_count }}</h3>
+            <p style="margin:5px 0 0; color:#666; font-size:13px;">Feedback Respondents</p>
+            <small>Total students who submitted feedback.</small>
+        </div>
+    </div>
+
+    <div style="background:white; border-radius:12px; box-shadow:0 4px 12px rgba(0,0,0,0.05); overflow:hidden;">
+        <table style="width:100%; border-collapse:collapse; text-align:left;">
+            <thead>
+                <tr style="background:#f9fafb; border-bottom:2px solid #e5e7eb; color:#6b7280; font-size:13px; text-transform:uppercase;">
+                    <th style="padding:15px 20px;">Student</th>
+                    <th style="padding:15px 20px;">SUS Score</th>
+                    <th style="padding:15px 20px;">Interpretation</th>
+                    <th style="padding:15px 20px;">Comments</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for item in sus_results %}
+                <tr style="border-bottom:1px solid #f3f4f6;">
                     <td style="padding:15px 20px; font-weight:bold;">
-                        {{ q.test_type }}
+                        {{ item.username }}
+                    </td>
+
+                    <td style="padding:15px 20px; color:#6366f1; font-weight:bold;">
+                        {{ item.sus_score }}
                     </td>
 
                     <td style="padding:15px 20px;">
-                        {{ q.number }}
+                        {{ item.interpretation }}
                     </td>
 
-                    <td style="padding:15px 20px;">
-                        {{ q.question_text }}
-                    </td>
-
-                    <td style="padding:15px 20px; color:#10b981; font-weight:bold;">
-                        {{ q.correct_percentage }}%
-                        <span style="color:#666; font-weight:normal;">({{ q.correct_count }})</span>
-                    </td>
-
-                    <td style="padding:15px 20px; color:#dc2626; font-weight:bold;">
-                        {{ q.wrong_percentage }}%
-                        <span style="color:#666; font-weight:normal;">({{ q.wrong_count }})</span>
+                    <td style="padding:15px 20px; color:#4b5563;">
+                        {% if item.comments %}
+                            {{ item.comments }}
+                        {% else %}
+                            <span style="color:#9ca3af;">No comment</span>
+                        {% endif %}
                     </td>
                 </tr>
                 {% else %}
                 <tr>
-                    <td colspan="5" style="padding:40px; text-align:center; color:#888;">
-                        No question statistics available yet.
+                    <td colspan="4" style="padding:40px; text-align:center; color:#888;">
+                        No usability feedback submitted yet.
                     </td>
                 </tr>
                 {% endfor %}
