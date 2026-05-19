@@ -140,15 +140,17 @@
             ] %}
 
             {% for question in questions %}
+            {% set question_number = loop.index %}
+
             <div class="sus-item">
                 <div class="sus-question">
-                    {{ loop.index }}. {{ question }}
+                    {{ question_number }}. {{ question }}
                 </div>
 
                 <div class="rating-row">
                     {% for score in range(1, 6) %}
                     <label class="rating-option">
-                        <input type="radio" name="q{{ loop.index }}" value="{{ score }}" required>
+                        <input type="radio" name="q{{ question_number }}" value="{{ score }}" required>
                         <div>{{ score }}</div>
                     </label>
                     {% endfor %}
@@ -159,6 +161,7 @@
                     <span>Strongly Agree</span>
                 </div>
             </div>
+
             {% endfor %}
 
             <div class="sus-item">
