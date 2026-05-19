@@ -116,7 +116,13 @@ def register():
         email = request.form.get('email')
         password = request.form.get('password')
         confirm_password = request.form.get('confirm_password')
-        professor_id = request.form.get('professor_id')
+        professor = db.users.find_one({"role": "admin"})
+
+        if not professor:
+            flash("No professor/admin account exists yet.")
+            return redirect(url_for('register'))
+
+        professor_id = professor["_id"]
 
         if password != confirm_password:
             flash('Passwords do not match!')
@@ -138,7 +144,7 @@ def register():
             "username": username,
             "email": email,
             "password": password,
-            "professor_id": professor_id
+            "professor_id": str(professor_id)
         }
 
         msg = Message(
@@ -153,14 +159,11 @@ def register():
 
         return redirect(url_for('verifyOTP'))
 
-    admins = list(db.users.find({"role": "admin"}))
     return render_template(
         'auth/register.html',
-        admins=admins,
         show_navbar=False,
         show_sidebar=False
     )
-
 
 @app.route('/logout')
 @login_required

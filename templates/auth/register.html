@@ -33,16 +33,6 @@
                 </div>
 
                 <div class="auth-group">
-                    <label>Select Your Professor</label>
-                    <select name="professor_id" required>
-                        <option value="" disabled selected>Choose from list</option>
-                        {% for admin in admins %}
-                            <option value="{{ admin._id }}">Prof. {{ admin.username }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
-
-                <div class="auth-group">
                     <label>Password</label>
                     <input type="password" name="password" required>
                 </div>
