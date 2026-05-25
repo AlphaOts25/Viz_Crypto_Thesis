@@ -1,11 +1,11 @@
-from flask import Flask, render_template, request, redirect, url_for, flash, session
+from flask import Flask, render_template, request, redirect, url_for, flash, session, Response
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 from werkzeug.security import check_password_hash, generate_password_hash
 from bson.objectid import ObjectId
 from pymongo import MongoClient
 import os
 from dotenv import load_dotenv
-import random, math
+import random, math, csv, io
 from collections import defaultdict
 from datetime import datetime, timezone, timedelta
 from flask_mail import Mail, Message
@@ -571,6 +571,145 @@ def admin_users():
         sus_results=sus_results,
         show_sidebar=False
     )
+
+@app.route('/admin/export_results_csv')
+@login_required
+def export_results_csv():
+    if current_user.role != 'admin':
+        return redirect(url_for('home'))
+
+    students = list(db.users.find({"role": "student"}))
+
+    pre_test = db.tests.find_one({"type": "pre"})
+    post_test = db.tests.find_one({"type": "post"})
+
+    pre_questions = list(db.questions.find({"test_id": pre_test["_id"]}).sort("_id", 1)) if pre_test else []
+    post_questions = list(db.questions.find({"test_id": post_test["_id"]}).sort("_id", 1)) if post_test else []
+
+    output = io.StringIO()
+    writer = csv.writer(output)
+
+    headers = ["Username", "Pre-test Score"]
+
+    for index, question in enumerate(pre_questions, start=1):
+        headers.append(f"Pre Q{index} Correct")
+
+    headers.append("Post-test Score")
+
+    for index, question in enumerate(post_questions, start=1):
+        headers.append(f"Post Q{index} Correct")
+
+    headers.extend([
+        "Mean Pre-test Score",
+        "Mean Post-test Score",
+        "Mean Gain Score",
+        "T-value",
+        "Effect Size",
+        "Effect Label",
+        "SUS Score",
+        "SUS Interpretation",
+        "Comment"
+    ])
+
+    writer.writerow(headers)
+
+    test_stats = calculate_test_statistics()
+
+    for student in students:
+        row = []
+
+        user_id = student["_id"]
+
+        pre_result = db.results.find_one(
+            {"user_id": user_id, "test_type": "pre"},
+            sort=[("timestamp", -1)]
+        )
+
+        post_result = db.results.find_one(
+            {"user_id": user_id, "test_type": "post"},
+            sort=[("timestamp", -1)]
+        )
+
+        feedback = db.feedback.find_one({"user_id": user_id})
+
+        row.append(student.get("username", ""))
+
+        if pre_result:
+            row.append(f'{pre_result.get("score", 0)}/{pre_result.get("total", 0)}')
+        else:
+            row.append("Not taken")
+
+        pre_answer_map = {}
+
+        if pre_result:
+            for answer in pre_result.get("answers", []):
+                pre_answer_map[str(answer.get("question_id"))] = answer.get("is_correct")
+
+        for question in pre_questions:
+            is_correct = pre_answer_map.get(str(question["_id"]))
+
+            if is_correct is True:
+                row.append("Correct")
+            elif is_correct is False:
+                row.append("Wrong")
+            else:
+                row.append("No answer")
+
+        if post_result:
+            row.append(f'{post_result.get("score", 0)}/{post_result.get("total", 0)}')
+        else:
+            row.append("Not taken")
+
+        post_answer_map = {}
+
+        if post_result:
+            for answer in post_result.get("answers", []):
+                post_answer_map[str(answer.get("question_id"))] = answer.get("is_correct")
+
+        for question in post_questions:
+            is_correct = post_answer_map.get(str(question["_id"]))
+
+            if is_correct is True:
+                row.append("Correct")
+            elif is_correct is False:
+                row.append("Wrong")
+            else:
+                row.append("No answer")
+
+        row.extend([
+            test_stats["mean_pre"],
+            test_stats["mean_post"],
+            test_stats["mean_gain"],
+            test_stats["t_value"],
+            test_stats["effect_size"],
+            test_stats["effect_label"]
+        ])
+
+        if feedback:
+            responses = feedback.get("responses", {})
+            sus_score = feedback.get("sus_score")
+
+            if sus_score is None:
+                sus_score = calculate_sus_score(responses)
+
+            row.append(round(sus_score, 2))
+            row.append(interpret_sus_score(sus_score))
+            row.append(feedback.get("comments", ""))
+        else:
+            row.append("No feedback")
+            row.append("No feedback")
+            row.append("")
+
+        writer.writerow(row)
+
+    response = Response(
+        output.getvalue(),
+        mimetype="text/csv"
+    )
+
+    response.headers["Content-Disposition"] = "attachment; filename=student_results_export.csv"
+
+    return response
 
 @app.route('/admin/delete_result/<result_id>', methods=['POST'])
 @login_required

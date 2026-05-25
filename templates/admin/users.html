@@ -1,7 +1,62 @@
 {% extends "base.html" %}
 
 {% block content %}
+<style>
+    .control-btn {
+        background:white;
+        color:#111827;
+        border:1px solid #e5e7eb;
+        padding:10px 14px;
+        border-radius:8px;
+        font-weight:bold;
+        cursor:pointer;
+        box-shadow:0 2px 6px rgba(0,0,0,0.04);
+    }
 
+    .control-btn:hover {
+        background:#f9fafb;
+    }
+
+    .dropdown-menu {
+        display:none;
+        position:absolute;
+        top:45px;
+        left:0;
+        min-width:220px;
+        background:white;
+        border:1px solid #e5e7eb;
+        border-radius:10px;
+        box-shadow:0 12px 24px rgba(0,0,0,0.12);
+        z-index:1000;
+        overflow:hidden;
+    }
+
+    .dropdown-right {
+        right:0;
+        left:auto;
+    }
+
+    .dropdown-menu.show {
+        display:block;
+    }
+
+    .dropdown-menu button {
+        display:block;
+        width:100%;
+        padding:12px 14px;
+        background:white;
+        border:none;
+        text-align:left;
+        cursor:pointer;
+        font-weight:600;
+        color:#374151;
+    }
+
+    .dropdown-menu button:hover {
+        background:#eef2ff;
+        color:#4f46e5;
+    }
+</style>
 <div class="main-container">
     <a href="{{ url_for('admin_dashboard') }}"
         style="display:inline-block; background:#f3f4f6; color:#374151; padding:10px 16px; border-radius:6px; font-weight:bold; text-decoration:none; margin-bottom:-30px;">
@@ -47,7 +102,42 @@
         </div>
 
     </div>
+    <!-- FILTER AND SORT CONTROLS -->
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; flex-wrap:wrap; gap:12px;">
 
+        <div style="position:relative;">
+            <button type="button" onclick="toggleDropdown('filterDropdown')" class="control-btn">
+                Show Filters ⚙
+            </button>
+
+            <div id="filterDropdown" class="dropdown-menu">
+                <button type="button" onclick="filterStudents('all')">All Students</button>
+                <button type="button" onclick="filterStudents('complete')">Completed Both Tests</button>
+                <button type="button" onclick="filterStudents('pre-only')">Pre-test Only</button>
+                <button type="button" onclick="filterStudents('post-only')">Post-test Only</button>
+                <button type="button" onclick="filterStudents('none')">No Tests Taken</button>
+            </div>
+        </div>
+
+        <div style=" color:#374151;">
+            Showing <span id="visibleStudentCount">{{ students|length }}</span> of {{ students|length }} students
+        </div>
+
+        <div style="position:relative;">
+            <button type="button" onclick="toggleDropdown('sortDropdown')" class="control-btn">
+                Sort By ▼
+            </button>
+
+            <div id="sortDropdown" class="dropdown-menu dropdown-right">
+                <button type="button" onclick="sortStudents('username-asc')">Username A-Z</button>
+                <button type="button" onclick="sortStudents('username-desc')">Username Z-A</button>
+                <button type="button" onclick="sortStudents('pre-high')">Pre-test Highest</button>
+                <button type="button" onclick="sortStudents('post-high')">Post-test Highest</button>
+                <button type="button" onclick="sortStudents('gain-high')">Score Gain Highest</button>
+            </div>
+        </div>
+
+    </div>
     <!-- STUDENT SCORES TABLE -->
     <div style="background:white; border-radius:12px; box-shadow:0 4px 12px rgba(0,0,0,0.05); overflow:hidden;">
         <table style="width:100%; border-collapse:collapse; text-align:left;">
@@ -61,7 +151,13 @@
 
             <tbody>
                 {% for student in students %}
-                <tr style="border-bottom:1px solid #f3f4f6;">
+                <tr class="student-row"
+                    data-username="{{ student.username }}"
+                    data-pre="{{ student.pre_score if student.pre_score != 'Not taken' else -1 }}"
+                    data-post="{{ student.post_score if student.post_score != 'Not taken' else -1 }}"
+                    data-gain="{% if student.pre_score != 'Not taken' and student.post_score != 'Not taken' %}{{ student.post_score - student.pre_score }}{% else %}-999{% endif %}"
+                    data-status="{% if student.pre_score != 'Not taken' and student.post_score != 'Not taken' %}complete{% elif student.pre_score != 'Not taken' and student.post_score == 'Not taken' %}pre-only{% elif student.pre_score == 'Not taken' and student.post_score != 'Not taken' %}post-only{% else %}none{% endif %}"
+                    style="border-bottom:1px solid #f3f4f6;">
                     <td style="padding:15px 20px; font-weight:bold;">
                         {{ student.username }}
                     </td>
@@ -270,6 +366,118 @@
             </tbody>
         </table>
     </div>
+    <!-- CSV EXPORT -->
+    <div style="margin-top:30px; background:white; padding:25px; border-radius:12px; box-shadow:0 4px 12px rgba(0,0,0,0.05);">
+        <h2 style="margin-top:0;">Download Complete Results</h2>
+        <p style="color:#666; margin-bottom:20px;">
+            Download a CSV file containing student scores, per-question correctness, overall test analysis, SUS scores, and comments.
+        </p>
+
+        <a href="{{ url_for('export_results_csv') }}"
+        style="display:inline-block; background:#10b981; color:white; padding:12px 18px; border-radius:8px; text-decoration:none; font-weight:bold;">
+            Download CSV
+        </a>
+    </div>
 
 </div>
+<script>
+function toggleDropdown(id) {
+    const dropdown = document.getElementById(id);
+
+    document.querySelectorAll(".dropdown-menu").forEach(menu => {
+        if (menu.id !== id) {
+            menu.classList.remove("show");
+        }
+    });
+
+    dropdown.classList.toggle("show");
+}
+
+function filterStudents(status) {
+    const rows = document.querySelectorAll(".student-row");
+
+    rows.forEach(row => {
+        const rowStatus = row.dataset.status.trim();
+
+        if (status === "all" || rowStatus === status) {
+            row.style.display = "";
+        } else {
+            row.style.display = "none";
+        }
+    });
+
+    document.getElementById("filterDropdown").classList.remove("show");
+}
+
+function sortStudents(type) {
+    const tbody = document.querySelector(".student-row").parentElement;
+    const rows = Array.from(document.querySelectorAll(".student-row"));
+
+    rows.sort((a, b) => {
+        const usernameA = a.dataset.username.toLowerCase();
+        const usernameB = b.dataset.username.toLowerCase();
+
+        const preA = Number(a.dataset.pre);
+        const preB = Number(b.dataset.pre);
+
+        const postA = Number(a.dataset.post);
+        const postB = Number(b.dataset.post);
+
+        const gainA = Number(a.dataset.gain);
+        const gainB = Number(b.dataset.gain);
+
+        if (type === "username-asc") return usernameA.localeCompare(usernameB);
+        if (type === "username-desc") return usernameB.localeCompare(usernameA);
+        if (type === "pre-high") return preB - preA;
+        if (type === "post-high") return postB - postA;
+        if (type === "gain-high") return gainB - gainA;
+    });
+
+    rows.forEach(row => tbody.appendChild(row));
+
+    document.getElementById("sortDropdown").classList.remove("show");
+}
+
+document.addEventListener("click", function(e) {
+    if (!e.target.closest(".control-btn") && !e.target.closest(".dropdown-menu")) {
+        document.querySelectorAll(".dropdown-menu").forEach(menu => {
+            menu.classList.remove("show");
+        });
+    }
+});
+
+function updateVisibleStudentCount() {
+    const rows = document.querySelectorAll(".student-row");
+    let visibleCount = 0;
+
+    rows.forEach(row => {
+        if (row.style.display !== "none") {
+            visibleCount++;
+        }
+    });
+
+    const counter = document.getElementById("visibleStudentCount");
+    if (counter) {
+        counter.textContent = visibleCount;
+    }
+}
+
+function filterStudents(status) {
+    const rows = document.querySelectorAll(".student-row");
+
+    rows.forEach(row => {
+        const rowStatus = row.dataset.status.trim();
+
+        if (status === "all" || rowStatus === status) {
+            row.style.display = "";
+        } else {
+            row.style.display = "none";
+        }
+    });
+
+    updateVisibleStudentCount();
+
+    document.getElementById("filterDropdown").classList.remove("show");
+}
+</script>
 {% endblock %}
