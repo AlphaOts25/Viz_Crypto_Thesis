@@ -606,6 +606,16 @@ def export_results_csv():
         "T-value",
         "Effect Size",
         "Effect Label",
+        "SUS Q1",
+        "SUS Q2",
+        "SUS Q3",
+        "SUS Q4",
+        "SUS Q5",
+        "SUS Q6",
+        "SUS Q7",
+        "SUS Q8",
+        "SUS Q9",
+        "SUS Q10",
         "SUS Score",
         "SUS Interpretation",
         "Comment"
@@ -692,10 +702,16 @@ def export_results_csv():
             if sus_score is None:
                 sus_score = calculate_sus_score(responses)
 
+            for i in range(1, 11):
+                row.append(responses.get(f"q{i}", ""))
+
             row.append(round(sus_score, 2))
             row.append(interpret_sus_score(sus_score))
             row.append(feedback.get("comments", ""))
         else:
+            for i in range(1, 11):
+                row.append("No feedback")
+
             row.append("No feedback")
             row.append("No feedback")
             row.append("")
