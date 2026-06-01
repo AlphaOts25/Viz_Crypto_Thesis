@@ -155,22 +155,33 @@
 
   <!-- HEADER / INTRO -->
   <div class="lesson-header" style="margin-bottom: 40px;">
-      <p style="color: #6366f1; font-weight: bold; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 1px;">Topic 3</p>
+      <p style="color: #6366f1; font-weight: bold; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 1px; ">Topic 3</p>
       <h1 style="font-size: 36px; margin-top: 0; margin-bottom: 15px;">The Key Exchange Problem</h1>
-      <p style="font-size: 18px; color: #555; line-height: 1.6;">
-          AES is mathematically unbreakable. But it has a fatal flaw: Symmetric encryption requires both the sender and receiver to have the <em>exact same secret key</em>. How do you send that key across the internet without a hacker stealing it?
+      <p style="font-size: 18px; color: #555; line-height: 1.6; text-indent: 40px;">
+          Diffie-Hellman is a key exchange method that allows two people to create the same secret key without directly sending the key to each other. It was designed to solve the key distribution problem in symmetric encryption, where both users need the same key but must avoid exposing it to attackers. Through mathematical computation, both sides can exchange public values, generate a shared secret, and use that secret for secure communication, even if someone is watching the exchange.
       </p>
   </div>
 
   <div class="study-section" style="background: #fff; border-radius: 12px; padding: 30px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); margin-bottom: 40px;">
       <h2 style="margin-top: 0; color: #333; border-bottom: 2px solid #e5e7eb; padding-bottom: 10px;">Enter Diffie-Hellman</h2>
-      <p style="color: #555; line-height: 1.6; font-size: 16px;">
-          In 1976, Whitfield Diffie and Martin Hellman solved this problem with pure mathematics. They invented a protocol that allows two people who have never met to generate a shared secret password in broad daylight, even if a hacker is listening to every single word they say.
+      <p style="color: #555; line-height: 1.6; font-size: 16px; text-indent: 40px;">
+          In the 1970s, secure communication had a serious weakness. Symmetric encryption could protect messages, but both people first needed the same secret key. The problem was how to share that key safely without meeting in person. If Alice sent the key through an open network, Eve could intercept it and later decrypt every message. This became known as the key distribution problem.
+      </p>
+      <p style="color: #555; line-height: 1.6; font-size: 16px; text-indent: 40px;">
+          In 1976, Whitfield Diffie and Martin Hellman introduced a new solution called the Diffie-Hellman key exchange. Instead of sending the secret key directly, both users exchange public values and use mathematics to generate the same shared secret independently. An attacker may see the exchanged values, but cannot easily compute the final secret. This idea became one of the foundations of modern public-key cryptography and secure online communication.
       </p>
   </div>
 
-  <h2>Diffie-Hellman Explained</h2>
+  <h2>How Does This Work?</h2>
+  <p style="font-size: 18px; color: #555; line-height: 1.6; text-indent: 40px;">
+    In this video, you will see how the Diffie-Hellman Key Exchange works as a method for creating a shared secret key. It shows how two users can exchange public values over an insecure network and still generate the same secret key without directly sending the key itself. The video also explains why this process helps solve the key distribution problem in symmetric encryption.
+  </p>  
+
   {% include "video_player.html" %}
+
+  <h2>Interactive Simulation Activity</h2>
+  <p style="font-size: 18px; color: #555; line-height: 1.6; text-indent: 40px;">
+    In this interactive simulation activity, you will apply what you learned about the Diffie-Hellman Key Exchange by observing how two users create a shared secret step by step. The activity demonstrates how public values are exchanged, how private values remain hidden, and how both sides independently compute the same shared key. This helps you understand how secure key exchange is possible even when an attacker can see the public communication.
 
   <!-- ── INTERACTIVE DIFFIE-HELLMAN SIMULATOR ── -->
   <div class="dh-wrapper">

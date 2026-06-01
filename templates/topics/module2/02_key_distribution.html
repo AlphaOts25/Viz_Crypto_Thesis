@@ -356,13 +356,68 @@ h2.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow
   <div class="lesson-header" style="margin-bottom: 40px;">
     <p style="color: #6366f1; font-weight: bold; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 1px;">Topic 2</p>
     <h1 style="font-size: 36px; margin-top: 0; margin-bottom: 15px;">The Key Distribution Problem</h1>
-    <p style="font-size: 18px; color: #555; line-height: 1.6;">
-      Symmetric algorithms like AES are mathematically unbreakable. But they all share one fatal flaw: to use a symmetric key, you must share it. If you send the key across the internet, the entire system breaks.
-    </p>
-  </div>
+    <div style="display: flex; gap: 30px; margin-top: 20px; flex-wrap: wrap;">
+     <p style="font-size: 18px; color: #555; line-height: 1.6; text-indent: 40px;">
+The key distribution problem happens because symmetric encryption depends on one shared secret key. The sender needs the key to encrypt the message, and the receiver needs the exact same key to decrypt it. The problem is not the encryption itself; the problem is how to give the receiver the key safely before communication starts.        </p> 
+    <div style="flex: 1; min-width: 260px;">
+        <h3 style="color: #f59e0b;">Unsafe Key Sharing</h3>
+        
+        <p style="color: #555; line-height: 1.6;">
+            The first challenge in key distribution is how to send the shared key safely. In symmetric encryption, both the sender and receiver must have the same secret key before they can communicate securely. If the key is sent through an unsafe network, an attacker may intercept it before encryption becomes useful.
+        </p>
+        <div style="background: #f8f9fa; padding: 15px; border-left: 4px solid #f59e0b; font-family: monospace; color: #333;">
+            Alice sends key → Eve intercepts key → Bob receives compromised key
+        </div>
+    </div>
 
-  <h1>The Problem</h1>
+    <div style="flex: 1; min-width: 260px;">
+        <h3 style="color: #f43f5e;">Key Exposure</h3>
+        <p style="color: #555; line-height: 1.6;">
+            If an attacker gets the shared key, the encrypted message is no longer protected. Even if the ciphertext looks unreadable, the attacker can use the stolen key to decrypt it. This means the security of the entire system depends on keeping the key secret.
+        </p>
+        <div style="background: #f8f9fa; padding: 15px; border-left: 4px solid #f43f5e; font-family: monospace; word-break: break-all; color: #333;">
+            Ciphertext + stolen key = readable plaintext
+        </div>
+    </div>
+
+</div>
+
+<div style="display: flex; gap: 30px; margin-top: 30px; flex-wrap: wrap;">
+
+    <div style="flex: 1; min-width: 260px;">
+        <h3 style="color: #6366f1;">Identity Verification</h3>
+        <p style="color: #555; line-height: 1.6;">
+            Another problem is knowing whether the key is being shared with the correct person. An attacker may pretend to be the receiver and trick the sender into giving them the key. If this happens, the sender may believe the communication is secure even though the attacker already has access.
+        </p>
+        <div style="background: #f8f9fa; padding: 15px; border-left: 4px solid #6366f1; font-family: monospace; color: #333;">
+            Attacker pretends to be Bob → Alice shares the key
+        </div>
+    </div>
+
+    <div style="flex: 1; min-width: 260px;">
+        <h3 style="color: #10b981;">Key Management at Scale</h3>
+        <p style="color: #555; line-height: 1.6;">
+            Key distribution becomes harder when many users need to communicate. Each pair of users may need a separate shared key. As the number of users increases, the number of keys also increases, making the system harder to manage, store, update, and protect.
+        </p>
+        <div style="background: #f8f9fa; padding: 15px; border-left: 4px solid #10b981; font-family: monospace; color: #333;">
+            More users = more shared keys to manage
+        </div>
+    </div>
+
+</div>
+<p style="font-size: 18px; color: #555; line-height: 1.6; text-indent: 40px;">
+Because of these problems, secure systems need a safer way to exchange or establish keys. This is why methods like Diffie-Hellman key exchange and public-key cryptography were developed. They help two users create or share a secret key without directly sending the key in a dangerous way.  </div>
+
+
+  <h2>How Does This Work?</h2>
+        <p style="font-size: 18px; color: #555; line-height: 1.6; text-indent: 40px;">
+In this video, you will see why the key distribution problem exists in symmetric encryption. It shows that both the sender and receiver need the same secret key before they can communicate securely. The video also explains the main challenge: if the key must be sent through an unsafe channel, an attacker may intercept it before secure communication even begins.
+        </p>   
   {% include "video_player.html" %}
+
+<h2>Interactive Simulation Activity</h2>
+        <p style="font-size: 18px; color: #555; line-height: 1.6; text-indent: 40px;">
+In this interactive simulation activity, you will apply what you learned about the key distribution problem by observing how a shared key must reach both users. The activity demonstrates that encrypting a message is not enough if the secret key itself is exposed during transfer. This helps you understand why securely sharing the key is one of the biggest problems in symmetric encryption.</p>   
 
   <h2 class="sr-only">Key distribution interactive — try every network route to send the key to Bob while Eve intercepts every path</h2>
 

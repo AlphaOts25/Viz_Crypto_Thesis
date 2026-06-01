@@ -5,9 +5,10 @@
 <div class="lesson-header" style="margin-bottom: 30px;">
     <p style="color: #6366f1; font-weight: bold; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 1px;">Module 2</p>
     <h1 style="font-size: 36px; margin-top: 0; margin-bottom: 15px;">Introduction to Symmetric Encryption</h1>
-    <p style="font-size: 18px; color: #555; line-height: 1.6; max-width: 800px;">
-        Symmetric encryption is the workhorse of modern cryptography. It is incredibly fast and efficient, relying on a beautifully simple concept: a single, shared secret key used to both lock and unlock the data. 
-    </p>
+    <p style="font-size: 18px; color: #555; line-height: 1.6; max-width: 800px; text-indent: 40px;">
+Symmetric encryption is a method of secure communication where the same secret key is used to encrypt and decrypt a message. This means that both the sender and the receiver must have access to the same key before they can communicate securely. The sender uses the key to transform plaintext into ciphertext, while the receiver uses that same key to convert the ciphertext back into readable plaintext. This process is fast and efficient, but it depends heavily on keeping the shared key secret.    </p>
+    <p style="font-size: 18px; color: #555; line-height: 1.6; max-width: 800px; text-indent: 40px;">
+The main challenge in symmetric encryption is the key distribution problem. Before two people can communicate securely, they must first find a safe way to share the secret key. If the key is sent through an insecure channel, an attacker may intercept it and use it to read the encrypted messages. This problem led to the development of key exchange methods such as the Diffie-Hellman Exchange, which allows two parties to create a shared secret key even over an insecure network. Through this module, learners will understand how shared keys are used, why key distribution is risky, and how Diffie-Hellman helps solve this problem.    </p>
 </div>
 
 <hr style="border: 0; height: 1px; background: #e5e7eb; margin: 40px 0;">
@@ -17,7 +18,7 @@
     
     <div style="display: grid; gap: 20px; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));">
         
-        <div style="background: #f8f9fa; border: 1px solid #e5e7eb; border-radius: 8px; padding: 20px; border-top: 4px solid #1f1e2e">
+        <div style="background: #f8f9fa; border: 1px solid #e5e7eb; border-radius: 8px; padding: 20px; border-top: 4px solid #6366f1">
             <h3 style="margin-top: 0; color: #333;">1. The Shared Key Concept</h3>
             <p style="color: #666; font-size: 15px; margin-bottom: 0;">
                 Explore the foundation of symmetric systems. Just like a physical padlock, the exact same key that secures the data is required to open it.
@@ -31,13 +32,13 @@
             </p>
         </div>
         -->
-        <div style="background: #f8f9fa; border: 1px solid #e5e7eb; border-radius: 8px; padding: 20px; border-top: 4px solid #1f1e2e">
+        <div style="background: #f8f9fa; border: 1px solid #e5e7eb; border-radius: 8px; padding: 20px; border-top: 4px solid #6366f1">
             <h3 style="margin-top: 0; color: #333;">2. The Key Distribution Problem</h3>
             <p style="color: #666; font-size: 15px; margin-bottom: 0;">
                 Discover the fatal flaw of symmetric encryption. If Alice and Bob are across the world, how can they safely share the secret key over the internet without a hacker stealing it?
             </p>
         </div>
-        <div style="background: #f8f9fa; border: 1px solid #e5e7eb; border-radius: 8px; padding: 20px; border-top: 4px solid #1f1e2e;">
+        <div style="background: #f8f9fa; border: 1px solid #e5e7eb; border-radius: 8px; padding: 20px; border-top: 4px solid #6366f1;">
             <h3 style="margin-top: 0; color: #333;">3. Diffie-Hellman key exchange</h3>
             <p style="color: #666; font-size: 15px; margin-bottom: 0;">
                 Explore the most famous asymmetric algorithm in the world, and learn how it uses the multiplication of massive prime numbers to lock your data.
