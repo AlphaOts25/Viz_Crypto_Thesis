@@ -1213,6 +1213,7 @@ def view_lesson(module_num, lesson_num):
     return render_template(
         template_path,
         lesson_data=current_lesson,
+        lesson_code=target_code,
         show_sidebar=True,
         pre_test_exists=db.tests.find_one({"type": "pre"}) is not None,
         post_test_exists=db.tests.find_one({"type": "post"}) is not None
@@ -1245,9 +1246,11 @@ def module_intro(module_num):
     )
 
 #-----------------------MAIN------------------------------------
+'''
 UPLOAD_FOLDER = 'static/uploads/videos'
 os.makedirs(UPLOAD_FOLDER, exist_ok=True) 
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+'''
 
 if __name__ == '__main__':
     app.run(debug=True, use_reloader=False)

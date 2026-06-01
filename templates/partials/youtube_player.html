@@ -1,0 +1,74 @@
+{% set lesson_videos = {
+    "module1_lesson1": {
+        "platform": "youtube",
+        "id": "w7w689-CIjg"
+    },
+    "module1_lesson2": {
+        "platform": "youtube",
+        "id": "dhRqmPFkhR8"
+    },
+    "module2_lesson1": {
+        "platform": "youtube",
+        "id": "Hb_rim9S-Lw"
+    },
+    "module2_lesson2": {
+        "platform": "youtube",
+        "id": "_94-qea8fm0"
+    },
+    "module2_lesson3": {
+        "platform": "youtube",
+        "id": "GhvPHhfLIpM"
+    }
+} %}
+
+{% set video = lesson_videos.get(lesson_code) %}
+
+<div style="margin:30px 0 40px 0; border-radius:12px; overflow:hidden; box-shadow:0 10px 25px rgba(0,0,0,0.1); background:#000; border:1px solid #e5e7eb;">
+
+    {% if video and video.platform == "youtube" and video.id %}
+        <div style="position:relative; width:100%; height:480px; background:#000;">
+            <iframe
+                src="https://www.youtube-nocookie.com/embed/{{ video.id }}"
+                title="YouTube Lesson Video"
+                frameborder="0"
+                referrerpolicy="origin"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                allowfullscreen
+                style="width:100%; height:100%; border:0;">
+            </iframe>
+        </div>
+        <!--
+        <a href="https://youtu.be/{{ video.id }}"
+           target="_blank"
+           style="display:block; background:#6366f1; color:white; padding:12px 18px; text-align:center; text-decoration:none; font-weight:bold;">
+            Open Video on YouTube
+        </a>
+        -->
+
+    {% elif video and video.platform == "google_drive" and video.id %}
+        <div style="position:relative; width:100%; height:480px; background:#000;">
+            <iframe
+                src="https://drive.google.com/file/d/{{ video.id }}/preview"
+                title="Google Drive Lesson Video"
+                frameborder="0"
+                allow="autoplay"
+                allowfullscreen
+                style="width:100%; height:100%; border:0;">
+            </iframe>
+        </div>
+        <!--
+        <a href="https://drive.google.com/file/d/{{ video.id }}/view"
+           target="_blank"
+           style="display:block; background:#6366f1; color:white; padding:12px 18px; text-align:center; text-decoration:none; font-weight:bold;">
+            Open Video in Google Drive
+        </a>
+        -->
+    {% else %}
+        <div style="padding:60px 20px; text-align:center; background:#f9fafb;">
+            <p style="color:#6b7280; font-size:16px; margin:0;">
+                No video assigned for this lesson.
+            </p>
+        </div>
+    {% endif %}
+
+</div>
