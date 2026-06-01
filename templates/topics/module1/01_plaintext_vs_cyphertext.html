@@ -24,25 +24,386 @@
         max-width: 100%;
         min-width: 0;
     }
+
+    .crypto-sim {
+    font-family: 'Inter', 'Segoe UI', sans-serif;
+    background: #0f172a;
+    color: #0f172a;
+    padding: 2rem;
+    border-radius: 16px;
+    margin-top: 2rem;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+  }
+
+  .crypto-sim h1 {
+    font-size: 24px;
+    font-weight: 700;
+    margin: 0 0 6px;
+  }
+
+  .crypto-sim .subtitle {
+    font-size: 14px;
+    color: #777;
+    line-height: 1.5;
+    margin-bottom: 1.5rem;
+  }
+
+  .input-panel {
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 12px;
+    padding: 1.25rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .input-panel label {
+    display: block;
+    font-size: 13px;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: #777;
+    margin-bottom: 8px;
+  }
+
+  .input-row {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  #plainInput {
+    flex: 1;
+    min-width: 220px;
+    padding: 13px 14px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-size: 15px;
+    outline: none;
+  }
+
+  #plainInput:focus {
+    border-color: #6366f1;
+  }
+
+  .btn-main,
+  .btn-reset {
+    padding: 12px 22px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    border: none;
+  }
+
+  .btn-main {
+    background: #1a1a1a;
+    color: #fff;
+  }
+
+  .btn-main:disabled {
+    background: #ddd;
+    color: #aaa;
+    cursor: not-allowed;
+  }
+
+  .btn-reset {
+    background: #fff;
+    border: 1px solid #ccc;
+    color: #555;
+  }
+
+  .step-info {
+    background: #fff;
+    border: 1px solid #ddd;
+    border-left: 4px solid #888;
+    border-radius: 12px;
+    padding: 1.25rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .step-info.encrypt {
+    border-left-color: #6366f1;
+  }
+
+  .step-info.key {
+    border-left-color: #f59e0b;
+  }
+
+  .step-info.decrypt {
+    border-left-color: #10b981;
+  }
+
+  .step-info.done {
+    border-left-color: #059669;
+  }
+
+  .step-counter {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: .5px;
+    color: #aaa;
+    font-weight: 700;
+    margin-bottom: 4px;
+  }
+
+  .step-title {
+    font-size: 17px;
+    font-weight: 700;
+    margin-bottom: 8px;
+  }
+
+  .step-body {
+    font-size: 14px;
+    color: #555;
+    line-height: 1.6;
+  }
+
+  .stage {
+    position: relative;
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 14px;
+    min-height: 310px;
+    overflow: hidden;
+    margin-bottom: 1.5rem;
+  }
+
+  .machine {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 120px;
+    height: 120px;
+    transform: translate(-50%, -50%);
+    border-radius: 50%;
+    background: #f5f5f0;
+    border: 2px solid #ddd;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 4;
+  }
+
+  .machine img {
+    width: 52px;
+    height: 52px;
+    object-fit: contain;
+  }
+
+  .machine-label {
+    font-size: 12px;
+    font-weight: 700;
+    color: #555;
+    margin-top: 6px;
+  }
+
+  .spinning {
+    animation: spin 1s linear infinite;
+  }
+
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+
+  .token {
+    position: absolute;
+    max-width: 190px;
+    padding: 12px 16px;
+    border-radius: 12px;
+    font-family: 'Courier New', monospace;
+    font-size: 14px;
+    font-weight: 700;
+    opacity: 0;
+    transition: all .8s ease;
+    word-break: break-word;
+    text-align: center;
+    z-index: 3;
+  }
+
+  .plain-token {
+    left: 35px;
+    top: 120px;
+    background: #e0f2fe;
+    color: #075985;
+    border: 1px solid #7dd3fc;
+  }
+
+  .cipher-token {
+    right: 35px;
+    top: 120px;
+    background: #fee2e2;
+    color: #991b1b;
+    border: 1px solid #fca5a5;
+  }
+
+  .key-token {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+
+    background: transparent;
+    border: none;
+    box-shadow: none;
+    padding: 0;
+    }
+
+  .stage-label {
+    position: absolute;
+    font-size: 12px;
+    font-weight: 700;
+    color: #999;
+  }
+
+  .left-label {
+    left: 35px;
+    top: 25px;
+  }
+
+  .right-label {
+    right: 35px;
+    top: 25px;
+  }
+
+  .result-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin-bottom: 1.5rem;
+  }
+
+  .result-card {
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 12px;
+    padding: 1rem;
+  }
+
+  .result-label {
+    font-size: 11px;
+    text-transform: uppercase;
+    font-weight: 700;
+    color: #888;
+    margin-bottom: 6px;
+  }
+
+  .result-value {
+    font-family: 'Courier New', monospace;
+    font-size: 14px;
+    font-weight: 700;
+    word-break: break-word;
+    color: #1a1a1a;
+  }
+
+  .controls {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  .progress {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+  }
+
+  .dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #ddd;
+  }
+
+  .dot.active {
+    background: #6366f1;
+  }
+
+  .dot.done {
+    background: #10b981;
+  }
+
+  @media (max-width: 700px) {
+    .crypto-sim {
+      padding: 1rem;
+    }
+
+    .stage {
+      min-height: 360px;
+    }
+
+    .machine {
+      width: 95px;
+      height: 95px;
+    }
+
+    .machine img {
+      width: 42px;
+      height: 42px;
+    }
+
+    .token {
+      max-width: 135px;
+      font-size: 12px;
+      padding: 10px;
+    }
+
+    .plain-token,
+    .key-token {
+      left: 15px;
+    }
+
+    .cipher-token {
+      right: 15px;
+    }
+
+    .result-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+  .key-token {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    }
+
+    .key-img {
+        width: 125px;
+        height: 125px;
+        object-fit: contain;
+        display: block;
+    }
+
+    .key-token span {
+        font-size: 16px;
+        font-weight: 700;
+        color: #92400e;
+        }
 </style>
+
 <div class="lesson-container" style="max-width: 850px; margin: 0 auto; padding-bottom: 60px;">
 
     <div class="lesson-header" style="margin-bottom: 40px;">
         <p style="color: #6366f1; font-weight: bold; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 1px;">Topic 1</p>
-        <h1 style="font-size: 36px; margin-top: 0; margin-bottom: 15px;">Plaintext vs. Ciphertext</h1>
-        <p style="font-size: 18px; color: #555; line-height: 1.6;">
-            Before we can understand complex cryptographic algorithms, we must understand the core goal of cryptography: protecting information by changing its state.
+        <h1 style="font-size: 36px; margin-top: 0; margin-bottom: 15px;">Encryption and Decryption</h1>
+        <p style="font-size: 18px; color: #555; line-height: 1.6; text-indent: 40px;">
+            Before learning how encryption works, it is important to understand the difference between plaintext and ciphertext. These two terms describe the state of data before and after it has been protected. Plaintext is the original message or information that can be easily read and understood. Ciphertext is the protected version of that message after it has been changed by an encryption process.
         </p>
     </div>
 
     <div class="study-section" style="background: #fff; border-radius: 12px; padding: 30px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); margin-bottom: 40px;">
         <h2 style="margin-top: 0; color: #333; border-bottom: 2px solid #e5e7eb; padding-bottom: 10px;">The Fundamentals</h2>
+        <p style="font-size: 18px; color: #555; line-height: 1.6; text-indent: 40px;">
+            The main purpose of encryption is to turn plaintext into ciphertext so that sensitive information remains protected. The reverse process is called decryption, where ciphertext is changed back into readable plaintext. This relationship is the foundation of cryptography: plaintext is the original data, encryption protects it, ciphertext hides it, and decryption restores it.
+        </p>
         
         <div style="display: flex; gap: 30px; margin-top: 20px;">
             <div style="flex: 1;">
                 <h3 style="color: #10b981;">Plaintext</h3>
                 <p style="color: #555; line-height: 1.6;">
-                    Plaintext is any unencrypted data. It is the original, readable message. This doesn't just mean text files; an unencrypted image, a database of passwords, or a network request are all considered "plaintext" if anyone intercepting them can read them perfectly.
+                    Plaintext can be anything that contains readable information. It may be a text message, password, email, image, file, database record, or network request. If the data can be understood without any special process, it is considered plaintext. For example, the message “Hello, meet me at 9 PM” is plaintext because anyone who sees it can immediately understand its meaning.
                 </p>
                 <div style="background: #f8f9fa; padding: 15px; border-left: 4px solid #10b981; font-family: monospace; color: #333;">
                     "Hello, meet me at 9 PM."
@@ -52,7 +413,7 @@
             <div style="flex: 1;">
                 <h3 style="color: #f43f5e;">Ciphertext</h3>
                 <p style="color: #555; line-height: 1.6;">
-                    Ciphertext is the scrambled, unreadable output of an encryption algorithm. To a computer or an attacker intercepting the data, ciphertext looks completely random. It contains the original data, but it is locked away.
+                    Ciphertext is the result of applying encryption to plaintext. It appears scrambled, random, or meaningless to anyone who does not have the correct key or method to unlock it. Even if an attacker intercepts the ciphertext, they should not be able to understand the original message. For example, the same message may become something like “U2FsdGVkX19z...” after encryption.
                 </p>
                 <div style="background: #f8f9fa; padding: 15px; border-left: 4px solid #f43f5e; font-family: monospace; word-break: break-all; color: #333;">
                     U2FsdGVkX19z... (Random Data)
@@ -60,296 +421,357 @@
             </div>
         </div>
         
-        <p style="color: #555; line-height: 1.6; margin-top: 20px; font-weight: 500;">
+        <p style="color: #555; line-height: 1.6; margin-top: 20px; font-weight: 500; text-indent: 40px;">
             The process of turning plaintext into ciphertext is called <strong>Encryption</strong>. The process of turning ciphertext back into plaintext is called <strong>Decryption</strong>.
         </p>
     </div>
 
     <h2>Plaintext vs Ciphertext</h2>
+        <p style="font-size: 18px; color: #555; line-height: 1.6; text-indent: 40px;">
+            In this video, you will see how encryption and decryption work as a complete process. It shows how a readable message, called plaintext, is transformed into an unreadable form called ciphertext to protect it from unauthorized access. The video also explains how the ciphertext can be changed back into its original readable form through decryption when the correct key or method is used.
+        </p>   
         
     {% include "video_player.html" %}
+
+    <h2>Interactive Simulation Activity</h2>
+        <p style="font-size: 18px; color: #555; line-height: 1.6; text-indent: 40px;">
+            In this interactive simulation activity, you will apply what you learned about encryption and decryption by observing how a message changes step by step. The activity demonstrates how plaintext is transformed into ciphertext during encryption, how the protected message is sent, and how it can be returned to readable plaintext through decryption. This helps you understand the process visually instead of only reading definitions.
+        </p>   
     
-    <div class="interactive-test" style="background: #1e1e2e; border-radius: 12px; padding: 30px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); color: white;">
-        <h2 style="text-align: center; color: #fff; font-size: 30px;">An Interactive Simulation</h2>
-        <h2 style="text-align:center; color: #1f1e2e; font-size: 30px;"></h2>
-        <h2 style="margin-top: 0; color: #fff; font-size: 20px;">How Does Encryption and Decryption Works?</h2>
-        <p style="color: #a6accd; font-size: 14px; margin-bottom: 20px;">Click the button to view a step-by-step demonstration of encryption and decryption, presented clearly and simply by the computer.</p>
-        <div class="crypto-wrap">
-            <div class="input-row">
-                <input id="msgInput" type="text" placeholder="Enter text to encrypt…" maxlength="40" />
-                <button id="runBtn">Encrypt / Decrypt</button>
-            </div>
+    <div class="crypto-sim">
+  <p class="subtitle">
+    Type a plaintext message, encrypt it into ciphertext, then use the generated key to decrypt it back into readable text.
+  </p>
 
-            <div class="stage" id="stage">
-                <div class="token token-plain" id="tokPlain">Hello!</div>
-                <div class="token token-key" id="tokKey">
-                    <img src="https://cdn.jsdelivr.net/npm/lucide-static@0.441.0/icons/key-round.svg"
-                        width="28" height="28"
-                        style="filter: invert(85%) sepia(40%) saturate(400%) hue-rotate(90deg); display:block;">
-                </div>
-                <div class="token token-cipher" id="tokCipher">abc123</div>
+  <div class="input-panel">
+    <label for="plainInput">Enter Plaintext</label>
+    <div class="input-row">
+      <input id="plainInput" type="text" maxlength="60" placeholder="Example: Hello Bob">
+      <button class="btn-main" id="startBtn">Start</button>
+    </div>
+  </div>
 
-                <div class="machine" id="machine">
-                <img src="{{ url_for('static', filename='elements/machine.png') }}"
-                    id="machGear"
-                    class="machine-icon"
-                    width="48" height="48"
-                    style="object-fit: contain; display: block;">
-                <span class="machine-label" id="machLabel">Machine</span>
-                </div>
-            </div>
+  <div class="step-info" id="stepBox">
+    <div class="step-counter" id="stepCounter">Step 0 of 4</div>
+    <div class="step-title" id="stepTitle">Enter a plaintext message</div>
+    <div class="step-body" id="stepBody">
+      Plaintext is the original readable message before encryption.
+    </div>
+  </div>
 
-            <div class="key-display" id="keyDisplay"></div>
+  <div class="stage" id="stage">
+    <div class="stage-label left-label">Plaintext + Key</div>
+    <div class="stage-label right-label">Ciphertext</div>
 
-            <div class="output-area" id="outputBox">
-                <div class="output-label" id="outputLabel">Ciphertext</div>
-                <div id="outputText"></div>
-            </div>
+    <div class="token plain-token" id="plainToken">Plaintext</div>
+    <div class="token key-token" id="keyToken">Key: —</div>
+    <div class="token cipher-token" id="cipherToken">Ciphertext</div>
 
-            <div class="status" id="status">Enter text and press Encrypt / Decrypt to begin.</div>
-        </div>
-        <p style="color: #a6accd; font-size: 14px; margin-bottom: 20px;">Note: There is no particular algorithm that is used during the process. This is just a visualization of how encryption and decryption works. </p>
+    <div class="machine">
+      <img src="{{ url_for('static', filename='elements/machine.png') }}" id="machineIcon">
+      <span class="machine-label" id="machineLabel">Machine</span>
+    </div>
+  </div>
+
+  <div class="result-grid">
+    <div class="result-card">
+      <div class="result-label">Plaintext</div>
+      <div class="result-value" id="plainOutput">—</div>
     </div>
 
-    <div style="margin-top: 50px; text-align: right;">
-        <a href="{{ url_for('view_lesson', module_num=1, lesson_num=2) }}" style="background: #10b981; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold; font-size: 16px; transition: background 0.2s;">
-            NEXT | Caesar Cipher
-        </a>
+    <div class="result-card">
+      <div class="result-label">Generated Key</div>
+      <div class="result-value" id="keyOutput">—</div>
     </div>
-        
+
+    <div class="result-card">
+      <div class="result-label">Ciphertext</div>
+      <div class="result-value" id="cipherOutput">—</div>
+    </div>
+  </div>
+
+  <div class="controls">
+    <button class="btn-main" id="nextBtn" disabled>Next</button>
+    <button class="btn-reset" id="resetBtn">Start Over</button>
+    <div class="progress" id="progress"></div>
+  </div>
 </div>
 
 <script>
-    (function () {
-    const msgInput  = document.getElementById('msgInput');
-    const runBtn    = document.getElementById('runBtn');
-    const tokPlain  = document.getElementById('tokPlain');
-    const tokKey    = document.getElementById('tokKey');
-    const tokCipher = document.getElementById('tokCipher');
-    const machGear  = document.getElementById('machGear');
-    const machLabel = document.getElementById('machLabel');
-    const keyDisplay  = document.getElementById('keyDisplay');
-    const outputBox   = document.getElementById('outputBox');
-    const outputLabel = document.getElementById('outputLabel');
-    const outputText  = document.getElementById('outputText');
-    const status      = document.getElementById('status');
+(function () {
+  const plainInput = document.getElementById('plainInput');
+  const startBtn = document.getElementById('startBtn');
+  const nextBtn = document.getElementById('nextBtn');
+  const resetBtn = document.getElementById('resetBtn');
 
-    let running = false;
-    const timers = [];
+  const stepBox = document.getElementById('stepBox');
+  const stepCounter = document.getElementById('stepCounter');
+  const stepTitle = document.getElementById('stepTitle');
+  const stepBody = document.getElementById('stepBody');
 
-    function delay(ms) {
-        return new Promise(res => {
-        const id = setTimeout(res, ms);
-        timers.push(id);
-        });
+  const plainToken = document.getElementById('plainToken');
+  const keyToken = document.getElementById('keyToken');
+  const cipherToken = document.getElementById('cipherToken');
+  const machineIcon = document.getElementById('machineIcon');
+  const machineLabel = document.getElementById('machineLabel');
+
+  const plainOutput = document.getElementById('plainOutput');
+  const keyOutput = document.getElementById('keyOutput');
+  const cipherOutput = document.getElementById('cipherOutput');
+  const progress = document.getElementById('progress');
+
+  let plaintext = '';
+  let ciphertext = '';
+  let key = 0;
+  let currentStep = 0;
+  let busy = false;
+
+  function delay(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+  }
+
+  function shortText(text) {
+    return text.length > 24 ? text.slice(0, 24) + '…' : text;
+  }
+
+  function generateKey() {
+    return Math.floor(Math.random() * 20) + 1;
+  }
+
+  function encryptText(text, shift) {
+    return text.split('').map(char => {
+      const code = char.charCodeAt(0);
+      if (code < 32 || code > 126) return char;
+      return String.fromCharCode(((code - 32 + shift) % 95) + 32);
+    }).join('');
+  }
+
+  function decryptText(text, shift) {
+    return text.split('').map(char => {
+      const code = char.charCodeAt(0);
+      if (code < 32 || code > 126) return char;
+      return String.fromCharCode(((code - 32 - shift + 95) % 95) + 32);
+    }).join('');
+  }
+
+  function setStep(num, title, body, colorClass) {
+    currentStep = num;
+
+    stepBox.className = 'step-info ' + colorClass;
+    stepCounter.textContent = `Step ${num} of 4`;
+    stepTitle.textContent = title;
+    stepBody.innerHTML = body;
+
+    buildProgress();
+  }
+
+  function buildProgress() {
+    progress.innerHTML = '';
+
+    for (let i = 0; i <= 4; i++) {
+      const dot = document.createElement('div');
+      dot.className = 'dot' + (i < currentStep ? ' done' : i === currentStep ? ' active' : '');
+      progress.appendChild(dot);
+    }
+  }
+
+  function resetVisuals() {
+    plainToken.style.opacity = '0';
+    keyToken.style.opacity = '0';
+    cipherToken.style.opacity = '0';
+
+    plainToken.style.left = '35px';
+    plainToken.style.top = '120px';
+    keyToken.style.left = '35px';
+    keyToken.style.top = '210px';
+    cipherToken.style.right = '35px';
+    cipherToken.style.left = 'auto';
+    cipherToken.style.top = '120px';
+
+    machineIcon.classList.remove('spinning');
+    machineLabel.textContent = 'Machine';
+  }
+
+  function resetAll() {
+    plaintext = '';
+    ciphertext = '';
+    key = 0;
+    busy = false;
+
+    plainInput.disabled = false;
+    startBtn.disabled = false;
+    nextBtn.disabled = true;
+    nextBtn.textContent = 'Next';
+
+    plainOutput.textContent = '—';
+    keyOutput.textContent = '—';
+    cipherOutput.textContent = '—';
+
+    resetVisuals();
+
+    setStep(
+      0,
+      'Enter a plaintext message',
+      'Plaintext is the original readable message before encryption.',
+      ''
+    );
+  }
+
+  async function runEncryption() {
+    if (busy) return;
+
+    plaintext = plainInput.value.trim();
+
+    if (!plaintext) {
+      setStep(
+        0,
+        'No plaintext entered',
+        'Type a message first. The simulator needs plaintext before encryption can begin.',
+        ''
+      );
+      return;
     }
 
-    function clearTimers() {
-        timers.forEach(clearTimeout);
-        timers.length = 0;
-    }
+    busy = true;
+    startBtn.disabled = true;
+    plainInput.disabled = true;
+    nextBtn.disabled = true;
 
-    /* ── Helpers ── */
-    function resetTokens() {
-        // plaintext: left side
-        tokPlain.style.transition = 'none';
-        tokPlain.style.opacity = '0';
-        tokPlain.style.left = '0px';
-        tokPlain.style.top  = '60px';
+    resetVisuals();
 
-        tokKey.style.transition = 'none';
-        tokKey.style.opacity = '0';
-        tokKey.style.left = '0px';
-        tokKey.style.top  = '130px';
+    key = generateKey();
+    ciphertext = encryptText(plaintext, key);
 
-        tokCipher.style.transition = 'none';
-        tokCipher.style.opacity = '0';
-        tokCipher.style.right = '0px';
-        tokCipher.style.left  = 'auto';
-        tokCipher.style.top   = '95px';
-    }
+    plainToken.textContent = shortText(plaintext);
+    keyToken.innerHTML = `
+        <img src="{{ url_for('static', filename='elements/key2.png') }}" 
+            alt="Key" 
+            class="key-img">
+        <span>${key}</span>
+        `;
+    cipherToken.textContent = shortText(ciphertext);
 
-    function resetUI() {
-        resetTokens();
-        machGear.className = 'machine-icon';
-        machLabel.textContent = 'Machine';
-        outputBox.classList.remove('visible');
-        keyDisplay.classList.remove('visible');
-        status.textContent = 'Enter text and press Encrypt / Decrypt to begin.';
-    }
+    plainOutput.textContent = plaintext;
+    keyOutput.textContent = '—';
+    cipherOutput.textContent = '—';
 
-    function setStatus(msg) { status.textContent = msg; }
+    setStep(
+      1,
+      'Plaintext enters the encryption process',
+      'The readable message is prepared for encryption. A secret key will be used to transform it into unreadable text.',
+      'encrypt'
+    );
 
-    // Simple Caesar-ish cipher (demo)
-    function encrypt(text) {
-        const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*';
-        return text.split('').map(() =>
-            chars[Math.floor(Math.random() * chars.length)]
-        ).join('');
-        }
-        function decrypt(text) {
-        return text;
-        }
+    await delay(300);
+    plainToken.style.opacity = '1';
+    await delay(700);
 
-    /* ── Animate tokens toward the center of the stage ── */
-    function moveToCenter() {
-        const stage = document.getElementById('stage');
-        const sw = stage.offsetWidth;
+    keyToken.style.opacity = '1';
+    await delay(700);
 
-        tokPlain.style.transition = 'opacity 0.6s ease, left 1.2s ease, top 1.2s ease';
-        tokKey.style.transition   = 'opacity 0.6s ease, left 1.2s ease, top 1.2s ease';
-        tokPlain.style.left = (sw / 2 - 90) + 'px';
-        tokPlain.style.top  = '70px';
-        tokKey.style.left   = (sw / 2 - 90) + 'px';
-        tokKey.style.top    = '130px';
-    }
+    plainToken.style.left = 'calc(50% - 95px)';
+    keyToken.style.left = 'calc(50% - 95px)';
+    await delay(1000);
 
-    function fadePlainKey() {
-        tokPlain.style.opacity = '0';
-        tokKey.style.opacity   = '0';
-    }
+    setStep(
+      2,
+      'The machine encrypts the message',
+      'The plaintext and key are processed together. The output is ciphertext, which hides the original meaning of the message.',
+      'key'
+    );
 
-    function showCipher(text) {
-  const stage = document.getElementById('stage');
-  const sw = stage.offsetWidth;
-  tokCipher.textContent = text.length > 22 ? text.slice(0,22)+'…' : text;
-  tokCipher.style.transition = 'none';
-  tokCipher.style.opacity = '0';
-  tokCipher.style.left  = (sw / 2 + 10) + 'px';
-  tokCipher.style.top   = '60px';
+    machineIcon.classList.add('spinning');
+    machineLabel.textContent = 'Encrypting';
+    await delay(1500);
 
-  requestAnimationFrame(() => requestAnimationFrame(() => {
-    tokCipher.style.transition = 'opacity 0.8s ease, left 1.2s ease';
-    tokCipher.style.opacity = '1';
-    tokCipher.style.left    = (sw - 160) + 'px';
-  }));
-}
+    plainToken.style.opacity = '0';
+    keyToken.style.opacity = '0';
+    await delay(500);
 
-    function moveCipherToCenter() {
-  const stage = document.getElementById('stage');
-  const sw = stage.offsetWidth;
-  tokCipher.style.transition = 'opacity 0.6s ease, left 1.2s ease, top 1.2s ease';
-  tokCipher.style.left = (sw / 2 + 10) + 'px';
-  tokCipher.style.top  = '70px';
-}
+    machineIcon.classList.remove('spinning');
+    machineLabel.textContent = 'Done';
 
-    function showKeyForDecrypt() {
-        const stage = document.getElementById('stage');
-        const sw = stage.offsetWidth;
-        tokKey.style.transition = 'none';
-        tokKey.style.opacity = '0';
-        tokKey.style.left = (sw - 160) + 'px';
-        tokKey.style.top  = '130px';
+    cipherToken.style.opacity = '1';
+    cipherToken.style.right = '35px';
 
-        requestAnimationFrame(() => requestAnimationFrame(() => {
-            tokKey.style.transition = 'opacity 0.8s ease, left 1.2s ease';
-            tokKey.style.opacity = '1';
-            tokKey.style.left    = (sw / 2 + 10) + 'px';
-        }));
-    }
+    keyOutput.textContent = key;
+    cipherOutput.textContent = ciphertext;
 
-    function showPlainResult(text) {
-        const stage = document.getElementById('stage');
-        const sw = stage.offsetWidth;
-        tokPlain.textContent = text.length > 22 ? text.slice(0,22)+'…' : text;
-        tokPlain.style.transition = 'none';
-        tokPlain.style.opacity = '0';
-        tokPlain.style.left = (sw / 2 + 10) + 'px';
-        tokPlain.style.top  = '95px';
+    setStep(
+      3,
+      'Ciphertext and key are produced',
+      'The ciphertext is unreadable without the key. The key must be used later to reverse the encryption.',
+      'key'
+    );
 
-        requestAnimationFrame(() => requestAnimationFrame(() => {
-        tokPlain.style.transition = 'opacity 0.8s ease, left 1.2s ease';
-        tokPlain.style.opacity = '1';
-        tokPlain.style.left    = '0px';
-        }));
-    }
+    nextBtn.disabled = false;
+    busy = false;
+  }
 
-    /* ── Main sequence ── */
-    async function runSequence() {
-        if (running) return;
-        const text = msgInput.value.trim();
-        if (!text) { setStatus('Please enter some text first.'); return; }
+  async function runDecryption() {
+    if (busy || !ciphertext) return;
 
-        running = true;
-        runBtn.disabled = true;
-        clearTimers();
-        resetUI();
+    busy = true;
+    nextBtn.disabled = true;
 
-        const key = Math.floor(Math.random() * 900 + 100);
-        const cipher = encrypt(text);
-        const recovered = text;
+    setStep(
+      4,
+      'Ciphertext is decrypted using the same key',
+      'The ciphertext and key enter the decryption process. Because the correct key is used, the original plaintext is recovered.',
+      'decrypt'
+    );
 
-        tokPlain.textContent = text.length > 22 ? text.slice(0,22)+'…' : text;
-        //keyDisplay.textContent = 'Shared key: ' + key;
+    cipherToken.style.left = 'calc(50% + 20px)';
+    cipherToken.style.right = 'auto';
 
-        // ── PHASE 1: Fade in plaintext + key on left ──
-        setStatus('Plaintext and key appear…');
-        await delay(200);
-        tokPlain.style.transition = 'opacity 0.8s ease';
-        tokKey.style.transition   = 'opacity 0.8s ease';
-        tokPlain.style.opacity = '1';
-        tokKey.style.opacity   = '1';
-        await delay(1000);
+    keyToken.style.left = 'calc(50% - 95px)';
+    keyToken.style.top = '210px';
+    keyToken.style.opacity = '1';
 
-        // ── PHASE 2: Slide toward machine ──
-        setStatus('Moving toward the machine…');
-        moveToCenter();
-        await delay(1400);
+    await delay(1000);
 
-        // ── PHASE 3: Machine spins, tokens fade ──
-        setStatus('Encrypting…');
-        machGear.className = 'machine-icon spinning';
-        machLabel.textContent = 'Encrypting';
-        fadePlainKey();
-        await delay(1800);
+    machineIcon.classList.add('spinning');
+    machineLabel.textContent = 'Decrypting';
 
-        // ── PHASE 4: Show ciphertext on right ──
-        machGear.className = 'machine-icon';
-        machLabel.textContent = 'Done';
-        setStatus('Ciphertext produced!');
+    await delay(1500);
 
-        keyDisplay.classList.add('visible');
-        outputLabel.textContent = 'Ciphertext';
-        outputText.textContent  = cipher;
-        outputBox.classList.add('visible');
+    cipherToken.style.opacity = '0';
+    keyToken.style.opacity = '0';
 
-        showCipher(cipher);
-        await delay(2200);
+    await delay(500);
 
-        // ── PHASE 5: Begin decrypt — cipher + key move to center ──
-        setStatus('Starting decryption with the same key…');
-        moveCipherToCenter();
-        await delay(800);
-        showKeyForDecrypt();
-        await delay(1400);
+    machineIcon.classList.remove('spinning');
+    machineLabel.textContent = 'Recovered';
 
-        // ── PHASE 6: Machine spins for decrypt ──
-        setStatus('Decrypting…');
-        machGear.className = 'machine-icon spinning';
-        machLabel.textContent = 'Decrypting';
-        tokCipher.style.opacity = '0';
-        tokKey.style.opacity    = '0';
-        await delay(1800);
+    const recovered = decryptText(ciphertext, key);
 
-        // ── PHASE 7: Recovered plaintext slides out left ──
-        machGear.className = 'machine-icon';
-        machLabel.textContent = 'Done';
-        setStatus('Plaintext recovered!');
+    plainToken.textContent = shortText(recovered);
+    plainToken.style.left = '35px';
+    plainToken.style.top = '120px';
+    plainToken.style.opacity = '1';
 
-        outputLabel.textContent = 'Recovered plaintext';
-        outputText.textContent  = recovered;
+    plainOutput.textContent = recovered;
 
-        showPlainResult(recovered);
-        await delay(1800);
+    setStep(
+      4,
+      'Plaintext recovered',
+      'The encrypted message has returned to its original readable form. This shows the basic relationship between encryption, key, ciphertext, and decryption.',
+      'done'
+    );
 
-        // ── Done ──
-        setStatus('Encryption ↔ Decryption complete. Same key, same message!');
-        running = false;
-        runBtn.disabled = false;
-    }
+    nextBtn.textContent = 'Completed';
+    busy = false;
+  }
 
-    runBtn.addEventListener('click', runSequence);
-    msgInput.addEventListener('keydown', e => { if (e.key === 'Enter') runSequence(); });
-    })();
+  startBtn.addEventListener('click', runEncryption);
+  nextBtn.addEventListener('click', runDecryption);
+  resetBtn.addEventListener('click', resetAll);
+
+  plainInput.addEventListener('keydown', function (e) {
+    if (e.key === 'Enter') runEncryption();
+  });
+
+  resetAll();
+})();
 </script>
 {% endblock %}

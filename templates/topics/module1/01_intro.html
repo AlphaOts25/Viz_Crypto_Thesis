@@ -22,8 +22,11 @@
 <div class="lesson-header" style="margin-bottom: 30px;">
     <p style="color: #6366f1; font-weight: bold; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 1px;">Module 1</p>
     <h1 style="font-size: 36px; margin-top: 0; margin-bottom: 15px;">Introduction to Encryption & Decryption</h1>
-    <p style="font-size: 18px; color: #555; line-height: 1.6; max-width: 800px;">
-        Welcome to the foundation of cryptography. In this module, we explore the core mechanics of how data is scrambled to hide its meaning from unauthorized eyes, and how it is unscrambled back into readable format.
+    <p style="font-size: 18px; color: #555; line-height: 1.6; max-width: 800px; text-indent: 40px;">
+        Encryption and decryption are the basic processes that make secure communication possible. Encryption changes readable information, called plaintext, into an unreadable form called ciphertext. This prevents unauthorized people from understanding the data even if they are able to access or intercept it. Decryption reverses the process by converting the ciphertext back into its original readable form, but only when the correct key or method is used.
+    </p>
+    <p style="font-size: 18px; color: #555; line-height: 1.6; max-width: 800px; text-indent: 40px;">
+        In this module, learners will understand how messages are protected as they move from one person or system to another. The focus is not only on memorizing definitions, but also on visualizing how information is transformed, protected, transmitted, and recovered. By learning encryption and decryption first, students build the foundation needed to understand more advanced cryptographic concepts such as ciphers, secret keys, key exchange, and secure communication.
     </p>
 </div>
 
@@ -34,24 +37,24 @@
     
     <div style="display: grid; gap: 20px; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));">
         
-        <div style="background: #f8f9fa; border: 1px solid #e5e7eb; border-radius: 8px; padding: 20px;">
-            <h3 style="margin-top: 0; color: #333;">1. Plaintext vs Ciphertext</h3>
+        <div style="background: #f8f9fa; border: 1px solid #e5e7eb; border-radius: 8px; padding: 20px; border-top: 4px solid #6366f1;">
+            <h3 style="margin-top: 0; color: #333;">1. The Encryption Process</h3>
             <p style="color: #666; font-size: 15px; margin-bottom: 0;">
-                Learn the vocabulary of cryptography. Understand the difference between the original readable message and the scrambled, unreadable output.
+                Learn how readable information is transformed into a hidden, unreadable format to protect it from unauthorized access.
             </p>
         </div>
 
-        <div style="background: #f8f9fa; border: 1px solid #e5e7eb; border-radius: 8px; padding: 20px;">
-            <h3 style="margin-top: 0; color: #333;">2. The Encryption Process</h3>
+        <div style="background: #f8f9fa; border: 1px solid #e5e7eb; border-radius: 8px; padding: 20px; border-top: 4px solid #6366f1;">
+            <h3 style="margin-top: 0; color: #333;">2. The Decryption Process</h3>
             <p style="color: #666; font-size: 15px; margin-bottom: 0;">
-                Visualize how an algorithm and a secret key transform $m$ (message) into $c$ (ciphertext). We will look at the mathematical formula $E(k, m) = c$.
+                Learn how encrypted information is converted back into its original readable form using the correct key or method..
             </p>
         </div>
 
-        <div style="background: #f8f9fa; border: 1px solid #e5e7eb; border-radius: 8px; padding: 20px;">
-            <h3 style="margin-top: 0; color: #333;">3. The Decryption Process</h3>
+        <div style="background: #f8f9fa; border: 1px solid #e5e7eb; border-radius: 8px; padding: 20px; border-top: 4px solid #6366f1;">
+            <h3 style="margin-top: 0; color: #333;">3. Caesar Cipher</h3>
             <p style="color: #666; font-size: 15px; margin-bottom: 0;">
-                See how the receiver reverses the process. We will explore the formula $D(k, c) = m$ and why the key is the most critical piece of the puzzle.
+                Learn a simple classical cipher that shifts letters in the alphabet to create encrypted messages.
             </p>
         </div>
 
