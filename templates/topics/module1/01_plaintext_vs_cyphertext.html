@@ -549,7 +549,7 @@ const currentCipherLeft = cipherRect.left - stageRect.left;
   }
 
   function generateKey() {
-    return "";
+    return Math.floor(Math.random() * 94) + 1;
   }
 
   function encryptText(text, shift) {
@@ -661,7 +661,7 @@ const currentCipherLeft = cipherRect.left - stageRect.left;
         <img src="{{ url_for('static', filename='elements/key2.png') }}" 
             alt="Key" 
             class="key-img">
-        <span>${key}</span>
+        <span>${''}</span>
         `;
     cipherToken.textContent = shortText(ciphertext);
 
@@ -724,7 +724,7 @@ cipherToken.offsetHeight;
 // animate ciphertext from machine to right side
 cipherToken.style.transition = 'left 1.2s ease, opacity 0.5s ease';
 cipherToken.style.opacity = '1';
-cipherToken.style.left = 'calc(100% - 90px)';
+cipherToken.style.left = 'calc(100% - 200px)';
 
     keyOutput.textContent = key;
     cipherOutput.textContent = ciphertext;
