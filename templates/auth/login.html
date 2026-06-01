@@ -10,7 +10,11 @@
     <div class="auth-left">
         <div class="auth-card">
 
-            <h2>Welcome Back</h2>
+            <img src="{{ url_for('static', filename='elements/logo.png') }}"
+            alt="Cryptography Visualizer Logo"
+            class="auth-main-logo">
+
+            <h2>Welcome</h2>
             <p class="auth-subtitle">Enter your account details to continue.</p>
 
             {% with messages = get_flashed_messages() %}
@@ -32,7 +36,7 @@
 
                 <div style="text-align:right; margin-top:-10px; margin-bottom:18px;">
                     <a href="{{ url_for('forgotpassword') }}"
-                    style="font-size:13px; color:#6366f1; font-weight:700; text-decoration:none;">
+                    style="font-size:13px; color:#0f172a; font-weight:700; text-decoration:none;">
                         Forgot Password?
                     </a>
                 </div>

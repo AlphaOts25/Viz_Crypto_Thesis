@@ -30,7 +30,7 @@
                 {% elif current_user.role == 'admin' %}
                     <a href="{{ url_for('admin_dashboard') }}">Dashboard</a>
                     <a href="{{ url_for('admin_users') }}">Results</a>
-                    <a href="#">Settings</a>
+                    <!--<a href="#">Settings</a>-->
                 {% endif %}
 
                 <a href="{{ url_for('logout') }}">Logout</a>
