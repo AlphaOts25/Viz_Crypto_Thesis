@@ -3,7 +3,83 @@
 
 {% block content %}
 <style>
-    @media (max-width: 768px) {
+
+.hero-intro {
+    max-width: 760px;
+    margin: 0 0 28px;
+    font-size: 18px;
+    line-height: 1.7;
+    color: #4b5563;
+}
+
+.cipher-preview {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    margin: 28px 0;
+    flex-wrap: wrap;
+}
+
+.cipher-box {
+    flex: 1;
+    min-width: 220px;
+    padding: 22px;
+    border-radius: 18px;
+    background: white;
+    border: 1px solid #e5e7eb;
+}
+
+.cipher-box .label {
+    display: block;
+    margin-bottom: 10px;
+    font-size: 13px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.cipher-box strong {
+    font-family: monospace;
+    font-size: 30px;
+    letter-spacing: 4px;
+}
+
+.cipher-box.plain .label,
+.cipher-box.plain strong {
+    color: #10b981;
+}
+
+.cipher-box.encrypted .label,
+.cipher-box.encrypted strong {
+    color: #f43f5e;
+}
+
+.shift-arrow {
+    text-align: center;
+    color: #6366f1;
+    font-weight: 700;
+}
+
+.shift-arrow span {
+    display: block;
+    margin-bottom: 6px;
+    font-size: 14px;
+}
+
+.shift-arrow div {
+    font-size: 34px;
+}
+
+.hero-description {
+    margin: 0;
+    padding-left: 18px;
+    border-left: 4px solid #6366f1;
+    font-size: 17px;
+    line-height: 1.7;
+    color: #374151;
+}
+
+@media (max-width: 768px) {
     .sim-stage {
         flex-direction: column;
         min-height: auto;
@@ -17,6 +93,28 @@
     #symSim {
         padding: 20px;
     }
+
+    .lesson-header {
+        padding: 28px 22px;
+    }
+
+    .lesson-header h1 {
+        font-size: 32px !important;
+    }
+
+    .hero-intro,
+    .hero-description {
+        font-size: 16px;
+    }
+
+    .cipher-preview {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .shift-arrow div {
+        transform: rotate(90deg);
+    }
 }
 </style>
 <div class="lesson-container" style="max-width: 850px; margin: 0 auto; padding-bottom: 60px;">
@@ -25,21 +123,51 @@
     <div class="lesson-header" style="margin-bottom: 40px;">
         <p style="color: #6366f1; font-weight: bold; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 1px;">Topic 2</p>
         <h1 style="font-size: 36px; margin-top: 0; margin-bottom: 15px; color: #333;">The Caesar Cipher</h1>
-        <p style="font-size: 18px; color: #555; line-height: 1.6;">
-            Named after Julius Caesar, who used it to communicate with his generals, the Caesar Cipher is one of the simplest and most widely known encryption techniques. It is a type of <strong>substitution cipher</strong> where each letter in the plaintext is replaced by a letter some fixed number of positions down the alphabet.
+        <p class="hero-intro" style = "text-indent: 40px;">
+            The Caesar Cipher is one of the earliest and simplest methods used to protect written messages. It works by replacing each letter in the original message with another letter that is a fixed number of positions away in the alphabet. For example, if the shift value is 3, the letter A becomes D, B becomes E, and C becomes F.
         </p>
-        <p style="font-size: 18px; color: #555; line-height: 1.6;">
-            For example, with a shift of 3, <strong style="color: #10b981;">A</strong> would be replaced by <strong style="color: #f43f5e;">D</strong>, <strong style="color: #10b981;">B</strong> would become <strong style="color: #f43f5e;">E</strong>, and so on. The method wraps around the alphabet, meaning <strong style="color: #10b981;">Z</strong> becomes <strong style="color: #f43f5e;">C</strong>. While easy to crack today, it formed the foundation for centuries of cryptographic advancements!
+        <p class="hero-intro" style = "text-indent: 40px;">
+            This method shows the basic idea of encryption: changing readable information into a form that is harder to understand. Although the Caesar Cipher is no longer secure for modern use, it is still important because it helps explain how substitution, shifting, keys, encryption, and decryption work in a simple and visual way. the earliest and simplest methods used to protect written messages. It works by replacing each letter in the original message with another letter that is a fixed number of positions away in the alphabet. For example, if the shift value is 3, the letter A becomes D, B becomes E, and C becomes F.
+        </p>
+
+        <div class="cipher-preview">
+            <div class="cipher-box plain">
+                <span class="label">Plaintext</span>
+                <strong>HELLO</strong>
+            </div>
+
+            <div class="shift-arrow">
+                <span>Shift +3</span>
+                <div>→</div>
+            </div>
+
+            <div class="cipher-box encrypted">
+                <span class="label">Ciphertext</span>
+                <strong>KHOOR</strong>
+            </div>
+        </div>
+
+        <p class="hero-description">
+            Named after Julius Caesar, this cipher replaces each letter with another letter a fixed number of spaces away. 
+            For example, with a shift of 3, A becomes D, B becomes E, and Z wraps around to become C. 
+            Although it is easy to break today, it remains an important starting point for understanding how encryption works.
         </p>
     </div>
 
     <!-- ── VIDEO HOLDER ── -->
-    <h2 style="color: #333;">Lesson Video</h2>
+    <h2>How Does This Work?</h2>
+        <p style="font-size: 18px; color: #555; line-height: 1.6; text-indent: 40px;">
+            In this video, you will see how encryption and decryption work as a complete process. It shows how a readable message, called plaintext, is transformed into an unreadable form called ciphertext to protect it from unauthorized access. The video also explains how the ciphertext can be changed back into its original readable form through decryption when the correct key or method is used.
+        </p>   
     {% include "video_player.html" %}
+
+    <h2>Interactive Simulation Activity</h2>
+        <p style="font-size: 18px; color: #555; line-height: 1.6; text-indent: 40px;">
+        In this interactive simulation activity, you will apply what you learned about the Caesar Cipher by observing how each letter in a message shifts step by step. The activity demonstrates how plaintext is transformed into ciphertext using a fixed shift value, and how the encrypted message can be changed back into readable plaintext by shifting the letters in reverse. This helps you understand the Caesar Cipher visually instead of only reading its definition.
+    </p>   
 
     <!-- ── INTERACTIVE SIMULATOR (Dark Theme) ── -->
     <div class="interactive-test" style="background: #1e1e2e; border-radius: 12px; padding: 30px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); color: white; margin-top: 40px;">
-        <h2 style="margin-top: 0; color: #fff; font-size: 24px;">Try It: The Caesar Cipher</h2>
         <p style="color: #a6accd; font-size: 14px; margin-bottom: 24px;">
             Set your shift key, then click Encrypt. The simulator will process one letter at a time — watch the <strong style="color: #10b981;">alphabet ruler</strong> highlight, the <strong style="color: #f43f5e;">character spotlight</strong> show the math, and the log fill in step by step.
         </p>

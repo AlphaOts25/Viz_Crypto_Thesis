@@ -96,7 +96,7 @@
   }
 
   .btn-main {
-    background: #1a1a1a;
+    background: #6366f1;
     color: #fff;
   }
 
@@ -426,7 +426,7 @@
         </p>
     </div>
 
-    <h2>Plaintext vs Ciphertext</h2>
+    <h2>How Does This Work?</h2>
         <p style="font-size: 18px; color: #555; line-height: 1.6; text-indent: 40px;">
             In this video, you will see how encryption and decryption work as a complete process. It shows how a readable message, called plaintext, is transformed into an unreadable form called ciphertext to protect it from unauthorized access. The video also explains how the ciphertext can be changed back into its original readable form through decryption when the correct key or method is used.
         </p>   
@@ -446,7 +446,7 @@
   <div class="input-panel">
     <label for="plainInput">Enter Plaintext</label>
     <div class="input-row">
-      <input id="plainInput" type="text" maxlength="60" placeholder="Example: Hello Bob">
+      <input id="plainInput" type="text" maxlength="60" placeholder="try 'Hello, World!'">
       <button class="btn-main" id="startBtn">Start</button>
     </div>
   </div>
@@ -495,6 +495,14 @@
     <button class="btn-reset" id="resetBtn">Start Over</button>
     <div class="progress" id="progress"></div>
   </div>
+
+  
+</div>
+
+<div style="margin-top: 50px; text-align: right;">
+    <a href="{{ url_for('view_lesson', module_num=1, lesson_num=2) }}" style="background: #10b981; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold; font-size: 16px; transition: background 0.2s;">
+        Next | Caesar Cipher
+    </a>
 </div>
 
 <script>
@@ -519,6 +527,11 @@
   const keyOutput = document.getElementById('keyOutput');
   const cipherOutput = document.getElementById('cipherOutput');
   const progress = document.getElementById('progress');
+
+  const stage = document.getElementById('stage');
+const cipherRect = cipherToken.getBoundingClientRect();
+const stageRect = stage.getBoundingClientRect();
+const currentCipherLeft = cipherRect.left - stageRect.left;
 
   let plaintext = '';
   let ciphertext = '';
@@ -698,8 +711,19 @@
     machineIcon.classList.remove('spinning');
     machineLabel.textContent = 'Done';
 
-    cipherToken.style.opacity = '1';
-    cipherToken.style.right = '35px';
+   // start ciphertext near the machine
+cipherToken.style.transition = 'none';
+cipherToken.style.right = 'auto';
+cipherToken.style.left = 'calc(50% + 20px)';
+cipherToken.style.opacity = '0';
+
+// force browser to read starting state
+cipherToken.offsetHeight;
+
+// animate ciphertext from machine to right side
+cipherToken.style.transition = 'left 1.2s ease, opacity 0.5s ease';
+cipherToken.style.opacity = '1';
+cipherToken.style.left = 'calc(100% - 90px)';
 
     keyOutput.textContent = key;
     cipherOutput.textContent = ciphertext;
@@ -728,32 +752,51 @@
       'decrypt'
     );
 
-    cipherToken.style.transition = 'left 1s ease, opacity 0.4s ease 0.6s';
-    keyToken.style.transition = 'left 1s ease, top 1s ease, opacity 0.4s ease 0.6s';
+    cipherToken.style.transition = 'none';
+cipherToken.style.right = 'auto';
+cipherToken.style.left = currentCipherLeft + 'px';
 
-    cipherToken.style.right = 'auto';
-    cipherToken.style.left = 'calc(50% + 20px)';
+// place key on the right side first
+keyToken.style.transition = 'none';
+keyToken.style.right = '35px';
+keyToken.style.left = 'auto';
+keyToken.style.top = '135px';
+keyToken.style.opacity = '1';
 
-    keyToken.style.left = 'calc(50% - 40px)';
-    keyToken.style.top = '210px';
+// force browser to apply starting positions
+cipherToken.offsetHeight;
+keyToken.offsetHeight;
 
-    cipherToken.style.opacity = '0';
-    keyToken.style.opacity = '0';
+// animate both toward the machine
+cipherToken.style.transition = 'left 1s ease, opacity 0.4s ease 0.6s';
+keyToken.style.transition = 'left 1s ease, top 1s ease, opacity 0.4s ease 0.6s';
 
-    await delay(1000);
+const keyRect = keyToken.getBoundingClientRect();
+const currentKeyLeft = keyRect.left - stageRect.left;
 
-    machineIcon.classList.add('spinning');
-    machineLabel.textContent = 'Decrypting';
+keyToken.style.right = 'auto';
+keyToken.style.left = currentKeyLeft + 'px';
 
-    await delay(1500);
+// force again after switching right to left
+keyToken.offsetHeight;
 
-    cipherToken.style.opacity = '0';
-    keyToken.style.opacity = '0';
+cipherToken.style.left = 'calc(50% + 20px)';
+keyToken.style.left = 'calc(50% + (-30px))';
+keyToken.style.top = '135px';
 
-    await delay(500);
+// fade while moving
+cipherToken.style.opacity = '0';
+keyToken.style.opacity = '0';
 
-    machineIcon.classList.remove('spinning');
-    machineLabel.textContent = 'Recovered';
+await delay(1500);
+
+machineIcon.classList.add('spinning');
+machineLabel.textContent = 'Decrypting';
+
+await delay(2000);
+
+machineIcon.classList.remove('spinning');
+machineLabel.textContent = 'Recovered';
 
     const recovered = decryptText(ciphertext, key);
 
