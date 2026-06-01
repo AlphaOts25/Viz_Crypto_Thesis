@@ -339,8 +339,8 @@
     }
 
     .machine img {
-      width: 42px;
-      height: 42px;
+      width: 100px;
+      height: 100px;
     }
 
     .token {
@@ -464,7 +464,7 @@
     <div class="stage-label right-label">Ciphertext</div>
 
     <div class="token plain-token" id="plainToken">Plaintext</div>
-    <div class="token key-token" id="keyToken">Key: —</div>
+    <div class="token key-token" id="keyToken"></div>
     <div class="token cipher-token" id="cipherToken">Ciphertext</div>
 
     <div class="machine">
@@ -535,7 +535,7 @@
   }
 
   function generateKey() {
-    return Math.floor(Math.random() * 20) + 1;
+    return "";
   }
 
   function encryptText(text, shift) {
@@ -582,8 +582,8 @@
 
     plainToken.style.left = '35px';
     plainToken.style.top = '120px';
-    keyToken.style.left = '35px';
-    keyToken.style.top = '210px';
+    keyToken.style.left = '10px';
+    keyToken.style.top = '130px';
     cipherToken.style.right = '35px';
     cipherToken.style.left = 'auto';
     cipherToken.style.top = '120px';
@@ -669,8 +669,15 @@
     keyToken.style.opacity = '1';
     await delay(700);
 
+    plainToken.style.transition = 'left 1s ease, opacity 0.4s ease 0.6s';
+    keyToken.style.transition = 'left 1s ease, opacity 0.4s ease 0.6s';
+
     plainToken.style.left = 'calc(50% - 95px)';
     keyToken.style.left = 'calc(50% - 95px)';
+
+    plainToken.style.opacity = '0';
+    keyToken.style.opacity = '0';
+
     await delay(1000);
 
     setStep(
@@ -721,12 +728,17 @@
       'decrypt'
     );
 
-    cipherToken.style.left = 'calc(50% + 20px)';
-    cipherToken.style.right = 'auto';
+    cipherToken.style.transition = 'left 1s ease, opacity 0.4s ease 0.6s';
+    keyToken.style.transition = 'left 1s ease, top 1s ease, opacity 0.4s ease 0.6s';
 
-    keyToken.style.left = 'calc(50% - 95px)';
+    cipherToken.style.right = 'auto';
+    cipherToken.style.left = 'calc(50% + 20px)';
+
+    keyToken.style.left = 'calc(50% - 40px)';
     keyToken.style.top = '210px';
-    keyToken.style.opacity = '1';
+
+    cipherToken.style.opacity = '0';
+    keyToken.style.opacity = '0';
 
     await delay(1000);
 
